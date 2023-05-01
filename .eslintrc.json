@@ -1,0 +1,55 @@
+{
+  "env": {
+    "browser": true,
+    "node": true
+  },
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint", "import", "simple-import-sort", "react"],
+  "extends": [
+    "next",
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "plugin:react-hooks/recommended",
+    "plugin:simple-import-sort/recommended",
+    "next/core-web-vitals"
+  ],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "no-unused-vars": "off",
+    "no-restricted-imports": ["error"],
+    "@typescript-eslint/no-empty-interface": "off",
+    "import/first": "error",
+    "import/newline-after-import": "error",
+    "@typescript-eslint/no-restricted-imports": "warn",
+    "import/no-duplicates": "error",
+    "simple-import-sort/imports": [
+      "error",
+      {
+        "groups": [
+          // `react` first, `next` second, then packages starting with a character
+          ["^react$", "^next", "^[a-z]"],
+          // Packages starting with `@`
+          ["^@"],
+          // Packages starting with `~`
+          ["^~"],
+          // Imports starting with `../`
+          ["^\\.\\.(?!/?$)", "^\\.\\./?$"],
+          // Imports starting with `./`
+          ["^\\./(?=.*/)(?!/?$)", "^\\.(?!/?$)", "^\\./?$"],
+          // Style imports
+          ["^.+\\.s?css$"],
+          // Side effect imports
+          ["^\\u0000"]
+        ]
+      }
+    ],
+    "simple-import-sort/exports": "error",
+    "react/react-in-jsx-scope": "off",
+    "react/prop-types": "off"
+  }
+}
