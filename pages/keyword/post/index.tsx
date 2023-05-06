@@ -1,60 +1,198 @@
-import { category as Category, Keyword } from '@interface/keywords';
-import { useState } from 'react';
+import 'bootstrap/dist/css/bootstrap.min.css';
+
+import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
+import { SubmitButton } from '@components/common/button';
 import NewsSelect from '@components/keyword/newsSelect';
+import { category as Category, Keyword } from '@interface/keywords';
+import { News } from '@interface/news';
+import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
+import { useNewsStore } from '@store/news';
 
-export default function KeywordPost() {
+import { keywordRepositories } from '@repositories/keyword';
+import { GetServerSideProps } from 'next';
+
+interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
+
+interface pageProps {
+  data: {
+    newsTitles: Array<NewsTitle>;
+    keywordTitles: Array<any>;
+  };
+}
+
+export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
+  const newsTitles: Array<NewsTitle> = await newsRepositories.getNewsTitles('');
+  return {
+    props: {
+      data: {
+        newsTitles,
+        keywordTitles: [],
+      },
+    },
+  };
+};
+
+export default function KeywordPost({ data }: pageProps) {
   const [keyword, setKeyword] = useState<string>('');
   const [explain, setExplain] = useState<string>('');
   const [category, setCategory] = useState<Keyword['category']>(Category.human);
   const [newsList, setNewsList] = useState<Array<number>>([]);
 
+  const isLoading = useCommonStore((state) => state.isLoading);
+  const setIsLoading = useCommonStore((state) => state.setIsLoading);
   const setIsModalUp = useCommonStore((state) => state.setIsModalup);
+  const setNewsTitleList = useNewsStore((store) => store.setNewsTitleList);
+  const newsTitleList = useNewsStore((store) => store.newsTitleList);
+
+  useEffect(() => {
+    setNewsTitleList(data.newsTitles);
+  }, []);
+
+  const submit = useCallback(async () => {
+    setIsLoading(true);
+    const result: boolean = await keywordRepositories.postKeyword({
+      keyword: keyword,
+      category: category,
+      explain: explain,
+      news: newsList,
+    });
+    setIsLoading(false);
+  }, [keyword, category, explain, newsList]);
 
   return (
     <Wrapper>
-      <Input
-        value={keyword}
-        onChange={(e) => {
-          setKeyword(e.currentTarget.value);
-        }}
-      ></Input>
-      <Input
-        value={explain}
-        onChange={(e) => {
-          setExplain(e.currentTarget.value);
-        }}
-      ></Input>
-      <Select
-        value={category}
-        onChange={(e) => {
-          setCategory(e.currentTarget.value as Category);
-        }}
-      >
-        <option value={Category.human}>인물</option>
-        <option value={Category.politics}>정치</option>
-        <option value={Category.policy}>정책</option>
-        <option value={Category.economics}>경제</option>
-        <option value={Category.social}>사회</option>
-        <option value={Category.organization}>조직</option>
-        <option value={Category.etc}>기타</option>
-      </Select>
-      <NewsSelectUp
-        onClick={() => {
-          setIsModalUp(true);
-        }}
-      ></NewsSelectUp>
-      <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList}></NewsSelect>
+      <ContentWrapper>
+        <InputWrapper>
+          <InputTitle>키워드</InputTitle>
+          <Input
+            type="text"
+            className="form-control"
+            value={keyword}
+            onChange={(e) => {
+              setKeyword(e.currentTarget.value);
+            }}
+          ></Input>
+        </InputWrapper>
+        <InputWrapper>
+          <InputTitle>설명</InputTitle>
+          <Input
+            type="textarea"
+            className="form-control"
+            value={explain}
+            onChange={(e) => {
+              setExplain(e.currentTarget.value);
+            }}
+          ></Input>
+        </InputWrapper>
+        <InputWrapper>
+          <InputTitle>카테고리</InputTitle>
+          <Select
+            className="form-select"
+            value={category}
+            onChange={(e) => {
+              setCategory(e.currentTarget.value as Category);
+            }}
+          >
+            <option value={Category.human}>인물</option>
+            <option value={Category.politics}>정치</option>
+            <option value={Category.policy}>정책</option>
+            <option value={Category.economics}>경제</option>
+            <option value={Category.social}>사회</option>
+            <option value={Category.organization}>조직</option>
+            <option value={Category.etc}>기타</option>
+          </Select>
+        </InputWrapper>
+        <InputWrapper>
+          <InputTitle>사진</InputTitle>
+          <Input type="file" className="form-control"></Input>
+        </InputWrapper>
+        <NewsSetter>
+          <SubmitButton
+            title={'뉴스 선택하기'}
+            click={() => {
+              setIsModalUp(true);
+            }}
+          />
+          <NewsWrapper>
+            {newsList.map((news) => {
+              let curTitle: string | undefined = '';
+              for (let newstitle of newsTitleList) {
+                if (newstitle.order === news) {
+                  curTitle = newstitle.title;
+                }
+              }
+              return <NewsLi key={news}>{curTitle}</NewsLi>;
+            })}
+          </NewsWrapper>
+        </NewsSetter>
+        <SubmitWrapper>
+          <SubmitButton
+            title="SUBMIT"
+            click={() => {
+              submit();
+            }}
+          />
+        </SubmitWrapper>
+        <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList}></NewsSelect>
+      </ContentWrapper>
     </Wrapper>
   );
 }
 
 const Wrapper = styled.div`
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  font-size: 18px;
+  padding-top: 100px;
+`;
+
+const ContentWrapper = styled.div`
+  width: 50%;
+  min-width: 60rem;
+`;
+const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding-top: 5px;
+  padding-bottom: 5px;
+`;
+
+const InputTitle = styled.div`
+  width: 100px;
+  font-size: 18px;
 `;
 
 const Input = styled.input``;
 const Select = styled.select``;
-const NewsSelectUp = styled.button``;
+
+const NewsSetter = styled.div`
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+`;
+
+const NewsWrapper = styled.ul`
+  padding: 0.375rem 0.75rem;
+  list-style-type: none;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+
+  margin-top: 10px;
+`;
+const NewsLi = styled.li`
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+
+  margin-bottom: 5px;
+`;
+
+const SubmitWrapper = styled.div``;

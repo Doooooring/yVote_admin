@@ -8,6 +8,8 @@ import { useEffect, useState } from 'react';
 import { News } from '@interface/news';
 import { useCommonStore } from '@store/common';
 
+import { SubmitButton } from '@components/common/button';
+import Loader from '@components/common/loader';
 import { TfiLoop } from 'react-icons/tfi';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
@@ -25,13 +27,12 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
   const [containSelected, setContainSelected] = useState<Array<NewsTitle>>([]);
 
   const newsTitleList = useNewsStore((store) => store.newsTitleList);
-  const setIsModalUp = useNewsStore((store) => store.setIsModalup);
+  const setIsModalUp = useCommonStore((store) => store.setIsModalup);
 
   const isLoading = useCommonStore((store) => store.isLoading);
   const setIsLoading = useCommonStore((store) => store.setIsLoading);
 
   useEffect(() => {
-    console.log(newsTitleList);
     const curRest: Array<NewsTitle> = [];
     const curContain: Array<NewsTitle> = [];
     newsTitleList.forEach((news) => {
@@ -43,13 +44,13 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
     });
     setNewsRest(curRest);
     setNewsContain(curContain);
-  }, []);
+  }, [newsTitleList]);
 
   function clickRest(news: NewsTitle) {
     if (restSelected.includes(news)) {
       setRestSelected(
         restSelected.filter((rest) => {
-          rest._id != news._id;
+          return rest._id != news._id;
         }),
       );
       return;
@@ -60,8 +61,8 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
   function clickContain(news: NewsTitle) {
     if (containSelected.includes(news)) {
       setContainSelected(
-        restSelected.filter((contain) => {
-          contain._id != news._id;
+        containSelected.filter((contain) => {
+          return contain._id != news._id;
         }),
       );
       return;
@@ -71,11 +72,12 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
 
   function reBuild() {
     if (isLoading) {
+      console.log('is loading');
       return;
     }
     setIsLoading(true);
-    const newRest = [];
-    const newContain = [];
+    const newRest: Array<NewsTitle> = [];
+    const newContain: Array<NewsTitle> = [];
     newsTitleList.map((news) => {
       if (newsRest.includes(news)) {
         if (restSelected.includes(news)) {
@@ -85,14 +87,16 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
         }
       } else {
         if (containSelected.includes(news)) {
-          newsRest.push(news);
+          newRest.push(news);
         } else {
           newContain.push(news);
         }
       }
     });
-    setNewsRest(newsRest);
-    setNewsContain(newsContain);
+    setNewsRest(newRest);
+    setNewsContain(newContain);
+    setContainSelected([]);
+    setRestSelected([]);
     setIsLoading(false);
   }
 
@@ -100,6 +104,7 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
     <Modal>
       <Wrapper>
         <NewsGrid>
+          <h3>전체 리스트</h3>
           <NewsUl>
             {newsRest.map((news) => {
               return (
@@ -108,6 +113,7 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
                   onClick={() => {
                     clickRest(news);
                   }}
+                  state={restSelected.includes(news)}
                 >
                   {news.title}
                 </NewsLi>
@@ -120,9 +126,10 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
             reBuild();
           }}
         >
-          <TfiLoop />
+          <TfiLoop className="reload" />
         </ButtonWrapper>
         <NewsGrid>
+          <h3>선택 리스트</h3>
           <NewsUl>
             {newsContain.map((news) => {
               return (
@@ -131,32 +138,85 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
                   onClick={() => {
                     clickContain(news);
                   }}
+                  state={containSelected.includes(news)}
                 >
                   {news.title}
                 </NewsLi>
               );
             })}
           </NewsUl>
+          <Loader />
         </NewsGrid>
-        <SaveButton
-          onClick={() => {
-            setCurNewsList(newsContain.map((news) => news.order!));
-            setIsModalUp(false);
-          }}
-        ></SaveButton>
+        <SubmitWrapper>
+          <SubmitButton
+            title={'선택 완료'}
+            click={() => {
+              setIsModalUp(false);
+              setCurNewsList(newsContain.map((news) => news.order!));
+            }}
+          ></SubmitButton>
+        </SubmitWrapper>
       </Wrapper>
     </Modal>
   );
 }
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  width: 800px;
+  background-color: white;
+  border: 1px solid #ced4da;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 50px;
+  padding-bottom: 50px;
+`;
 
-const NewsGrid = styled.div``;
+const NewsGrid = styled.div`
+  width: 50%;
+  max-height: 400px;
+  overflow: scroll;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+`;
 
-const NewsUl = styled.ul``;
+const NewsUl = styled.ul`
+  list-style-type: none;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  padding: 0.375rem 0.75rem;
+`;
 
-const NewsLi = styled.li``;
+interface newsLiProps {
+  state: boolean;
+}
 
-const ButtonWrapper = styled.div``;
+const NewsLi = styled.li<newsLiProps>`
+  background-color: ${({ state }) => (state ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)')};
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  &:hover {
+    cursor: pointer;
+  }
+  padding: 0.375rem 0.75rem;
+  margin-bottom: 10px;
+`;
 
-const SaveButton = styled.button``;
+const ButtonWrapper = styled.div`
+  display: inline-block;
+  padding-top: 30px;
+  padding-bottom: 20px;
+  & > svg {
+    width: 30px;
+    height: 30px;
+  }
+  &:hover {
+    cursor: pointer;
+  }
+`;
+
+const SubmitWrapper = styled.div`
+  padding-top: 30px;
+`;

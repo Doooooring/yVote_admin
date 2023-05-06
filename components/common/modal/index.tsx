@@ -30,11 +30,16 @@ interface WrapperProps {
 }
 
 const Wrapper = styled.div<WrapperProps>`
-  display: flex;
+  width: 100%;
+  height: 100vh;
+  display: ${({ state }) => (state ? 'flex' : 'none')};
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  position: relative;
-  backdrop-filter: blur(2px);
+  position: absolute;
+  top: 0;
+  left: 0;
+  backdrop-filter: blur(5px);
+  padding-bottom: 50px;
   z-index: 999;
 `;

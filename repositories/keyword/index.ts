@@ -6,7 +6,7 @@ import axios from 'axios';
 interface keywordToSend
   extends Partial<Pick<Keyword, 'keyword' | 'category' | 'explain' | 'news'>> {}
 
-class KeywordReposiotires {
+class KeywordRepositories {
   async getKeyword(keyname: string) {
     const response: Response<{ keyword: Keyword }> = await axios.get(
       `${HOST_URL}/admin/keyword?keyname=${keyname}`,
@@ -16,7 +16,15 @@ class KeywordReposiotires {
 
   getKeywords() {}
 
-  postKeyword(keyword: keywordToSend) {}
+  async postKeyword(keyword: keywordToSend) {
+    const response: { data: Response<{ state: boolean }> } = await axios.post(
+      `${HOST_URL}/admin/keyword}`,
+      { keyword: keyword },
+    );
+    return response.data.result.state;
+  }
 
   patchNews(keyword: keywordToSend) {}
 }
+
+export const keywordRepositories = new KeywordRepositories();

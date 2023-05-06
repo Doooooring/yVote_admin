@@ -7,10 +7,19 @@ interface NewsTitle extends Partial<Pick<News, '_id' | 'order' | 'title'>> {}
 
 class NewsRepositories {
   async getNewsTitles(search: string) {
-    const response: Response<{
-      newsList: Array<NewsTitle>;
-    }> = await axios.get(`${HOST_URL}/admin/news/newstitle/?search=${search}`);
-    return response.result.newsList;
+    console.log('is get news');
+    try {
+      const response: {
+        data: Response<{
+          newsList: Array<NewsTitle>;
+        }>;
+      } = await axios.get(`${HOST_URL}/admin/news/newstitle?search=${search}`);
+      console.log(response.data.result.newsList);
+      return response.data.result.newsList;
+    } catch (e) {
+      console.log(e);
+      return [];
+    }
   }
 }
 
