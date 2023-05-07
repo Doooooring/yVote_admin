@@ -1,4 +1,4 @@
-type Press = "조선" | "중앙" | "동아" | "한겨레" | "한경" | "매경";
+export type Press = '조선' | '중앙' | '동아' | '한겨레' | '한경' | '매경';
 
 export interface News {
   _id: string;
@@ -21,6 +21,4 @@ export interface News {
 }
 
 export interface Preview
-  extends Partial<
-    Pick<News, "_id" | "order" | "title" | "summary" | "keywords" | "state">
-  > {}
+  extends Partial<Pick<News, '_id' | 'order' | 'title' | 'summary' | 'keywords' | 'state'>> {}
