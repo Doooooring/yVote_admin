@@ -3,7 +3,10 @@ import { Response } from '@interface/basic';
 import { Keyword } from '@interface/keywords';
 import axios from 'axios';
 
-interface keywordToSend
+interface keywordToPatch
+  extends Partial<Pick<Keyword, '_id' | 'keyword' | 'category' | 'explain' | 'news'>> {}
+
+interface keywordToPost
   extends Partial<Pick<Keyword, 'keyword' | 'category' | 'explain' | 'news'>> {}
 interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
 
@@ -30,7 +33,7 @@ class KeywordRepositories {
 
   getKeywords() {}
 
-  async postKeyword(keyword: keywordToSend) {
+  async postKeyword(keyword: keywordToPost) {
     const response: { data: Response<{ state: boolean }> } = await axios.post(
       `${HOST_URL}/admin/keyword}`,
       { keyword: keyword },
@@ -38,7 +41,7 @@ class KeywordRepositories {
     return true;
   }
 
-  async patchKeyword(keyword: keywordToSend) {
+  async patchKeyword(keyword: keywordToPatch) {
     try {
       const response: { data: Response<{ state: boolean }> } = await axios.patch(
         `${HOST_URL}/admin/keyword`,

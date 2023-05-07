@@ -38,6 +38,7 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
   };
 };
 export default function KeywordPatch({ data }: pageProps) {
+  const [id, setId] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
   const [explain, setExplain] = useState<string>('');
   const [category, setCategory] = useState<Keyword['category']>(Category.human);
@@ -63,6 +64,7 @@ export default function KeywordPatch({ data }: pageProps) {
       const { keyword, category, explain, news }: Keyword = await keywordRepositories.getKeyword(
         searchWord,
       );
+      setId(id);
       setKeyword(keyword);
       setCategory(category);
       setExplain(explain);
@@ -85,13 +87,14 @@ export default function KeywordPatch({ data }: pageProps) {
   const submit = useCallback(async () => {
     setIsLoading(true);
     const result: boolean = await keywordRepositories.patchKeyword({
+      _id: id,
       keyword: keyword,
       category: category,
       explain: explain,
       news: newsList,
     });
     setIsLoading(false);
-  }, [keyword, category, explain, newsList]);
+  }, [id, keyword, category, explain, newsList]);
 
   return (
     <Wrapper>
@@ -102,7 +105,6 @@ export default function KeywordPatch({ data }: pageProps) {
           <Input
             type="text"
             className="form-control"
-            disabled={true}
             value={keyword}
             onChange={(e) => {
               setKeyword(e.currentTarget.value);
