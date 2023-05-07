@@ -14,7 +14,7 @@ export interface Keyword {
   explain: string;
   category: category;
   recent: boolean;
-  news: Array<number>; //number : news order
+  news: Array<string>; //number : news order
 }
 
 export interface KeywordToView

@@ -15,8 +15,8 @@ import { TfiLoop } from 'react-icons/tfi';
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 
 interface NewsSelectProps {
-  curNewsList: Array<number>;
-  setCurNewsList: (curList: Array<number>) => void;
+  curNewsList: Array<string>;
+  setCurNewsList: (curList: Array<string>) => void;
 }
 
 export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectProps) {
@@ -36,7 +36,7 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
     const curRest: Array<NewsTitle> = [];
     const curContain: Array<NewsTitle> = [];
     newsTitleList.forEach((news) => {
-      if (curNewsList.includes(news.order!)) {
+      if (curNewsList.includes(news._id!)) {
         curContain.push(news);
       } else {
         curRest.push(news);
@@ -152,7 +152,7 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
             title={'선택 완료'}
             click={() => {
               setIsModalUp(false);
-              setCurNewsList(newsContain.map((news) => news.order!));
+              setCurNewsList(newsContain.map((news) => news._id!));
             }}
           ></SubmitButton>
         </SubmitWrapper>

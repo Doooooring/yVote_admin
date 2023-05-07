@@ -39,7 +39,7 @@ export default function KeywordPost({ data }: pageProps) {
   const [keyword, setKeyword] = useState<string>('');
   const [explain, setExplain] = useState<string>('');
   const [category, setCategory] = useState<Keyword['category']>(Category.human);
-  const [newsList, setNewsList] = useState<Array<number>>([]);
+  const [newsList, setNewsList] = useState<Array<string>>([]);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
@@ -81,6 +81,7 @@ export default function KeywordPost({ data }: pageProps) {
           <Input
             type="textarea"
             className="form-control"
+            placeholder="의도적으로 줄 넘기고 싶으면 $ 넣기"
             value={explain}
             onChange={(e) => {
               setExplain(e.currentTarget.value);
@@ -120,7 +121,7 @@ export default function KeywordPost({ data }: pageProps) {
             {newsList.map((news) => {
               let curTitle: string | undefined = '';
               for (let newstitle of newsTitleList) {
-                if (newstitle.order === news) {
+                if (newstitle._id === news) {
                   curTitle = newstitle.title;
                 }
               }

@@ -5,13 +5,27 @@ import axios from 'axios';
 
 interface keywordToSend
   extends Partial<Pick<Keyword, 'keyword' | 'category' | 'explain' | 'news'>> {}
+interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
 
 class KeywordRepositories {
   async getKeyword(keyname: string) {
-    const response: Response<{ keyword: Keyword }> = await axios.get(
-      `${HOST_URL}/admin/keyword?keyname=${keyname}`,
+    const response: { data: Response<{ keyword: Keyword }> } = await axios.get(
+      `${HOST_URL}/admin/keyword/keyname?keyname=${keyname}`,
     );
-    return response.result.keyword;
+    return response.data.result.keyword;
+  }
+
+  async getKeywordTitles(search: string) {
+    try {
+      const response: {
+        data: Response<{
+          keywordList: Array<KeywordTitle>;
+        }>;
+      } = await axios.get(`${HOST_URL}/admin/keyword/titles?search=${search}`);
+      return response.data.result.keywordList;
+    } catch {
+      return [];
+    }
   }
 
   getKeywords() {}
@@ -21,10 +35,20 @@ class KeywordRepositories {
       `${HOST_URL}/admin/keyword}`,
       { keyword: keyword },
     );
-    return response.data.result.state;
+    return true;
   }
 
-  patchNews(keyword: keywordToSend) {}
+  async patchKeyword(keyword: keywordToSend) {
+    try {
+      const response: { data: Response<{ state: boolean }> } = await axios.patch(
+        `${HOST_URL}/admin/keyword`,
+        { keyword: keyword },
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
 }
 
 export const keywordRepositories = new KeywordRepositories();

@@ -2,19 +2,21 @@ import { create } from 'zustand';
 
 import { Keyword } from '@interface/keywords';
 
+interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
+
 interface KeywordState {
-  keywordList: Array<Keyword>;
+  keywordTitleList: Array<KeywordTitle>;
 }
 
 interface KeywordAction {
-  setKeywordList: (newList: Array<Keyword>) => void;
+  setKeywordTitleList: (newList: Array<KeywordTitle>) => void;
 }
 
-export const useNewsStore = create<KeywordState & KeywordAction>((set) => ({
-  keywordList: [],
-  setKeywordList: (newArray: Array<Keyword>) => {
+export const useKeywordStore = create<KeywordState & KeywordAction>((set) => ({
+  keywordTitleList: [],
+  setKeywordTitleList: (newArray: Array<KeywordTitle>) => {
     set(() => ({
-      keywordList: newArray,
+      keywordTitleList: newArray,
     }));
   },
 }));
