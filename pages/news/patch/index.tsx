@@ -1,4 +1,7 @@
 import { SubmitButton } from '@components/common/button';
+import SearchBox from '@components/keyword/search';
+import { SearchState } from '@components/keyword/searchState';
+import IdSelector from '@components/news/idSelector';
 import KeywordSelect from '@components/news/keywordSelect';
 import { Keyword } from '@interface/keywords';
 import { News, Press } from '@interface/news';
@@ -64,6 +67,7 @@ export default function NewsPatch({ data }: pageProps) {
 
   const [newsSearchList, setNewsSearchList] = useState<NewsTitle[]>([]);
   const [newsSearchErr, setNewsSearchErr] = useState<boolean>(false);
+  const [newsSelectorUp, setNewsSelectorup] = useState<boolean>(false);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
@@ -77,10 +81,19 @@ export default function NewsPatch({ data }: pageProps) {
   }, []);
 
   const findNews = useCallback(async (searchWord: string) => {
-    setIsLoading(true);
-    const response = await newsRepositories.getNewsTitles(searchWord);
-    setNewsSearchList(response);
-    setIsLoading(false);
+    try {
+      setIsLoading(true);
+      const response = await newsRepositories.getNewsTitles(searchWord);
+      setNewsSearchList(response);
+      setIsLoading(false);
+      return true;
+    } catch {
+      setTitle('');
+      setNewsSearchErr(true);
+      setIsLoading(false);
+      console.log('is here');
+      return false;
+    }
   }, []);
 
   const getNews = useCallback(async (id: string) => {
@@ -170,6 +183,13 @@ export default function NewsPatch({ data }: pageProps) {
 
   return (
     <Wrapper>
+      <SearchBox findKeyword={findNews} />
+      <IdSelector
+        newsSearchList={newsSearchList}
+        getNews={getNews}
+        newsSelectorUp={newsSelectorUp}
+        setNewsSelectorUp={setNewsSelectorup}
+      />
       <ContentWrapper className="mb-5">
         <InputWrapper className="pb-1 pt-1 mb-1">
           <InputTitle>제목</InputTitle>
@@ -398,6 +418,7 @@ export default function NewsPatch({ data }: pageProps) {
         </SubmitWrapper>
         <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
       </ContentWrapper>
+      <SearchState searchErr={newsSearchErr} loading={isLoading} />i
     </Wrapper>
   );
 }

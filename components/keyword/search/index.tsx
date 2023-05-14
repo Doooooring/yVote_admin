@@ -12,7 +12,7 @@ export default function SearchBox({ findKeyword }: SearchBoxProps) {
   return (
     <Wrapper>
       <InputWrapper>
-        <InputTitle>키워드 검색</InputTitle>
+        <InputTitle>검색</InputTitle>
         <Input
           type="text"
           value={searchWord}
@@ -24,6 +24,9 @@ export default function SearchBox({ findKeyword }: SearchBoxProps) {
         <SubmitButton
           title="검색"
           click={async () => {
+            console.log('is start');
+            console.log(searchWord);
+            console.log('....');
             const response = await findKeyword(searchWord);
           }}
         />
