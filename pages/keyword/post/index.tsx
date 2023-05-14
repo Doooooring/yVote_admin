@@ -15,21 +15,26 @@ import { keywordRepositories } from '@repositories/keyword';
 import { GetServerSideProps } from 'next';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
+interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
 
 interface pageProps {
   data: {
     newsTitles: Array<NewsTitle>;
-    keywordTitles: Array<any>;
+    keywordTitles: Array<KeywordTitle>;
   };
 }
 
 export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
   const newsTitles: Array<NewsTitle> = await newsRepositories.getNewsTitles('');
+  const keywordTitles: Array<KeywordTitle> = await keywordRepositories.getKeywordTitles('');
+  console.log('is her');
+  console.log(keywordTitles);
+
   return {
     props: {
       data: {
         newsTitles,
-        keywordTitles: [],
+        keywordTitles,
       },
     },
   };
@@ -133,6 +138,7 @@ export default function KeywordPost({ data }: pageProps) {
           <SubmitButton
             title="SUBMIT"
             click={() => {
+              if (isLoading) return;
               submit();
             }}
           />

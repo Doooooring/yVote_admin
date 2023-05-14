@@ -9,6 +9,7 @@ import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -59,20 +60,15 @@ export default function KeywordPatch({ data }: pageProps) {
 
   const findKeyword = useCallback(async (searchWord: string) => {
     setIsLoading(true);
-    console.log('here');
     try {
-      const { keyword, category, explain, news }: Keyword = await keywordRepositories.getKeyword(
-        searchWord,
-      );
-      setId(id);
+      const { _id, keyword, category, explain, news }: Keyword =
+        await keywordRepositories.getKeyword(searchWord);
+      setId(_id);
       setKeyword(keyword);
       setCategory(category);
       setExplain(explain);
       setNewsList(news);
       setKeywordSearchErr(false);
-      console.log(';;;');
-      console.log(news);
-      console.log(';;;');
     } catch {
       setKeyword('');
       setKeywordSearchErr(true);
