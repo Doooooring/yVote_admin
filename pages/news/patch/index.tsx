@@ -23,13 +23,14 @@ interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
 interface pageProps {
   data: {
     newsTitles: Array<NewsTitle>;
-    keywordTitles: Array<any>;
+    keywordTitles: Array<KeywordTitle>;
   };
 }
 
 export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
   const newsTitles: Array<NewsTitle> = await newsRepositories.getNewsTitles('');
   const keywordTitles: Array<KeywordTitle> = await keywordRepositories.getKeywordTitles('');
+  console.log(keywordTitles);
   return {
     props: {
       data: {
@@ -84,8 +85,13 @@ export default function NewsPatch({ data }: pageProps) {
     try {
       setIsLoading(true);
       const response = await newsRepositories.getNewsTitles(searchWord);
-      setNewsSearchList(response);
-      setIsLoading(false);
+      if (response.length == 0) {
+        Error;
+      } else {
+        setNewsSearchList(response);
+        setNewsSelectorup(true);
+        setIsLoading(false);
+      }
       return true;
     } catch {
       setTitle('');
@@ -190,7 +196,7 @@ export default function NewsPatch({ data }: pageProps) {
         newsSelectorUp={newsSelectorUp}
         setNewsSelectorUp={setNewsSelectorup}
       />
-      <ContentWrapper className="mb-5">
+      <ContentWrapper className="mb-5" state={id === ''}>
         <InputWrapper className="pb-1 pt-1 mb-1">
           <InputTitle>제목</InputTitle>
           <Input
@@ -275,6 +281,15 @@ export default function NewsPatch({ data }: pageProps) {
                 </NewsInputLayer>
               );
             })}
+            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
+              <Plus
+                onClick={() => {
+                  addNews(newsList.length);
+                }}
+              >
+                +
+              </Plus>
+            </BlankLayer>
           </LayerWrapper>
         </NewsInputWrapper>
         <JournalsWrapper className="pb-1 pt-1 mb-1">
@@ -418,7 +433,7 @@ export default function NewsPatch({ data }: pageProps) {
         </SubmitWrapper>
         <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
       </ContentWrapper>
-      <SearchState searchErr={newsSearchErr} loading={isLoading} />i
+      <SearchState searchErr={newsSearchErr} loading={isLoading} />
     </Wrapper>
   );
 }
@@ -431,7 +446,12 @@ const Wrapper = styled.div`
   padding-top: 100px;
 `;
 
-const ContentWrapper = styled.div`
+interface ContentWrapperProps {
+  state: boolean;
+}
+
+const ContentWrapper = styled.div<ContentWrapperProps>`
+  display: ${({ state }) => (state ? 'none' : 'block')};
   width: 50%;
   min-width: 60rem;
 `;
@@ -504,6 +524,19 @@ const JournalsWrapper = styled.div`
 const JournalLayer = styled.div`
   display: flex;
   flex-direction: column;
+  width: 280px;
+  height: 220px;
+`;
+
+const BlankLayer = styled.div`
+  display: flex;
+  flex-direction: column;
+  height: 220px;
+  width: 280px;
+`;
+
+const Plus = styled.div`
+  cursor: pointer;
 `;
 
 const OpinionWrapper = styled.div``;
