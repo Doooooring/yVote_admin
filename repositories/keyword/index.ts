@@ -8,7 +8,7 @@ interface keywordToPatch
 
 interface keywordToPost
   extends Partial<Pick<Keyword, 'keyword' | 'category' | 'explain' | 'news'>> {}
-interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
+export interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
 
 class KeywordRepositories {
   async getKeyword(keyname: string) {
@@ -35,7 +35,7 @@ class KeywordRepositories {
 
   async postKeyword(keyword: keywordToPost) {
     const response: { data: Response<{ state: boolean }> } = await axios.post(
-      `${HOST_URL}/admin/keyword}`,
+      `${HOST_URL}/admin/keyword`,
       { keyword: keyword },
     );
     return true;
@@ -48,6 +48,19 @@ class KeywordRepositories {
         { keyword: keyword },
       );
       return true;
+    } catch {
+      return false;
+    }
+  }
+  async deleteKeyword(id: string) {
+    try {
+      const response: { data: Response<{ state: boolean }> } = await axios.delete(
+        `${HOST_URL}/admin/keyword?id=${id}`,
+      );
+      if (!response) Error;
+      else {
+        return true;
+      }
     } catch {
       return false;
     }

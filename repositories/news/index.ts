@@ -3,7 +3,7 @@ import { Response } from '@interface/basic';
 import { News } from '@interface/news';
 import axios from 'axios';
 
-interface NewsTitle extends Partial<Pick<News, '_id' | 'order' | 'title'>> {}
+export interface NewsTitle extends Partial<Pick<News, '_id' | 'order' | 'title'>> {}
 
 export interface NewsToPost
   extends Partial<
@@ -55,18 +55,47 @@ class NewsRepositories {
   async postNews(news: NewsToPost) {
     try {
       const response: { data: Response<{ state: boolean }> } = await axios.post(
-        `${HOST_URL}/adimn/news`,
+        `${HOST_URL}/admin/news`,
         {
           news: news,
         },
       );
+      console.log(response);
       return true;
     } catch {
       return false;
     }
   }
 
-  async patchNews(news: NewsToPatch) {}
+  async patchNews(news: NewsToPatch) {
+    try {
+      const response: { data: Response<{ state: boolean }> } = await axios.patch(
+        `${HOST_URL}/admin/news`,
+        {
+          news: news,
+        },
+      );
+      console.log(response);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  async deleteNews(id: string) {
+    try {
+      const response: { data: Response<{ state: boolean }> } = await axios.delete(
+        `${HOST_URL}/admin/news?id=${id}`,
+      );
+
+      if (!response.data.result.state) Error;
+      else {
+        return true;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 export const newsRepositories = new NewsRepositories();

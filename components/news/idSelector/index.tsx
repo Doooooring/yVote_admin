@@ -24,9 +24,10 @@ export default function IdSelector({
     >
       <SelectWrapper>
         <NewsUl>
-          {newsSearchList.map((news) => {
+          {newsSearchList.map((news, idx) => {
             return (
               <NewsLi
+                key={idx}
                 onClick={async () => {
                   await getNews(news._id!);
                   setNewsSelectorUp(false);

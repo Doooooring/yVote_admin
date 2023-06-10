@@ -110,6 +110,8 @@ export default function NewsPatch({ data }: pageProps) {
       else {
         const { _id, title, summary, news, journals, keywords, state, opinions }: NewsToPatch =
           response;
+        console.log('current state');
+        console.log(state);
         setId(_id);
         setTitle(title!);
         setSummary(summary!);
@@ -127,7 +129,8 @@ export default function NewsPatch({ data }: pageProps) {
 
   const submit = useCallback(async () => {
     setIsLoading(true);
-    const result: boolean = await newsRepositories.postNews({
+    const result: boolean = await newsRepositories.patchNews({
+      _id: id,
       summary,
       title,
       state,
@@ -136,8 +139,26 @@ export default function NewsPatch({ data }: pageProps) {
       news: newsList,
       keywords: keywordList,
     });
+    setId('');
+    setSummary('');
+    setTitle('');
+    setState(true);
+    setOpinions({
+      left: '',
+      right: '',
+    });
+    setJournals([
+      {
+        press: '동아',
+        title: '',
+        link: '',
+      },
+    ]),
+      setNewsList([{ date: '', title: '', link: '' }]),
+      setKeywordList([]);
+    setIsLoading(false);
     return result;
-  }, [title, summary, newsList, journals, state, opinions, keywordList]);
+  }, [id, title, summary, newsList, journals, state, opinions, keywordList]);
 
   const addNews = useCallback(
     (idx: number) => {
@@ -356,13 +377,22 @@ export default function NewsPatch({ data }: pageProps) {
                 </JournalLayer>
               );
             })}
+            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
+              <Plus
+                onClick={() => {
+                  addJournals(journals.length);
+                }}
+              >
+                +
+              </Plus>
+            </BlankLayer>
           </LayerWrapper>
         </JournalsWrapper>
         <InputWrapper className="pb-1 pt-1 mb-1">
           <InputTitle>상태</InputTitle>
           <Select
             className="form-control"
-            value={state === true ? '최신' : '구닥다리'}
+            value={state === true ? 'true' : 'false'}
             onChange={(e) => {
               if (e.currentTarget.value === 'true') {
                 setState(true);
@@ -412,13 +442,7 @@ export default function NewsPatch({ data }: pageProps) {
           />
           <KeywordWrapper>
             {keywordList.map((keyword, idx) => {
-              let curTitle: string | undefined = '';
-              for (let keywordTitle of keywordTitleList) {
-                if (keywordTitle._id === keyword) {
-                  curTitle = keywordTitle.keyword;
-                }
-              }
-              return <KeywordLi key={idx}>{curTitle}</KeywordLi>;
+              return <KeywordLi key={idx}>{keyword}</KeywordLi>;
             })}
           </KeywordWrapper>
         </KeywordSetter>

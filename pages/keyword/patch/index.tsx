@@ -137,10 +137,6 @@ export default function KeywordPatch({ data }: pageProps) {
             <option value={Category.etc}>기타</option>
           </Select>
         </InputWrapper>
-        <InputWrapper>
-          <InputTitle>사진</InputTitle>
-          <Input type="file" className="form-control"></Input>
-        </InputWrapper>
         <NewsSetter>
           <SubmitButton
             title={'뉴스 선택하기'}

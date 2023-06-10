@@ -35,6 +35,10 @@ export default function Header() {
       setCurTab('keyword/post');
     } else if (navigation.pathname.includes('keyword/patch')) {
       setCurTab('keyword/patch');
+    } else if (navigation.pathname.includes('news/delete')) {
+      setCurTab('news/delete');
+    } else if (navigation.pathname.includes('keyword/delete')) {
+      setCurTab('keyword/delete');
     } else {
       setCurTab('home');
     }
@@ -58,6 +62,14 @@ export default function Header() {
             link={'/keyword/patch'}
             comment="키워드 수정하기"
             state={curTab === 'keyword/patch'}
+          />{' '}
+          <Blank />
+          <NavBox link={'/news/delete'} comment="뉴스 지우기" state={curTab === 'news/delete'} />
+          <Blank />
+          <NavBox
+            link={'/keyword/delete'}
+            comment="키워드 지우기"
+            state={curTab === 'keyword/delete'}
           />
         </NavigationBox>
       </HeaderBody>

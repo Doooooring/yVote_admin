@@ -24,9 +24,6 @@ export default function SearchBox({ findKeyword }: SearchBoxProps) {
         <SubmitButton
           title="검색"
           click={async () => {
-            console.log('is start');
-            console.log(searchWord);
-            console.log('....');
             const response = await findKeyword(searchWord);
           }}
         />

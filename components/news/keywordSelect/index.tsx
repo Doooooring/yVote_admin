@@ -37,7 +37,7 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: key
     const curRest: Array<KeywordTitle> = [];
     const curContain: Array<KeywordTitle> = [];
     KeywordTitleList.forEach((keyword) => {
-      if (curKeywordList.includes(keyword._id!)) {
+      if (curKeywordList.includes(keyword.keyword!)) {
         curContain.push(keyword);
       } else {
         curRest.push(keyword);
@@ -51,7 +51,7 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: key
     if (restSelected.includes(keyword)) {
       setRestSelected(
         restSelected.filter((rest) => {
-          return rest._id != keyword._id;
+          return rest.keyword != keyword.keyword;
         }),
       );
       return;
@@ -63,7 +63,7 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: key
     if (containSelected.includes(keyword)) {
       setContainSelected(
         containSelected.filter((contain) => {
-          return contain._id != keyword._id;
+          return contain.keyword != keyword.keyword;
         }),
       );
       return;
@@ -153,7 +153,7 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: key
             title={'선택 완료'}
             click={() => {
               setIsModalUp(false);
-              setCurKeywordList(keywordContain.map((keyword) => keyword._id!));
+              setCurKeywordList(keywordContain.map((keyword) => keyword.keyword!));
             }}
           ></SubmitButton>
         </SubmitWrapper>
