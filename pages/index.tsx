@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 
 import { newsRepositories } from '@repositories/news';
 import { useNewsStore } from '@store/news';
+import { useRouter } from 'next/router';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 
@@ -31,7 +32,9 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 
 const Home = ({ data }: pageProps) => {
   const setNewsTitleList = useNewsStore((state) => state.setNewsTitleList);
+  const router = useRouter();
   useEffect(() => {
+    router.push('/news/post');
     setNewsTitleList(data.newsTitles);
   }, []);
 
