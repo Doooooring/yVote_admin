@@ -1,17 +1,19 @@
-import { News, Press } from '@interface/news';
+import { News, commentType } from '@interface/news';
 import { useCommonStore } from '@store/common';
 import { clone } from '@utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
+import CommentModal from '@components/news/commenModal';
 import KeywordSelect from '@components/news/keywordSelect';
 import { Keyword } from '@interface/keywords';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useKeywordStore } from '@store/keyword';
+import { useNewsStore } from '@store/news';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
@@ -39,30 +41,38 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 export default function NewsPost({ data }: pageProps) {
   const [title, setTitle] = useState<string>('');
   const [summary, setSummary] = useState<string>('');
-  const [newsList, setNewsList] = useState<News['news']>([
+  const [timeline, setTimeline] = useState<News['timeline']>([
     {
-      date: '',
-      title: '',
-      link: '',
+      date: '2022.08',
+      title: '테스트 제목입니다',
     },
-  ]);
-  const [journals, setJournals] = useState<News['journals']>([
     {
-      press: '조선',
-      title: '',
-      link: '',
+      date: '2022.08',
+      title: '테스트 제목입니다',
+    },
+    {
+      date: '2022.08',
+      title: '테스트 제목입니다',
     },
   ]);
   const [state, setState] = useState<boolean>(true);
   const [opinions, setOpinions] = useState<News['opinions']>({
-    left: '',
-    right: '',
+    left: 'aaaaaaa',
+    right: 'bbbbbbbbbb',
   });
+  const [comments, setComments] = useState<
+    Array<{
+      type: commentType;
+      data: Array<{ title: string; comment: string }>;
+    }>
+  >([]);
   const [keywordList, setKeywordList] = useState<Array<string>>([]);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
-  const setIsModalUp = useCommonStore((state) => state.setIsModalup);
+  const setIsSelectorModalUp = useCommonStore((state) => state.setIsSelectorModalUp);
+
+  const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
 
   const setKeywordTitleList = useKeywordStore((state) => state.setKeywordTitleList);
   const keywordTitleList = useKeywordStore((state) => state.keywordTitleList);
@@ -71,89 +81,117 @@ export default function NewsPost({ data }: pageProps) {
     setKeywordTitleList(data.keywordTitles);
   }, []);
 
-  const submit = useCallback(async () => {
+  const commentTypeKey = Object.keys(commentType) as Array<commentType>;
+
+  const submit = async () => {
     setIsLoading(true);
-    const result: boolean = await newsRepositories.postNews({
-      summary,
-      title,
-      state,
-      opinions,
-      journals,
-      news: newsList,
-      keywords: keywordList,
+    const commentsToSend = {} as {
+      [key in commentType]?: Array<{
+        title: string;
+        comment: string;
+      }>;
+    };
+    comments.forEach((item) => {
+      const { type, data } = item;
+      commentsToSend[type] = data;
     });
-    if (result) {
-      setSummary('');
-      setTitle('');
-      setState(true);
-      setOpinions({
-        left: '',
-        right: '',
+    try {
+      const result: boolean = await newsRepositories.postNews({
+        summary,
+        title,
+        state,
+        opinions,
+        timeline,
+        comments: commentsToSend,
+        keywords: keywordList,
       });
-      setJournals([
-        {
-          press: '동아',
-          title: '',
-          link: '',
-        },
-      ]),
-        setNewsList([{ date: '', title: '', link: '' }]),
+      if (result) {
+        setSummary('');
+        setTitle('');
+        setTimeline([]);
+        setState(true);
+        setOpinions({
+          left: '',
+          right: '',
+        });
+        setComments([]);
         setKeywordList([]);
-      alert('잘감');
-      setIsLoading(false);
-    } else {
+        alert('잘감');
+      } else {
+        alert('안감');
+      }
+    } catch (e) {
       alert('안감');
+      console.log(e);
+    } finally {
       setIsLoading(false);
     }
-  }, [title, summary, newsList, journals, state, opinions, keywordList]);
+  };
 
-  const addNews = useCallback(
-    (idx: number) => {
-      const curNewsList = clone(newsList);
-      curNewsList.splice(idx + 1, 0, {
-        date: '',
-        title: '',
-        link: '',
+  const commentRest: commentType[] = useMemo(() => {
+    const curComments = comments;
+    let restComment: commentType[] = [];
+    commentTypeKey.forEach((commentType) => {
+      const result = curComments.filter((comment) => {
+        return comment.type === commentType;
       });
-
-      setNewsList(curNewsList);
-    },
-    [newsList],
-  );
-
-  const deleteNews = useCallback(
-    (idx: number) => {
-      if (newsList.length == 1) {
-        return;
+      if (result.length === 0) {
+        restComment.push(commentType);
       }
-      const curNewsList = clone(newsList);
-      curNewsList.splice(idx, 1);
-      setNewsList(curNewsList);
+    });
+    return restComment;
+  }, [comments]);
+
+  const editComment = (comment: {
+    type: commentType;
+    data: Array<{ title: string; comment: string }>;
+  }) => {
+    let index = null;
+    for (let i = 0; i < comments.length; i++) {
+      const cur = comments[i];
+      if (cur.type === comment.type) {
+        index = i;
+        break;
+      }
+    }
+
+    if (index === null) return;
+    const newComments = clone(comments);
+    newComments[index] = comment;
+    setComments(newComments);
+    setCommentSelected(comment);
+  };
+
+  const addComments = (idx: number) => {
+    if (commentRest.length === 0) return;
+    const curComments = clone(comments);
+    const curType = commentRest[0];
+    const newComment = { type: curType, data: [] };
+    curComments.splice(idx + 1, 0, newComment);
+    setComments(curComments);
+  };
+
+  const deleteComments = useCallback(
+    (idx: number) => {
+      const curComments = clone(comments);
+      curComments.splice(idx, 1);
+      setComments(curComments);
     },
-    [newsList],
+    [comments],
   );
 
-  const addJournals = useCallback(
-    (idx: number) => {
-      const curJournals = clone(journals);
-      curJournals.splice(idx + 1, 0, {
-        press: '조선',
-        title: '',
-        link: '',
-      });
-      setJournals(curJournals);
-    },
-    [journals],
-  );
+  const addTimeline = (idx: number) => {
+    const curTimeline = clone(timeline);
+    const newData = { date: '', title: '' };
+    curTimeline.splice(idx + 1, 0, newData);
+    setTimeline(curTimeline);
+  };
 
-  const deleteJournals = useCallback(
-    (idx: number) => {
-      const curJournals = clone(journals);
-      curJournals.splice(idx, 1);
-      setJournals(curJournals);
-    },
-    [journals],
-  );
+  const deleteTimeline = (idx: number) => {
+    const curTimeline = clone(timeline);
+    curTimeline.splice(idx, 1);
+    setTimeline(curTimeline);
+  };
 
   return (
     <Wrapper>
@@ -181,12 +219,70 @@ export default function NewsPost({ data }: pageProps) {
             }}
           ></Input>
         </InputWrapper>
-        <NewsInputWrapper className="pb-1 pt-1 mb-1">
+        <TimelineInputWrapper className="pb-1 pt-1 mb-1">
+          <LayerTitleWrapper>
+            <InputTitle>평론</InputTitle>
+          </LayerTitleWrapper>
+          <LayerWrapper className="px-3 pb-3 pt-3">
+            {timeline.map((item, idx) => {
+              return (
+                <NewsInputLayer className="shadow p-3 bg-white rounded">
+                  <ButtonWrapper>
+                    <Button className="btn btn-primary" onClick={() => addTimeline(idx)}>
+                      {' '}
+                      추가{' '}
+                    </Button>
+                    <Button className="btn btn-secondary" onClick={() => deleteTimeline(idx)}>
+                      {' '}
+                      삭제{' '}
+                    </Button>
+                  </ButtonWrapper>
+                  <InputWrapper>
+                    <SubInputTitle>날짜</SubInputTitle>
+                    <SubInput
+                      type="text"
+                      className="form-control"
+                      value={item.date}
+                      onChange={(e) => {
+                        const curTimeline = clone(timeline);
+                        curTimeline[idx].date = e.currentTarget.value;
+                        setTimeline(curTimeline);
+                      }}
+                    ></SubInput>
+                  </InputWrapper>
+                  <InputWrapper>
+                    <SubInputTitle>제목</SubInputTitle>
+                    <SubInput
+                      type="text"
+                      className="form-control"
+                      value={item.title}
+                      onChange={(e) => {
+                        const curTimeline = clone(timeline);
+                        curTimeline[idx].title = e.currentTarget.value;
+                        setTimeline(curTimeline);
+                      }}
+                    ></SubInput>
+                  </InputWrapper>
+                </NewsInputLayer>
+              );
+            })}
+            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
+              <Plus
+                onClick={() => {
+                  addTimeline(timeline.length);
+                }}
+              >
+                +
+              </Plus>
+            </BlankLayer>
+          </LayerWrapper>
+        </TimelineInputWrapper>
+        {/* <TimelineInputWrapper className="pb-1 pt-1 mb-1">
           <LayerTitleWrapper>
             <InputTitle>관련 뉴스</InputTitle>
           </LayerTitleWrapper>
           <LayerWrapper className="px-3 pb-3 pt-3">
-            {newsList.map((news, idx) => {
+            {comments.map((comment, idx) => {
               return (
                 <NewsInputLayer key={idx} className="shadow p-3 bg-white rounded">
                   <ButtonWrapper>
@@ -207,9 +303,9 @@ export default function NewsPost({ data }: pageProps) {
                       placeholder="xxxx.xx 형식으로 넣으세요"
                       value={news.date}
                       onChange={(e) => {
-                        const curNewsList = clone(newsList);
-                        curNewsList[idx].date = e.currentTarget.value;
-                        setNewsList(curNewsList);
+                        const curComments = clone(comments);
+                        curComments[idx].date = e.currentTarget.value;
+                        setComments(curComments);
                       }}
                     ></SubInput>
                   </InputWrapper>
@@ -220,9 +316,9 @@ export default function NewsPost({ data }: pageProps) {
                       className="form-control"
                       value={news.link}
                       onChange={(e) => {
-                        const curNewsList = clone(newsList);
-                        curNewsList[idx].link = e.currentTarget.value;
-                        setNewsList(curNewsList);
+                        const curComments = clone(comments);
+                        curComments[idx].link = e.currentTarget.value;
+                        setComments(curComments);
                       }}
                     ></SubInput>
                   </InputWrapper>
@@ -233,9 +329,9 @@ export default function NewsPost({ data }: pageProps) {
                       className="form-control"
                       value={news.title}
                       onChange={(e) => {
-                        const curNewsList = clone(newsList);
-                        curNewsList[idx].title = e.currentTarget.value;
-                        setNewsList(curNewsList);
+                        const curComments = clone(comments);
+                        curComments[idx].title = e.currentTarget.value;
+                        setComments(curComments);
                       }}
                     ></SubInput>
                   </InputWrapper>
@@ -245,59 +341,56 @@ export default function NewsPost({ data }: pageProps) {
             <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
               <Plus
                 onClick={() => {
-                  addNews(newsList.length);
+                  addNews(comments.length);
                 }}
               >
                 +
               </Plus>
             </BlankLayer>
           </LayerWrapper>
-        </NewsInputWrapper>
-        <JournalsWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>저널</InputTitle>
-          <LayerWrapper className="px-3 pb-3 pt-3">
-            {journals.map((journal, idx) => {
+        </TimelineInputWrapper> */}
+        {/* <NewsInputWrapper className="pb-1 pt-1 mb-1">
+          <LayerTitleWrapper>
+            <InputTitle>관련 뉴스</InputTitle>
+          </LayerTitleWrapper>
+         <LayerWrapper className="px-3 pb-3 pt-3">
+            {comments.map((news, idx) => {
               return (
-                <JournalLayer key={idx} className="shadow p-3 bg-white rounded">
+                <NewsInputLayer key={idx} className="shadow p-3 bg-white rounded">
                   <ButtonWrapper>
-                    <Button className="btn btn-primary" onClick={() => addJournals(idx)}>
+                    <Button className="btn btn-primary" onClick={() => addNews(idx)}>
                       {' '}
                       추가{' '}
                     </Button>
-                    <Button className="btn btn-secondary" onClick={() => deleteJournals(idx)}>
+                    <Button className="btn btn-secondary" onClick={() => deleteNews(idx)}>
                       {' '}
                       삭제{' '}
                     </Button>
                   </ButtonWrapper>
                   <InputWrapper>
-                    <SubInputTitle>언론사</SubInputTitle>
-                    <PressSelect
-                      className="form-select"
-                      value={journal.press}
+                    <SubInputTitle>날짜</SubInputTitle>
+                    <SubInput
+                      type="text"
+                      className="form-control"
+                      placeholder="xxxx.xx 형식으로 넣으세요"
+                      value={news.date}
                       onChange={(e) => {
-                        const curJournals = clone(journals);
-                        curJournals[idx].press = e.currentTarget.value as Press;
-                        setJournals(curJournals);
+                        const curComments = clone(comments);
+                        curComments[idx].date = e.currentTarget.value;
+                        setComments(curComments);
                       }}
-                    >
-                      <option value="조선">조선</option>
-                      <option value="중앙">중앙</option>
-                      <option value="동아">동아</option>
-                      <option value="한겨레">한겨레</option>
-                      <option value="한경">한경</option>
-                      <option value="매경">매경</option>
-                    </PressSelect>
+                    ></SubInput>
                   </InputWrapper>
                   <InputWrapper>
                     <SubInputTitle>링크</SubInputTitle>
                     <SubInput
                       type="text"
                       className="form-control"
-                      value={journal.link}
+                      value={news.link}
                       onChange={(e) => {
-                        const curJournals = clone(journals);
-                        curJournals[idx].link = e.currentTarget.value;
-                        setJournals(curJournals);
+                        const curComments = clone(comments);
+                        curComments[idx].link = e.currentTarget.value;
+                        setComments(curComments);
                       }}
                     ></SubInput>
                   </InputWrapper>
@@ -306,13 +399,69 @@ export default function NewsPost({ data }: pageProps) {
                     <SubInput
                       type="text"
                       className="form-control"
-                      value={journal.title}
+                      value={news.title}
                       onChange={(e) => {
-                        const curJournals = clone(journals);
-                        curJournals[idx].title = e.currentTarget.value;
-                        setJournals(curJournals);
+                        const curComments = clone(comments);
+                        curComments[idx].title = e.currentTarget.value;
+                        setComments(curComments);
                       }}
                     ></SubInput>
+                  </InputWrapper>
+                </NewsInputLayer>
+              );
+            })}
+            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
+              <Plus
+                onClick={() => {
+                  addNews(comments.length);
+                }}
+              >
+                +
+              </Plus>
+            </BlankLayer>
+          </LayerWrapper>
+        </NewsInputWrapper> */}
+        <CommentWrapper className="pb-1 pt-1 mb-1">
+          <InputTitle>평론</InputTitle>
+          <LayerWrapper className="px-3 pb-3 pt-3">
+            {comments.map((comment, idx) => {
+              return (
+                <JournalLayer key={idx} className="shadow p-3 bg-white rounded">
+                  <ButtonWrapper>
+                    <Button className="btn btn-primary" onClick={() => addComments(idx)}>
+                      {' '}
+                      추가{' '}
+                    </Button>
+                    <Button className="btn btn-secondary" onClick={() => deleteComments(idx)}>
+                      {' '}
+                      삭제{' '}
+                    </Button>
+                  </ButtonWrapper>
+                  <InputWrapper>
+                    <SubInputTitle>평론 타입</SubInputTitle>
+                    <CommentSelect
+                      className="form-select"
+                      value={comment.type}
+                      onChange={(e) => {
+                        const curComments = clone(comments);
+                        curComments[idx].type = e.currentTarget.value as commentType;
+                        setComments(curComments);
+                      }}
+                    >
+                      {commentTypeKey.map((comment, idx) => {
+                        return (
+                          <option key={comment + JSON.stringify(idx)} value={comment}>
+                            {comment}
+                          </option>
+                        );
+                      })}
+                    </CommentSelect>
+                    <div
+                      className="comment-modal-button btn btn-primary"
+                      onClick={() => setCommentSelected(comment)}
+                    >
+                      내용 채우기
+                    </div>
                   </InputWrapper>
                 </JournalLayer>
               );
@@ -320,14 +469,14 @@ export default function NewsPost({ data }: pageProps) {
             <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
               <Plus
                 onClick={() => {
-                  addJournals(journals.length);
+                  addComments(comments.length);
                 }}
               >
                 +
               </Plus>
             </BlankLayer>
           </LayerWrapper>
-        </JournalsWrapper>
+        </CommentWrapper>
         <InputWrapper className="pb-1 pt-1 mb-1">
           <InputTitle>상태</InputTitle>
           <Select
@@ -377,7 +526,7 @@ export default function NewsPost({ data }: pageProps) {
           <SubmitButton
             title={'키워드 선택하기'}
             click={() => {
-              setIsModalUp(true);
+              setIsSelectorModalUp(true);
             }}
           />
           <KeywordWrapper>
@@ -396,10 +545,12 @@ export default function NewsPost({ data }: pageProps) {
           />
         </SubmitWrapper>
         <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
+        <CommentModal editComment={editComment} />
       </ContentWrapper>
     </Wrapper>
   );
 }
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -413,6 +564,7 @@ const ContentWrapper = styled.div`
   width: 50%;
   min-width: 60rem;
 `;
+
 const InputWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -451,7 +603,7 @@ const SubInput = styled.input`
   width: 200px;
 `;
 
-const NewsInputWrapper = styled.div`
+const TimelineInputWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;
@@ -474,18 +626,20 @@ const NewsInputLayer = styled.div`
   flex-direction: column;
 `;
 
-const JournalsWrapper = styled.div`
+const CommentWrapper = styled.div`
   display: flex;
   flex-direction: column;
 `;
 
 const JournalLayer = styled.div`
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
 `;
 
 const BlankLayer = styled.div`
   display: flex;
+  flex: 0 0 auto;
   flex-direction: column;
   height: 220px;
   width: 280px;
@@ -501,7 +655,7 @@ const InputBody = styled.div`
   gap: 20px;
 `;
 
-const PressSelect = styled.select`
+const CommentSelect = styled.select`
   width: 200px;
 `;
 

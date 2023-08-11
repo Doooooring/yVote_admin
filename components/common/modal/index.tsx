@@ -6,17 +6,17 @@ interface ModalProps {
 }
 
 export default function Modal({ children }: ModalProps) {
-  const [isModalUp, setIsModalUp] = useCommonStore((state) => [
-    state.isModalUp,
-    state.setIsModalup,
+  const [isSelectorModalUp, setIsSelectorModalUp] = useCommonStore((state) => [
+    state.isSelectorModalUp,
+    state.setIsSelectorModalUp,
   ]);
 
   return (
     <Wrapper
-      state={isModalUp}
+      state={isSelectorModalUp}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
-          setIsModalUp(false);
+          setIsSelectorModalUp(false);
         }
       }}
     >

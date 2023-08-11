@@ -6,23 +6,22 @@ import axios from 'axios';
 export interface NewsTitle extends Partial<Pick<News, '_id' | 'order' | 'title'>> {}
 
 export interface NewsToPost
-  extends Partial<
-    Pick<News, 'news' | 'summary' | 'title' | 'state' | 'opinions' | 'keywords' | 'journals'>
+  extends Pick<
+    News,
+    'title' | 'summary' | 'keywords' | 'state' | 'timeline' | 'comments' | 'opinions'
   > {}
 export interface NewsToPatch extends NewsToPost {
   _id: string;
 }
 class NewsRepositories {
   async getNewsTitles(search: string) {
-    console.log('is get news');
     try {
       const response: {
         data: Response<{
-          newsList: Array<NewsTitle>;
+          news: Array<NewsTitle>;
         }>;
-      } = await axios.get(`${HOST_URL}/admin/news/newstitle?search=${search}`);
-      console.log(response.data.result.newsList);
-      return response.data.result.newsList;
+      } = await axios.get(`${HOST_URL}/admin/news/title?search=${search}`);
+      return response.data.result.news;
     } catch (e) {
       console.log(e);
       return [];
@@ -35,7 +34,7 @@ class NewsRepositories {
         data: Response<{
           news: NewsToPatch;
         }>;
-      } = await axios.get(`${HOST_URL}/admin/news/id?id=${id}`);
+      } = await axios.get(`${HOST_URL}/admin/news/${id}`);
       return response.data.result.news;
     } catch {
       return false;
@@ -48,7 +47,8 @@ class NewsRepositories {
         data: Response<{
           news: News;
         }>;
-      } = await axios.get(`${HOST_URL}/admin/news/newstitle`);
+      } = await axios.get(`${HOST_URL}/admin/news/title?search=${search}`);
+      return response.data.result.news;
     } catch {}
   }
 
@@ -57,10 +57,158 @@ class NewsRepositories {
       const response: { data: Response<{ state: boolean }> } = await axios.post(
         `${HOST_URL}/admin/news`,
         {
-          news: news,
+          title: '더미데이터 제목입니다',
+          summary:
+            '더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.더미데이터 내용입니다.$ 더미데이터 내용입니다. 더미데이터 내용입니다. 더미데이터 내용입니다.',
+          keywords: [],
+          state: true,
+          timeline: [
+            {
+              date: '2017.08.12',
+              title: '더미데이터 입니다.',
+            },
+            {
+              date: '2017.08.12',
+              title: '더미데이터 입니다.',
+            },
+            {
+              date: '2017.08.12',
+              title: '더미데이터 입니다.',
+            },
+          ],
+          opinions: {
+            left: '왼쪽 의견 입니다.',
+            right: '오른쪽 의견입니다.',
+          },
+          comments: {
+            전략가: [
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+            ],
+            개혁가: [
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+            ],
+            관찰자: [
+              {
+                title: 'test1',
+                comment: 'test1 comment',
+              },
+            ],
+          },
         },
+        // {
+        //   news: news,
+        // },
       );
-      console.log(response);
       return true;
     } catch {
       return false;
@@ -75,7 +223,6 @@ class NewsRepositories {
           news: news,
         },
       );
-      console.log(response);
       return true;
     } catch {
       return false;

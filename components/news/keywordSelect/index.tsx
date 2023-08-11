@@ -28,7 +28,7 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: key
   const [containSelected, setContainSelected] = useState<Array<KeywordTitle>>([]);
 
   const KeywordTitleList = useKeywordStore((store) => store.keywordTitleList);
-  const setIsModalUp = useCommonStore((store) => store.setIsModalup);
+  const setIsSelectorModalUp = useCommonStore((store) => store.setIsSelectorModalUp);
 
   const isLoading = useCommonStore((store) => store.isLoading);
   const setIsLoading = useCommonStore((store) => store.setIsLoading);
@@ -152,7 +152,7 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: key
           <SubmitButton
             title={'선택 완료'}
             click={() => {
-              setIsModalUp(false);
+              setIsSelectorModalUp(false);
               setCurKeywordList(keywordContain.map((keyword) => keyword.keyword!));
             }}
           ></SubmitButton>

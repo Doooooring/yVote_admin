@@ -1,21 +1,21 @@
 import { create } from 'zustand';
 
 interface CommonState {
-  isModalUp: boolean;
+  isSelectorModalUp: boolean;
   isLoading: boolean;
 }
 
 interface CommonAction {
-  setIsModalup: (state: boolean) => void;
+  setIsSelectorModalUp: (state: boolean) => void;
   setIsLoading: (state: boolean) => void;
 }
 
 export const useCommonStore = create<CommonState & CommonAction>((set) => ({
-  isModalUp: false,
+  isSelectorModalUp: false,
   isLoading: false,
-  setIsModalup: (state: boolean) => {
+  setIsSelectorModalUp: (state: boolean) => {
     set(() => ({
-      isModalUp: state,
+      isSelectorModalUp: state,
     }));
   },
   setIsLoading: (state: boolean) => {

@@ -27,7 +27,7 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
   const [containSelected, setContainSelected] = useState<Array<NewsTitle>>([]);
 
   const newsTitleList = useNewsStore((store) => store.newsTitleList);
-  const setIsModalUp = useCommonStore((store) => store.setIsModalup);
+  const setIsSelectorModalUp = useCommonStore((store) => store.setIsSelectorModalUp);
 
   const isLoading = useCommonStore((store) => store.isLoading);
   const setIsLoading = useCommonStore((store) => store.setIsLoading);
@@ -154,7 +154,7 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
           <SubmitButton
             title={'선택 완료'}
             click={() => {
-              setIsModalUp(false);
+              setIsSelectorModalUp(false);
               setCurNewsList(newsContain.map((news) => news._id!));
             }}
           ></SubmitButton>
