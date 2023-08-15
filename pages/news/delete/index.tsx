@@ -70,8 +70,13 @@ export default function NewsDelete({ data }: pageProps) {
 
   return (
     <Wrapper>
-      <div className='delete-all'>
-        <div className='btn btn-primary' >
+      <div className="delete-all">
+        <div
+          className="btn btn-primary"
+          onClick={() => {
+            newsRepositories.deleteNewsAll();
+          }}
+        >
           전체 삭제
         </div>
       </div>
