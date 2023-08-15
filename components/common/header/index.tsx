@@ -26,7 +26,6 @@ export default function Header() {
       console.log("it's error");
       return;
     }
-    console.log('is here');
     if (navigation.pathname.includes('news/post')) {
       setCurTab('news/post');
     } else if (navigation.pathname.includes('news/patch')) {

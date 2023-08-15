@@ -72,6 +72,7 @@ export default function CommentModal({ editComment }: CommentModalProps) {
                       const curInput = curComment.data[idx];
                       curInput.title = e.target.value;
                       editComment(curComment);
+                      setCommentSelected(curComment);
                     }}
                   ></input>
                 </div>
@@ -87,13 +88,14 @@ export default function CommentModal({ editComment }: CommentModalProps) {
                       const curInput = curComment.data[idx];
                       curInput.comment = e.target.value;
                       editComment(curComment);
+                      setCommentSelected(curComment);
                     }}
                   ></input>
                 </div>
               </InputLayer>
             );
           })}
-          <div className="blank-layer p-3 bg-white rounded justify-content-center align-items-center">
+          <InputLayer className="shadow p-3 bg-white rounded">
             <div
               className="plus"
               onClick={() => {
@@ -102,7 +104,7 @@ export default function CommentModal({ editComment }: CommentModalProps) {
             >
               +
             </div>
-          </div>
+          </InputLayer>
         </div>
       </div>
     </Wrapper>
@@ -117,12 +119,12 @@ interface WrapperProps {
 
 const Wrapper = styled.div<WrapperProps>`
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: ${({ state }) => (state ? 'flex' : 'none')};
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   background-color: rgb(0, 0, 0, 0.5);
@@ -130,8 +132,13 @@ const Wrapper = styled.div<WrapperProps>`
   z-index: 999;
   div.dialog {
     background-color: white;
+    height: 600px;
+    overflow: scroll;
   }
   div.dialog-body {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
   }
   div.blank-layer {
     display: flex;
@@ -144,6 +151,10 @@ const Wrapper = styled.div<WrapperProps>`
 const InputLayer = styled.div`
   display: flex;
   flex-direction: column;
+  width: 500px;
+  height: 300px;
+  justify-content: center;
+  align-items: center;
   div.button-wrapper {
     display: flex;
     flex-direction: row;

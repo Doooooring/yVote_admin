@@ -32,7 +32,7 @@ interface pageProps {
 export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
   const newsTitles: Array<NewsTitle> = await newsRepositories.getNewsTitles('');
   const keywordTitles: Array<KeywordTitle> = await keywordRepositories.getKeywordTitles('');
-  console.log(keywordTitles);
+
   return {
     props: {
       data: {
@@ -96,7 +96,7 @@ export default function NewsPatch({ data }: pageProps) {
       setTitle('');
       setNewsSearchErr(true);
       setIsLoading(false);
-      console.log('is here');
+
       return false;
     }
   }, []);
@@ -131,8 +131,9 @@ export default function NewsPatch({ data }: pageProps) {
     }
   }, []);
 
-  const submit = useCallback(async () => {
+  const submit = async () => {
     setIsLoading(true);
+
     const commentsToSend = {} as {
       [key in commentType]?: Array<{
         title: string;
@@ -143,29 +144,41 @@ export default function NewsPatch({ data }: pageProps) {
       const { type, data } = item;
       commentsToSend[type] = data;
     });
-    const result: boolean = await newsRepositories.patchNews({
-      _id: id,
-      summary,
-      title,
-      state,
-      opinions,
-      timeline,
-      comments: commentsToSend,
-      keywords: keywordList,
-    });
-    setId('');
-    setSummary('');
-    setTitle('');
-    setTimeline([]);
-    setState(true);
-    setOpinions({
-      left: '',
-      right: '',
-    });
-    setKeywordList([]);
-    setIsLoading(false);
-    return result;
-  }, [id, title, summary, state, opinions, keywordList]);
+
+    try {
+      const result: boolean = await newsRepositories.patchNews({
+        _id: id,
+        summary,
+        title,
+        state,
+        opinions,
+        timeline,
+        comments: commentsToSend,
+        keywords: keywordList,
+      });
+      if (!result) {
+        Error();
+        return;
+      }
+
+      setId('');
+      setSummary('');
+      setTitle('');
+      setTimeline([]);
+      setState(true);
+      setOpinions({
+        left: '',
+        right: '',
+      });
+      setKeywordList([]);
+
+      return result;
+    } catch (e) {
+      alert('다시 시도해보세요.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const commentRest: commentType[] = useMemo(() => {
     const curComments = comments;
@@ -179,6 +192,10 @@ export default function NewsPatch({ data }: pageProps) {
       }
     });
     return restComment;
+  }, [comments]);
+
+  useEffect(() => {
+    console.log(comments);
   }, [comments]);
 
   const editComment = (comment: {

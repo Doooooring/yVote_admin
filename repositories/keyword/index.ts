@@ -13,7 +13,7 @@ export interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> 
 class KeywordRepositories {
   async getKeyword(keyname: string) {
     const response: { data: Response<{ keyword: Keyword }> } = await axios.get(
-      `${HOST_URL}/admin/keyword/keyname?keyname=${keyname}`,
+      `${HOST_URL}/admin/keywords/${keyname}`,
     );
     return response.data.result.keyword;
   }
@@ -22,10 +22,10 @@ class KeywordRepositories {
     try {
       const response: {
         data: Response<{
-          keywordList: Array<KeywordTitle>;
+          keywords: Array<KeywordTitle>;
         }>;
-      } = await axios.get(`${HOST_URL}/admin/keyword/titles?search=${search}`);
-      return response.data.result.keywordList;
+      } = await axios.get(`${HOST_URL}/admin/keywords/keyword?search=${search}`);
+      return response.data.result.keywords;
     } catch {
       return [];
     }
@@ -35,7 +35,7 @@ class KeywordRepositories {
 
   async postKeyword(keyword: keywordToPost) {
     const response: { data: Response<{ state: boolean }> } = await axios.post(
-      `${HOST_URL}/admin/keyword`,
+      `${HOST_URL}/admin/keywords`,
       { keyword: keyword },
     );
     return true;
@@ -44,7 +44,7 @@ class KeywordRepositories {
   async patchKeyword(keyword: keywordToPatch) {
     try {
       const response: { data: Response<{ state: boolean }> } = await axios.patch(
-        `${HOST_URL}/admin/keyword`,
+        `${HOST_URL}/admin/keywords`,
         { keyword: keyword },
       );
       return true;
@@ -55,7 +55,7 @@ class KeywordRepositories {
   async deleteKeyword(id: string) {
     try {
       const response: { data: Response<{ state: boolean }> } = await axios.delete(
-        `${HOST_URL}/admin/keyword?id=${id}`,
+        `${HOST_URL}/admin/keywords?id=${id}`,
       );
       if (!response) Error;
       else {

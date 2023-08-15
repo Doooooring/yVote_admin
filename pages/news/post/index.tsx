@@ -159,7 +159,6 @@ export default function NewsPost({ data }: pageProps) {
     const newComments = clone(comments);
     newComments[index] = comment;
     setComments(newComments);
-    setCommentSelected(comment);
   };
 
   const addComments = (idx: number) => {
