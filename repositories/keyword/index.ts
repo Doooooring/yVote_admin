@@ -65,6 +65,12 @@ class KeywordRepositories {
       return false;
     }
   }
+
+  async deleteKeywordAll() {
+    const response: { data: Response<{ state: boolean }> } = await axios.delete(
+      `${HOST_URL}/admin/keywords/kmj123/deleteAll`,
+    );
+  }
 }
 
 export const keywordRepositories = new KeywordRepositories();

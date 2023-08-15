@@ -70,6 +70,11 @@ export default function NewsDelete({ data }: pageProps) {
 
   return (
     <Wrapper>
+      <div className='delete-all'>
+        <div className='btn btn-primary' >
+          전체 삭제
+        </div>
+      </div>
       <SearchBox findKeyword={findNews} />
       <SelectWrapper>
         <NewsUl>

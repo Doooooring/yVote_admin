@@ -251,6 +251,19 @@ class NewsRepositories {
       return false;
     }
   }
+  async deleteNewsAll() {
+    try {
+      const response: { data: Response<{ state: boolean }> } = await axios.delete(
+        `${HOST_URL}/admin/news/kmj123/deleteAll`,
+      );
+      if (!response.data.result.state) Error;
+      else {
+        return true;
+      }
+    } catch (e) {
+      return false;
+    }
+  }
 }
 
 export const newsRepositories = new NewsRepositories();
