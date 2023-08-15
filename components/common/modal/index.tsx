@@ -6,17 +6,17 @@ interface ModalProps {
 }
 
 export default function Modal({ children }: ModalProps) {
-  const [isModalUp, setIsModalUp] = useCommonStore((state) => [
-    state.isModalUp,
-    state.setIsModalup,
+  const [isSelectorModalUp, setIsSelectorModalUp] = useCommonStore((state) => [
+    state.isSelectorModalUp,
+    state.setIsSelectorModalUp,
   ]);
 
   return (
     <Wrapper
-      state={isModalUp}
+      state={isSelectorModalUp}
       onClick={(e) => {
         if (e.target === e.currentTarget) {
-          setIsModalUp(false);
+          setIsSelectorModalUp(false);
         }
       }}
     >
@@ -31,15 +31,15 @@ interface WrapperProps {
 
 const Wrapper = styled.div<WrapperProps>`
   width: 100%;
-  height: 100vh;
+  height: 100%;
   display: ${({ state }) => (state ? 'flex' : 'none')};
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
-  backdrop-filter: blur(5px);
+  background-color: rgba(0, 0, 0, 0.5);
   padding-bottom: 50px;
   z-index: 999;
 `;

@@ -48,7 +48,7 @@ export default function KeywordPatch({ data }: pageProps) {
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
-  const setIsModalUp = useCommonStore((state) => state.setIsModalup);
+  const setIsSelectorModalUp = useCommonStore((state) => state.setIsSelectorModalUp);
   const setNewsTitleList = useNewsStore((store) => store.setNewsTitleList);
   const newsTitleList = useNewsStore((store) => store.newsTitleList);
   const setKeywordTitleList = useKeywordStore((store) => store.setKeywordTitleList);
@@ -141,7 +141,7 @@ export default function KeywordPatch({ data }: pageProps) {
           <SubmitButton
             title={'뉴스 선택하기'}
             click={() => {
-              setIsModalUp(true);
+              setIsSelectorModalUp(true);
             }}
           />
           <NewsWrapper>
