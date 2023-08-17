@@ -220,7 +220,7 @@ export default function NewsPost({ data }: pageProps) {
         </InputWrapper>
         <TimelineInputWrapper className="pb-1 pt-1 mb-1">
           <LayerTitleWrapper>
-            <InputTitle>평론</InputTitle>
+            <InputTitle>타임 라인</InputTitle>
           </LayerTitleWrapper>
           <LayerWrapper className="px-3 pb-3 pt-3">
             {timeline.map((item, idx) => {
@@ -521,6 +521,10 @@ export default function NewsPost({ data }: pageProps) {
             ></Input>
           </InputBody>
         </OpinionWrapper>
+        <div className="img-file">
+          <InputTitle>이미지</InputTitle>
+          <input type="file" className="form-control"></input>
+        </div>
         <KeywordSetter>
           <SubmitButton
             title={'키워드 선택하기'}
@@ -557,6 +561,13 @@ const Wrapper = styled.div`
   width: 100vw;
   font-size: 18px;
   padding-top: 100px;
+  & {
+    div.img-file {
+      display: flex;
+      flex-direction: row;
+      margin-bottom: 10px;
+    }
+  }
 `;
 
 const ContentWrapper = styled.div`

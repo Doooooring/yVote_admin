@@ -284,7 +284,7 @@ export default function NewsPatch({ data }: pageProps) {
         </InputWrapper>
         <TimelineInputWrapper className="pb-1 pt-1 mb-1">
           <LayerTitleWrapper>
-            <InputTitle>평론</InputTitle>
+            <InputTitle>타임 라인</InputTitle>
           </LayerTitleWrapper>
           <LayerWrapper className="px-3 pb-3 pt-3">
             {timeline.map((item, idx) => {
