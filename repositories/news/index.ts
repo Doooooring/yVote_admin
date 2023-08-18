@@ -237,6 +237,23 @@ class NewsRepositories {
     }
   }
 
+  async postImage(id: string, img: File) {
+    try {
+      const formData = new FormData();
+      formData.append('img', img);
+
+      const response = await axios.post(`${HOST_URL}/admin/news/img/${id}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data.success;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+
   async deleteNews(id: string) {
     try {
       const response: { data: Response<{ state: boolean }> } = await axios.delete(

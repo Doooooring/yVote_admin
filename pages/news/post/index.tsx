@@ -521,10 +521,7 @@ export default function NewsPost({ data }: pageProps) {
             ></Input>
           </InputBody>
         </OpinionWrapper>
-        <div className="img-file">
-          <InputTitle>이미지</InputTitle>
-          <input type="file" className="form-control"></input>
-        </div>
+
         <KeywordSetter>
           <SubmitButton
             title={'키워드 선택하기'}

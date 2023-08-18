@@ -30,10 +30,14 @@ export default function Header() {
       setCurTab('news/post');
     } else if (navigation.pathname.includes('news/patch')) {
       setCurTab('news/patch');
+    } else if (navigation.pathname.includes('news/image')) {
+      setCurTab('news/image');
     } else if (navigation.pathname.includes('keyword/post')) {
       setCurTab('keyword/post');
     } else if (navigation.pathname.includes('keyword/patch')) {
       setCurTab('keyword/patch');
+    } else if (navigation.pathname.includes('keyword/image')) {
+      setCurTab('keyword/image');
     } else if (navigation.pathname.includes('news/delete')) {
       setCurTab('news/delete');
     } else if (navigation.pathname.includes('keyword/delete')) {
@@ -51,6 +55,8 @@ export default function Header() {
           <Blank />
           <NavBox link={'/news/patch'} comment="뉴스 수정하기" state={curTab === 'news/patch'} />
           <Blank />
+          <NavBox link={'/news/image'} comment="뉴스 이미지 넣기" state={curTab === 'news/image'} />
+          <Blank />
           <NavBox
             link={'/keyword/post'}
             comment="키워드 새로넣기"
@@ -61,6 +67,12 @@ export default function Header() {
             link={'/keyword/patch'}
             comment="키워드 수정하기"
             state={curTab === 'keyword/patch'}
+          />{' '}
+          <Blank />
+          <NavBox
+            link={'/keyword/image'}
+            comment="키워드 이미지 넣기"
+            state={curTab === 'keyword/image'}
           />{' '}
           <Blank />
           <NavBox link={'/news/delete'} comment="뉴스 지우기" state={curTab === 'news/delete'} />
