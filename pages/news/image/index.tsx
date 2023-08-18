@@ -1,4 +1,6 @@
+import { HOST_URL } from '@asset';
 import { SubmitButton } from '@components/common/button';
+import ImageFallback from '@components/common/imgFallback';
 import SearchBox from '@components/keyword/search';
 import { NewsTitle, newsRepositories } from '@repositories/news';
 import { GetServerSideProps } from 'next';
@@ -123,6 +125,9 @@ export default function NewsImage({ data }: pageProps) {
                 fileChange(e);
               }}
             ></input>
+          </div>
+          <div className="imgWrapper">
+            <ImageFallback src={`${HOST_URL}/images/news/${id}`} />
           </div>
           <div>
             <SubmitButton
