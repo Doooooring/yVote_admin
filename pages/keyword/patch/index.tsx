@@ -11,7 +11,7 @@ import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -58,7 +58,7 @@ export default function KeywordPatch({ data }: pageProps) {
     setKeywordTitleList(data.keywordTitles);
   }, []);
 
-  const findKeyword = useCallback(async (searchWord: string) => {
+  const findKeyword = async (searchWord: string) => {
     setIsLoading(true);
     try {
       const { _id, keyword, category, explain, news }: Keyword =
@@ -78,19 +78,38 @@ export default function KeywordPatch({ data }: pageProps) {
 
     setIsLoading(false);
     return true;
-  }, []);
+  };
 
-  const submit = useCallback(async () => {
+  const resetInput = () => {
+    setId('');
+    setKeyword('');
+    setCategory(Category.economics);
+    setExplain('');
+    setNewsList([]);
+  };
+
+  const submit = async () => {
     setIsLoading(true);
-    const result: boolean = await keywordRepositories.patchKeyword({
-      _id: id,
-      keyword: keyword,
-      category: category,
-      explain: explain,
-      news: newsList,
-    });
-    setIsLoading(false);
-  }, [id, keyword, category, explain, newsList]);
+    try {
+      const result: boolean = await keywordRepositories.patchKeyword({
+        _id: id,
+        keyword: keyword,
+        category: category,
+        explain: explain,
+        news: newsList,
+      });
+      if (result) {
+        resetInput();
+      } else {
+        Error('patch error');
+        alert('patch error');
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <Wrapper>

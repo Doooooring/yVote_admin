@@ -15,6 +15,7 @@ class KeywordRepositories {
     const response: { data: Response<{ keyword: Keyword }> } = await axios.get(
       `${HOST_URL}/admin/keywords/${keyname}`,
     );
+    console.log(response);
     return response.data.result.keyword;
   }
 
@@ -34,11 +35,19 @@ class KeywordRepositories {
   getKeywords() {}
 
   async postKeyword(keyword: keywordToPost) {
-    const response: { data: Response<{ state: boolean }> } = await axios.post(
-      `${HOST_URL}/admin/keywords`,
-      { keyword: keyword },
-    );
-    return true;
+    try {
+      const response: { data: Response<{ state: boolean }> } = await axios.post(
+        `${HOST_URL}/admin/keywords`,
+        { keyword: keyword },
+      );
+      if (response.data.success) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
   }
 
   async postImage(id: string, img: File) {
@@ -46,7 +55,7 @@ class KeywordRepositories {
       const formData = new FormData();
       formData.append('img', img);
 
-      const response = await axios.post(`${HOST_URL}/admin/news/img/${id}`, formData, {
+      const response = await axios.post(`${HOST_URL}/admin/keywords/img/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },

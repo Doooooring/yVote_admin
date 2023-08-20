@@ -93,7 +93,7 @@ export default function KeywordImage({ data }: pageProps) {
   return (
     <Wrapper>
       <SearchBox findKeyword={findKeywords} />
-      <div
+      {/* <div
         className="select-wrapper"
         style={{
           display: keywordSelectorUp ? 'block' : 'none',
@@ -115,7 +115,7 @@ export default function KeywordImage({ data }: pageProps) {
             );
           })}
         </ul>
-      </div>
+      </div> */}
       {id ? (
         <div>
           <div className="img-file">

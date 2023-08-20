@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
@@ -56,17 +56,34 @@ export default function KeywordPost({ data }: pageProps) {
     setNewsTitleList(data.newsTitles);
   }, []);
 
-  const submit = useCallback(async () => {
+  const submit = async () => {
     setIsLoading(true);
-    const result: boolean = await keywordRepositories.postKeyword({
-      keyword: keyword,
-      category: category,
-      explain: explain,
-      news: newsList,
-    });
-    setIsLoading(false);
-  }, [keyword, category, explain, newsList]);
+    try {
+      const result: boolean = await keywordRepositories.postKeyword({
+        keyword: keyword,
+        category: category,
+        explain: explain,
+        news: newsList,
+      });
+      if (result) {
+        alert('잘감');
+        resetInput();
+      } else {
+        Error();
+      }
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  const resetInput = () => {
+    setKeyword('');
+    setExplain('');
+    setCategory(Category.human);
+    setNewsList([]);
+  };
   return (
     <Wrapper>
       <ContentWrapper>
