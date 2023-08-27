@@ -4,6 +4,8 @@ import { SearchState } from '@components/keyword/searchState';
 import CommentModal from '@components/news/commenModal';
 import IdSelector from '@components/news/idSelector';
 import KeywordSelect from '@components/news/keywordSelect';
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Keyword } from '@interface/keywords';
 import { News, commentType } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
@@ -11,7 +13,7 @@ import { NewsToPatch, newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
-import { clone } from '@utils';
+import { changeItemsOrder, clone } from '@utils';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -236,6 +238,20 @@ export default function NewsPatch({ data }: pageProps) {
     [comments],
   );
 
+  const moveCommentLeft = (idx: number) => {
+    if (idx === 0) return;
+
+    const newComments = changeItemsOrder(comments, idx, idx - 1);
+    setComments(newComments);
+  };
+
+  const moveCommentRight = (idx: number) => {
+    if (idx === comments.length - 1) return;
+
+    const newComments = changeItemsOrder(comments, idx, idx + 1);
+    setComments(newComments);
+  };
+
   const addTimeline = (idx: number) => {
     const curTimeline = clone(timeline);
     const newData = { date: '', title: '' };
@@ -247,6 +263,20 @@ export default function NewsPatch({ data }: pageProps) {
     const curTimeline = clone(timeline);
     curTimeline.splice(idx, 1);
     setTimeline(curTimeline);
+  };
+
+  const moveTimelineLeft = (idx: number) => {
+    if (idx === 0) return;
+
+    const newTimeline = changeItemsOrder(timeline, idx, idx - 1);
+    setTimeline(newTimeline);
+  };
+
+  const moveTimelineRight = (idx: number) => {
+    if (idx === timeline.length - 1) return;
+
+    const newTimline = changeItemsOrder(timeline, idx, idx + 1);
+    setTimeline(newTimline);
   };
 
   return (
@@ -346,16 +376,24 @@ export default function NewsPatch({ data }: pageProps) {
             {comments.map((comment, idx) => {
               return (
                 <JournalLayer key={idx} className="shadow p-3 bg-white rounded">
-                  <ButtonWrapper>
-                    <Button className="btn btn-primary" onClick={() => addComments(idx)}>
+                  <div className="button_wrapper">
+                    <Button className="btn btn-primary" onClick={() => addTimeline(idx)}>
                       {' '}
                       추가{' '}
                     </Button>
-                    <Button className="btn btn-secondary" onClick={() => deleteComments(idx)}>
+                    <Button className="btn btn-secondary" onClick={() => deleteTimeline(idx)}>
                       {' '}
                       삭제{' '}
                     </Button>
-                  </ButtonWrapper>
+                  </div>
+                  <div className="left-right-buttons">
+                    <div className="left order-button" onClick={() => moveTimelineLeft(idx)}>
+                      <FontAwesomeIcon icon={faChevronLeft} />
+                    </div>
+                    <div className="right order-button" onClick={() => moveTimelineRight(idx)}>
+                      <FontAwesomeIcon icon={faChevronRight} />
+                    </div>
+                  </div>
                   <InputWrapper>
                     <SubInputTitle>평론 타입</SubInputTitle>
                     <CommentSelect
@@ -552,6 +590,30 @@ const LayerWrapper = styled.div`
 const NewsInputLayer = styled.div`
   display: flex;
   flex-direction: column;
+  div.input_layer_header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    div.left-right-buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      div.order-button {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+  div.button_wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
 `;
 const CommentWrapper = styled.div`
   display: flex;
@@ -568,6 +630,30 @@ const JournalLayer = styled.div`
   flex-direction: column;
   width: 280px;
   height: 220px;
+  div.input_layer_header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    div.left-right-buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      div.order-button {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+  div.button_wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
 `;
 
 const BlankLayer = styled.div`

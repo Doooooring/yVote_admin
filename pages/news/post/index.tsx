@@ -1,6 +1,6 @@
 import { News, commentType } from '@interface/news';
 import { useCommonStore } from '@store/common';
-import { clone } from '@utils';
+import { changeItemsOrder, clone } from '@utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -14,6 +14,9 @@ import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
+
+import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
@@ -47,11 +50,11 @@ export default function NewsPost({ data }: pageProps) {
       title: '테스트 제목입니다',
     },
     {
-      date: '2022.08',
+      date: '2022.09',
       title: '테스트 제목입니다',
     },
     {
-      date: '2022.08',
+      date: '2022.10',
       title: '테스트 제목입니다',
     },
   ]);
@@ -179,6 +182,20 @@ export default function NewsPost({ data }: pageProps) {
     [comments],
   );
 
+  const moveCommentLeft = (idx: number) => {
+    if (idx === 0) return;
+
+    const newComments = changeItemsOrder(comments, idx, idx - 1);
+    setComments(newComments);
+  };
+
+  const moveCommentRight = (idx: number) => {
+    if (idx === comments.length - 1) return;
+
+    const newComments = changeItemsOrder(comments, idx, idx + 1);
+    setComments(newComments);
+  };
+
   const addTimeline = (idx: number) => {
     const curTimeline = clone(timeline);
     const newData = { date: '', title: '' };
@@ -190,6 +207,20 @@ export default function NewsPost({ data }: pageProps) {
     const curTimeline = clone(timeline);
     curTimeline.splice(idx, 1);
     setTimeline(curTimeline);
+  };
+
+  const moveTimelineLeft = (idx: number) => {
+    if (idx === 0) return;
+
+    const newTimeline = changeItemsOrder(timeline, idx, idx - 1);
+    setTimeline(newTimeline);
+  };
+
+  const moveTimelineRight = (idx: number) => {
+    if (idx === timeline.length - 1) return;
+
+    const newTimline = changeItemsOrder(timeline, idx, idx + 1);
+    setTimeline(newTimline);
   };
 
   return (
@@ -226,16 +257,26 @@ export default function NewsPost({ data }: pageProps) {
             {timeline.map((item, idx) => {
               return (
                 <NewsInputLayer className="shadow p-3 bg-white rounded">
-                  <ButtonWrapper>
-                    <Button className="btn btn-primary" onClick={() => addTimeline(idx)}>
-                      {' '}
-                      추가{' '}
-                    </Button>
-                    <Button className="btn btn-secondary" onClick={() => deleteTimeline(idx)}>
-                      {' '}
-                      삭제{' '}
-                    </Button>
-                  </ButtonWrapper>
+                  <div className="input_layer_header">
+                    <div className="button_wrapper">
+                      <Button className="btn btn-primary" onClick={() => addTimeline(idx)}>
+                        {' '}
+                        추가{' '}
+                      </Button>
+                      <Button className="btn btn-secondary" onClick={() => deleteTimeline(idx)}>
+                        {' '}
+                        삭제{' '}
+                      </Button>
+                    </div>
+                    <div className="left-right-buttons">
+                      <div className="left order-button" onClick={() => moveTimelineLeft(idx)}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                      </div>
+                      <div className="right order-button" onClick={() => moveTimelineRight(idx)}>
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </div>
+                    </div>
+                  </div>
                   <InputWrapper>
                     <SubInputTitle>날짜</SubInputTitle>
                     <SubInput
@@ -284,7 +325,7 @@ export default function NewsPost({ data }: pageProps) {
             {comments.map((comment, idx) => {
               return (
                 <NewsInputLayer key={idx} className="shadow p-3 bg-white rounded">
-                  <ButtonWrapper>
+                  <div className="button_wrapper">
                     <Button className="btn btn-primary" onClick={() => addNews(idx)}>
                       {' '}
                       추가{' '}
@@ -293,7 +334,7 @@ export default function NewsPost({ data }: pageProps) {
                       {' '}
                       삭제{' '}
                     </Button>
-                  </ButtonWrapper>
+                  </div className="button_wrapper">
                   <InputWrapper>
                     <SubInputTitle>날짜</SubInputTitle>
                     <SubInput
@@ -356,7 +397,7 @@ export default function NewsPost({ data }: pageProps) {
             {comments.map((news, idx) => {
               return (
                 <NewsInputLayer key={idx} className="shadow p-3 bg-white rounded">
-                  <ButtonWrapper>
+                  <div className="button_wrapper">
                     <Button className="btn btn-primary" onClick={() => addNews(idx)}>
                       {' '}
                       추가{' '}
@@ -365,7 +406,7 @@ export default function NewsPost({ data }: pageProps) {
                       {' '}
                       삭제{' '}
                     </Button>
-                  </ButtonWrapper>
+                  </div className="button_wrapper">
                   <InputWrapper>
                     <SubInputTitle>날짜</SubInputTitle>
                     <SubInput
@@ -426,16 +467,26 @@ export default function NewsPost({ data }: pageProps) {
             {comments.map((comment, idx) => {
               return (
                 <JournalLayer key={idx} className="shadow p-3 bg-white rounded">
-                  <ButtonWrapper>
-                    <Button className="btn btn-primary" onClick={() => addComments(idx)}>
-                      {' '}
-                      추가{' '}
-                    </Button>
-                    <Button className="btn btn-secondary" onClick={() => deleteComments(idx)}>
-                      {' '}
-                      삭제{' '}
-                    </Button>
-                  </ButtonWrapper>
+                  <div className="input_layer_header">
+                    <div className="button_wrapper">
+                      <Button className="btn btn-primary" onClick={() => addComments(idx)}>
+                        {' '}
+                        추가{' '}
+                      </Button>
+                      <Button className="btn btn-secondary" onClick={() => deleteComments(idx)}>
+                        {' '}
+                        삭제{' '}
+                      </Button>
+                    </div>
+                    <div className="left-right-buttons">
+                      <div className="left order-button" onClick={() => moveCommentLeft(idx)}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                      </div>
+                      <div className="right order-button" onClick={() => moveCommentRight(idx)}>
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </div>
+                    </div>
+                  </div>
                   <InputWrapper>
                     <SubInputTitle>평론 타입</SubInputTitle>
                     <CommentSelect
@@ -631,6 +682,30 @@ const LayerWrapper = styled.div`
 const NewsInputLayer = styled.div`
   display: flex;
   flex-direction: column;
+  div.input_layer_header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    div.left-right-buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      div.order-button {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+  div.button_wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
 `;
 
 const CommentWrapper = styled.div`
@@ -642,6 +717,30 @@ const JournalLayer = styled.div`
   display: flex;
   flex: 0 0 auto;
   flex-direction: column;
+  div.input_layer_header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    div.left-right-buttons {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+      div.order-button {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+  }
+  div.button_wrapper {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
 `;
 
 const BlankLayer = styled.div`
@@ -667,13 +766,6 @@ const CommentSelect = styled.select`
 `;
 
 const Select = styled.select``;
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  margin-bottom: 10px;
-`;
 
 const Button = styled.button``;
 
