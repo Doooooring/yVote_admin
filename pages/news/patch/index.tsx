@@ -320,16 +320,26 @@ export default function NewsPatch({ data }: pageProps) {
             {timeline.map((item, idx) => {
               return (
                 <NewsInputLayer className="shadow p-3 bg-white rounded">
-                  <ButtonWrapper>
-                    <Button className="btn btn-primary" onClick={() => addTimeline(idx)}>
-                      {' '}
-                      추가{' '}
-                    </Button>
-                    <Button className="btn btn-secondary" onClick={() => deleteTimeline(idx)}>
-                      {' '}
-                      삭제{' '}
-                    </Button>
-                  </ButtonWrapper>
+                  <div className="input_layer_header">
+                    <div className="button-wrapper">
+                      <Button className="btn btn-primary" onClick={() => addTimeline(idx)}>
+                        {' '}
+                        추가{' '}
+                      </Button>
+                      <Button className="btn btn-secondary" onClick={() => deleteTimeline(idx)}>
+                        {' '}
+                        삭제{' '}
+                      </Button>
+                    </div>
+                    <div className="left-right-buttons">
+                      <div className="left order-button" onClick={() => moveTimelineLeft(idx)}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                      </div>
+                      <div className="right order-button" onClick={() => moveTimelineRight(idx)}>
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </div>
+                    </div>
+                  </div>
                   <InputWrapper>
                     <SubInputTitle>날짜</SubInputTitle>
                     <SubInput
@@ -359,7 +369,7 @@ export default function NewsPatch({ data }: pageProps) {
                 </NewsInputLayer>
               );
             })}
-            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
+            <div className="blank-layer shadow p-3 bg-white rounded justify-content-center align-items-center">
               <Plus
                 onClick={() => {
                   addTimeline(timeline.length);
@@ -367,7 +377,7 @@ export default function NewsPatch({ data }: pageProps) {
               >
                 +
               </Plus>
-            </BlankLayer>
+            </div>
           </LayerWrapper>
         </TimelineInputWrapper>
         <CommentWrapper className="pb-1 pt-1 mb-1">
@@ -376,22 +386,24 @@ export default function NewsPatch({ data }: pageProps) {
             {comments.map((comment, idx) => {
               return (
                 <JournalLayer key={idx} className="shadow p-3 bg-white rounded">
-                  <div className="button_wrapper">
-                    <Button className="btn btn-primary" onClick={() => addTimeline(idx)}>
-                      {' '}
-                      추가{' '}
-                    </Button>
-                    <Button className="btn btn-secondary" onClick={() => deleteTimeline(idx)}>
-                      {' '}
-                      삭제{' '}
-                    </Button>
-                  </div>
-                  <div className="left-right-buttons">
-                    <div className="left order-button" onClick={() => moveTimelineLeft(idx)}>
-                      <FontAwesomeIcon icon={faChevronLeft} />
+                  <div className="input_layer_header">
+                    <div className="button_wrapper">
+                      <Button className="btn btn-primary" onClick={() => addComments(idx)}>
+                        {' '}
+                        추가{' '}
+                      </Button>
+                      <Button className="btn btn-secondary" onClick={() => deleteComments(idx)}>
+                        {' '}
+                        삭제{' '}
+                      </Button>
                     </div>
-                    <div className="right order-button" onClick={() => moveTimelineRight(idx)}>
-                      <FontAwesomeIcon icon={faChevronRight} />
+                    <div className="left-right-buttons">
+                      <div className="left order-button" onClick={() => moveCommentLeft(idx)}>
+                        <FontAwesomeIcon icon={faChevronLeft} />
+                      </div>
+                      <div className="right order-button" onClick={() => moveCommentRight(idx)}>
+                        <FontAwesomeIcon icon={faChevronRight} />
+                      </div>
                     </div>
                   </div>
                   <InputWrapper>
@@ -423,7 +435,7 @@ export default function NewsPatch({ data }: pageProps) {
                 </JournalLayer>
               );
             })}
-            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
+            <div className="blank-layer shadow p-3 bg-white rounded justify-content-center align-items-center">
               <Plus
                 onClick={() => {
                   addComments(comments.length);
@@ -431,7 +443,7 @@ export default function NewsPatch({ data }: pageProps) {
               >
                 +
               </Plus>
-            </BlankLayer>
+            </div>
           </LayerWrapper>
         </CommentWrapper>
         <InputWrapper className="pb-1 pt-1 mb-1">
@@ -585,6 +597,14 @@ const LayerWrapper = styled.div`
   flex-direction: row;
   gap: 20px;
   overflow: scroll;
+
+  div.blank-layer {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    height: 220px;
+    width: 280px;
+  }
 `;
 
 const NewsInputLayer = styled.div`
@@ -605,6 +625,7 @@ const NewsInputLayer = styled.div`
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
       }
     }
   }
@@ -645,6 +666,7 @@ const JournalLayer = styled.div`
         display: flex;
         justify-content: center;
         align-items: center;
+        cursor: pointer;
       }
     }
   }
@@ -654,14 +676,6 @@ const JournalLayer = styled.div`
     gap: 10px;
     margin-bottom: 10px;
   }
-`;
-
-const BlankLayer = styled.div`
-  display: flex;
-  flex: 0 0 auto;
-  flex-direction: column;
-  height: 220px;
-  width: 280px;
 `;
 
 const Plus = styled.div`
@@ -683,7 +697,7 @@ const PressSelect = styled.select`
 
 const Select = styled.select``;
 
-const ButtonWrapper = styled.div`
+const div = styled.div`
   display: flex;
   flex-direction: row;
   gap: 10px;
