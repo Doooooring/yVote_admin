@@ -220,6 +220,9 @@ export default function NewsPatch({ data }: pageProps) {
     setCommentSelected(comment);
   };
 
+  
+
+
   const addComments = (idx: number) => {
     if (commentRest.length === 0) return;
     const curComments = clone(comments);
@@ -229,15 +232,13 @@ export default function NewsPatch({ data }: pageProps) {
     setComments(curComments);
   };
 
-  const deleteComments = useCallback(
+  const deleteComments = 
     (idx: number) => {
       const curComments = clone(comments);
       curComments.splice(idx, 1);
       setComments(curComments);
-    },
-    [comments],
-  );
-
+    }
+  
   const moveCommentLeft = (idx: number) => {
     if (idx === 0) return;
 

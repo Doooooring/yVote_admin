@@ -1,8 +1,10 @@
 import { commentType } from '@interface/news';
 import { useNewsStore } from '@store/news';
-import { clone } from '@utils';
-import { useCallback } from 'react';
+import { changeItemsOrder, clone } from '@utils';
 import styled from 'styled-components';
+
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 interface CommentModalProps {
   editComment: (v: { type: commentType; data: Array<{ title: string; comment: string }> }) => void;
@@ -14,28 +16,47 @@ export default function CommentModal({ editComment }: CommentModalProps) {
     state.setCommentSelected,
   ]);
 
-  const addComments = useCallback(
-    (idx: number) => {
-      const curComment = clone(commentSelected);
-      const curComments = curComment?.data!;
-      curComments.splice(idx + 1, 0, {
-        title: '',
-        comment: '',
-      });
-      setCommentSelected(curComment);
-    },
-    [commentSelected],
-  );
+  const addComments = (idx: number) => {
+    const curComment = clone(commentSelected);
+    const curComments = curComment?.data!;
+    curComments.splice(idx + 1, 0, {
+      title: '',
+      comment: '',
+    });
+    editComment(curComment!);
+    setCommentSelected(curComment);
+  };
 
-  const deleteComments = useCallback(
-    (idx: number) => {
-      const curComment = clone(commentSelected);
-      const curComments = curComment?.data!;
-      curComments.splice(idx, 1);
-      setCommentSelected(curComment);
-    },
-    [commentSelected],
-  );
+  const deleteComments = (idx: number) => {
+    const curComment = clone(commentSelected);
+    const curComments = curComment?.data!;
+    curComments.splice(idx, 1);
+    editComment(curComment!);
+    setCommentSelected(curComment);
+  };
+
+  const moveCommentUp = (idx: number) => {
+    if (idx === 0) return;
+    const curComment = clone(commentSelected);
+    const curComments = curComment?.data!;
+    const newComments = changeItemsOrder(curComments, idx - 1, idx);
+    curComment!.data = newComments as {
+      title: string;
+      comment: string;
+    }[];
+    editComment(curComment!);
+  };
+  const moveCommentDown = (idx: number) => {
+    const curComment = clone(commentSelected);
+    const curComments = curComment?.data!;
+    if (idx === curComments.length - 1) return;
+    const newComments = changeItemsOrder(curComments, idx, idx + 1);
+    curComment!.data = newComments as {
+      title: string;
+      comment: string;
+    }[];
+    editComment(curComment!);
+  };
 
   return commentSelected !== null ? (
     <Wrapper
@@ -59,6 +80,24 @@ export default function CommentModal({ editComment }: CommentModalProps) {
                   <button className="btn btn-secondary" onClick={() => deleteComments(idx)}>
                     제거
                   </button>
+                  <div className="left-right-buttons">
+                    <div
+                      className="left order-button"
+                      onClick={() => {
+                        moveCommentUp(idx);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faChevronUp} />
+                    </div>
+                    <div
+                      className="right order-button"
+                      onClick={() => {
+                        moveCommentDown(idx);
+                      }}
+                    >
+                      <FontAwesomeIcon icon={faChevronDown} />
+                    </div>
+                  </div>
                 </div>
                 <div className="input-wrapper">
                   <div className="sub-input-title">제목</div>
