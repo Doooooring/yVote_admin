@@ -17,6 +17,7 @@ import { useNewsStore } from '@store/news';
 
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import dynamic from 'next/dynamic';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
@@ -27,6 +28,8 @@ interface pageProps {
     keywordTitles: Array<any>;
   };
 }
+
+const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
   const newsTitles: Array<NewsTitle> = await newsRepositories.getNewsTitles('');
@@ -239,6 +242,12 @@ export default function NewsPost({ data }: pageProps) {
         </InputWrapper>
         <InputWrapper className="pb-1 pt-1 mb-1">
           <InputTitle>설명</InputTitle>
+          <MDEditor
+            value={summary}
+            onChange={(v) => {
+              setSummary(v as string);
+            }}
+          />
           <Input
             type="textarea"
             className="form-control"
