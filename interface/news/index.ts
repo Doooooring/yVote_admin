@@ -12,6 +12,9 @@ export enum commentType {
   민주당 = '민주당',
   국민의힘 = '국민의힘',
   청와대 = '청와대',
+  헌법재판소 = '헌법재판소',
+  와이보트 = '와이보트',
+  기타 = '기타',
 }
 
 export interface Timeline {
