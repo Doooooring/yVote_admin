@@ -111,7 +111,7 @@ export default function NewsPatch({ data }: pageProps) {
       else {
         const { _id, title, summary, keywords, state, timeline, opinions, comments }: NewsToPatch =
           response;
-        const curCommentKeys = Object.keys(comments) as commentType[];
+        const curCommentKeys = Object.keys(comments ?? {}) as commentType[];
         const commentsToStore = curCommentKeys.map((comment) => {
           return {
             type: comment,
@@ -127,7 +127,8 @@ export default function NewsPatch({ data }: pageProps) {
         setState(state!);
         setOpinions(opinions!);
       }
-    } catch {
+    } catch (e) {
+      console.log(e);
     } finally {
       setIsLoading(false);
     }
@@ -220,9 +221,6 @@ export default function NewsPatch({ data }: pageProps) {
     setCommentSelected(comment);
   };
 
-  
-
-
   const addComments = (idx: number) => {
     if (commentRest.length === 0) return;
     const curComments = clone(comments);
@@ -232,13 +230,12 @@ export default function NewsPatch({ data }: pageProps) {
     setComments(curComments);
   };
 
-  const deleteComments = 
-    (idx: number) => {
-      const curComments = clone(comments);
-      curComments.splice(idx, 1);
-      setComments(curComments);
-    }
-  
+  const deleteComments = (idx: number) => {
+    const curComments = clone(comments);
+    curComments.splice(idx, 1);
+    setComments(curComments);
+  };
+
   const moveCommentLeft = (idx: number) => {
     if (idx === 0) return;
 
