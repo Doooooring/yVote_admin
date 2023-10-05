@@ -45,7 +45,7 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: key
     });
     setkeywordRest(curRest);
     setkeywordContain(curContain);
-  }, [KeywordTitleList]);
+  }, [KeywordTitleList, curKeywordList]);
 
   function clickRest(keyword: KeywordTitle) {
     if (restSelected.includes(keyword)) {
