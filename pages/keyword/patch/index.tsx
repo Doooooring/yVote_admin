@@ -60,9 +60,11 @@ export default function KeywordPatch({ data }: pageProps) {
 
   const findKeyword = async (searchWord: string) => {
     setIsLoading(true);
+    const encoded = searchWord.replace(/\//g, '$');
+
     try {
       const { _id, keyword, category, explain, news }: Keyword =
-        await keywordRepositories.getKeyword(searchWord);
+        await keywordRepositories.getKeyword(encoded);
       setId(_id);
       setKeyword(keyword);
       setCategory(category);

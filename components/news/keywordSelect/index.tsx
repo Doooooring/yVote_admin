@@ -73,7 +73,6 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: key
 
   function reBuild() {
     if (isLoading) {
-      console.log('is loading');
       return;
     }
     setIsLoading(true);
