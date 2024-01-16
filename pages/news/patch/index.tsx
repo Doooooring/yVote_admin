@@ -111,21 +111,30 @@ export default function NewsPatch({ data }: pageProps) {
       else {
         const { _id, title, summary, keywords, state, timeline, opinions, comments }: NewsToPatch =
           response;
-        const curCommentKeys = Object.keys(comments ?? {}) as commentType[];
-        const commentsToStore = curCommentKeys.map((comment) => {
-          return {
-            type: comment,
-            data: comments[comment]!,
-          };
-        });
+
         setId(_id);
         setTitle(title!);
         setSummary(summary!);
         setTimeline(timeline);
-        setComments(commentsToStore);
         setKeywordList(keywords!);
         setState(state!);
         setOpinions(opinions!);
+
+        /**
+         * @FIXME comment process error
+         */
+        if (Array.isArray(comments)) {
+          setComments([]);
+        } else {
+          const curCommentKeys = Object.keys(comments ?? {}) as commentType[];
+          const commentsToStore = curCommentKeys.map((comment) => {
+            return {
+              type: comment,
+              data: comments[comment]!,
+            };
+          });
+          setComments(commentsToStore);
+        }
       }
     } catch (e) {
       console.log(e);
