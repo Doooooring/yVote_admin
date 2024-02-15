@@ -49,22 +49,14 @@ export default function NewsPost({ data }: pageProps) {
   const [summary, setSummary] = useState<string>('');
   const [timeline, setTimeline] = useState<News['timeline']>([
     {
-      date: '2022.08',
-      title: '테스트 제목입니다',
-    },
-    {
-      date: '2022.09',
-      title: '테스트 제목입니다',
-    },
-    {
-      date: '2022.10',
+      date: '2024.01.01',
       title: '테스트 제목입니다',
     },
   ]);
   const [state, setState] = useState<boolean>(true);
   const [opinions, setOpinions] = useState<News['opinions']>({
-    left: 'aaaaaaa',
-    right: 'bbbbbbbbbb',
+    left: '민주당/좌파/진보',
+    right: '국민의힘/우파/보수',
   });
   const [comments, setComments] = useState<
     Array<{
