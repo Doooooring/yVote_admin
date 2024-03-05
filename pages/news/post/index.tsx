@@ -62,6 +62,7 @@ export default function NewsPost({ data }: pageProps) {
     },
   ]);
   const [state, setState] = useState<boolean>(true);
+  const [isPublished, setIsPublished] = useState<boolean>(true);
   const [opinions, setOpinions] = useState<News['opinions']>({
     left: 'aaaaaaa',
     right: 'bbbbbbbbbb',
@@ -106,6 +107,7 @@ export default function NewsPost({ data }: pageProps) {
         summary,
         title,
         state,
+        isPublished,
         opinions,
         timeline,
         comments: commentsToSend,
@@ -116,6 +118,7 @@ export default function NewsPost({ data }: pageProps) {
         setTitle('');
         setTimeline([]);
         setState(true);
+        setIsPublished(true);
         setOpinions({
           left: '',
           right: '',
@@ -551,6 +554,23 @@ export default function NewsPost({ data }: pageProps) {
           >
             <option value={'true'}>최신</option>
             <option value={'false'}>구닥다리</option>
+          </Select>
+        </InputWrapper>
+        <InputWrapper className="pb-1 pt-1 mb-1">
+          <InputTitle>퍼블리시 상태</InputTitle>
+          <Select
+            className="form-control"
+            value={isPublished === true ? 'true' : 'false'}
+            onChange={(e) => {
+              if (e.currentTarget.value === 'true') {
+                setIsPublished(true);
+              } else {
+                setIsPublished(false);
+              }
+            }}
+          >
+            <option value={'true'}>출간하기</option>
+            <option value={'false'}>김민재만 보기</option>
           </Select>
         </InputWrapper>
         <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">

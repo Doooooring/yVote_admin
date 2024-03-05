@@ -8,7 +8,14 @@ export interface NewsTitle extends Partial<Pick<News, '_id' | 'order' | 'title'>
 export interface NewsToPost
   extends Pick<
     News,
-    'title' | 'summary' | 'keywords' | 'state' | 'timeline' | 'comments' | 'opinions'
+    | 'title'
+    | 'summary'
+    | 'keywords'
+    | 'state'
+    | 'isPublished'
+    | 'timeline'
+    | 'comments'
+    | 'opinions'
   > {}
 export interface NewsToPatch extends NewsToPost {
   _id: string;

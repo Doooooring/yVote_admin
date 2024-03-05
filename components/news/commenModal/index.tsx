@@ -46,6 +46,7 @@ export default function CommentModal({ editComment }: CommentModalProps) {
     }[];
     editComment(curComment!);
   };
+  
   const moveCommentDown = (idx: number) => {
     const curComment = clone(commentSelected);
     const curComments = curComment?.data!;

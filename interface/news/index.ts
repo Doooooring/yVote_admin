@@ -28,6 +28,7 @@ export interface News {
   summary: string;
   keywords: Array<string>;
   state: boolean;
+  isPublished: boolean;
   timeline: Array<Timeline>;
   opinions: {
     left: string;
@@ -47,4 +48,6 @@ export interface News {
 }
 
 export interface Preview
-  extends Partial<Pick<News, '_id' | 'order' | 'title' | 'summary' | 'keywords' | 'state'>> {}
+  extends Partial<
+    Pick<News, '_id' | 'order' | 'title' | 'summary' | 'keywords' | 'state' | 'isPublished'>
+  > {}

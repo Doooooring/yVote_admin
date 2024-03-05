@@ -51,6 +51,7 @@ export default function NewsPatch({ data }: pageProps) {
   const [summary, setSummary] = useState<string>('');
   const [timeline, setTimeline] = useState<News['timeline']>([]);
   const [state, setState] = useState<boolean>(true);
+  const [isPublished, setIsPublished] = useState<boolean>(true);
   const [opinions, setOpinions] = useState<News['opinions']>({
     left: '',
     right: '',
@@ -109,8 +110,17 @@ export default function NewsPatch({ data }: pageProps) {
       const response = await newsRepositories.getNewsDetails(id);
       if (response === false) Error();
       else {
-        const { _id, title, summary, keywords, state, timeline, opinions, comments }: NewsToPatch =
-          response;
+        const {
+          _id,
+          title,
+          summary,
+          keywords,
+          state,
+          isPublished,
+          timeline,
+          opinions,
+          comments,
+        }: NewsToPatch = response;
 
         setId(_id);
         setTitle(title!);
@@ -118,6 +128,7 @@ export default function NewsPatch({ data }: pageProps) {
         setTimeline(timeline);
         setKeywordList(keywords!);
         setState(state!);
+        setIsPublished(isPublished ?? true);
         setOpinions(opinions!);
 
         /**
@@ -163,6 +174,7 @@ export default function NewsPatch({ data }: pageProps) {
         summary,
         title,
         state,
+        isPublished,
         opinions,
         timeline,
         comments: commentsToSend,
@@ -178,6 +190,7 @@ export default function NewsPatch({ data }: pageProps) {
       setTitle('');
       setTimeline([]);
       setState(true);
+      setIsPublished(true);
       setOpinions({
         left: '',
         right: '',
@@ -468,6 +481,23 @@ export default function NewsPatch({ data }: pageProps) {
           >
             <option value={'true'}>최신</option>
             <option value={'false'}>구닥다리</option>
+          </Select>
+        </InputWrapper>
+        <InputWrapper className="pb-1 pt-1 mb-1">
+          <InputTitle>퍼블리시 상태</InputTitle>
+          <Select
+            className="form-control"
+            value={isPublished === true ? 'true' : 'false'}
+            onChange={(e) => {
+              if (e.currentTarget.value === 'true') {
+                setIsPublished(true);
+              } else {
+                setIsPublished(false);
+              }
+            }}
+          >
+            <option value={'true'}>출간하기</option>
+            <option value={'false'}>김민재만 보기</option>
           </Select>
         </InputWrapper>
         <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
