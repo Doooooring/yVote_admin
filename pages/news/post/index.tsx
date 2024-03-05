@@ -54,7 +54,7 @@ export default function NewsPost({ data }: pageProps) {
     },
   ]);
   const [state, setState] = useState<boolean>(true);
-  const [isPublished, setIsPublished] = useState<boolean>(true);
+  const [isPublished, setIsPublished] = useState<boolean>(false);
   const [opinions, setOpinions] = useState<News['opinions']>({
     left: '민주당/좌파/진보',
     right: '국민의힘/우파/보수',
