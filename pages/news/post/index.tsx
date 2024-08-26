@@ -3,7 +3,7 @@ import { useCommonStore } from '@store/common';
 import { changeItemsOrder, clone } from '@utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
@@ -17,6 +17,8 @@ import { useNewsStore } from '@store/news';
 
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import TextEditor from '@components/common/textEditor';
+import ReactQuill from 'react-quill';
 // import dynamic from 'next/dynamic';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
@@ -45,6 +47,8 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 };
 
 export default function NewsPost({ data }: pageProps) {
+  const editorRef = useRef<ReactQuill>(null);
+
   const [title, setTitle] = useState<string>('');
   const [summary, setSummary] = useState<string>('');
   const [timeline, setTimeline] = useState<News['timeline']>([
@@ -223,6 +227,7 @@ export default function NewsPost({ data }: pageProps) {
 
   return (
     <Wrapper>
+      <TextEditor ref={editorRef} />
       <ContentWrapper className="mb-5">
         <InputWrapper className="pb-1 pt-1 mb-1">
           <InputTitle>제목</InputTitle>
