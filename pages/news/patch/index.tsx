@@ -1,9 +1,12 @@
 import { SubmitButton } from '@components/common/button';
+import TextEditor from '@components/common/textEditor';
+import ToggleButton from '@components/common/toggleButton';
 import SearchBox from '@components/keyword/search';
 import { SearchState } from '@components/keyword/searchState';
 import CommentModal from '@components/news/commenModal';
 import IdSelector from '@components/news/idSelector';
 import KeywordSelect from '@components/news/keywordSelect';
+import NewsContentPreview from '@components/news/newsContentPreview';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Keyword } from '@interface/keywords';
@@ -14,6 +17,7 @@ import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
 import { changeItemsOrder, clone } from '@utils';
+import { useReactQuill } from '@utils/hook/useReactQuill';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -46,6 +50,8 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 };
 
 export default function NewsPatch({ data }: pageProps) {
+  const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
+
   const [id, setId] = useState<string>('');
   const [title, setTitle] = useState<string>('');
   const [summary, setSummary] = useState<string>('');
@@ -124,7 +130,8 @@ export default function NewsPatch({ data }: pageProps) {
 
         setId(_id);
         setTitle(title!);
-        setSummary(summary!);
+        //setSummary(summary!);
+        initializeQuillContents(summary!);
         setTimeline(timeline);
         setKeywordList(keywords!);
         setState(state!);
@@ -171,7 +178,7 @@ export default function NewsPatch({ data }: pageProps) {
     try {
       const result: boolean = await newsRepositories.patchNews({
         _id: id,
-        summary,
+        summary: content,
         title,
         state,
         isPublished,
@@ -186,7 +193,8 @@ export default function NewsPatch({ data }: pageProps) {
       }
 
       setId('');
-      setSummary('');
+      //setSummary('');
+      resetContents();
       setTitle('');
       setTimeline([]);
       setState(true);
@@ -308,30 +316,110 @@ export default function NewsPatch({ data }: pageProps) {
         newsSelectorUp={newsSelectorUp}
         setNewsSelectorUp={setNewsSelectorup}
       />
+      <TextEditWrapper state={id === ''}>
+        <ContentEditWrapper>
+          <InputWrapper className="pb-1 pt-1 mb-1">
+            <InputTitle>제목</InputTitle>
+            <Input
+              type="text"
+              className="form-control"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.currentTarget.value);
+              }}
+            ></Input>
+          </InputWrapper>
+          <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
+          <StateToggleWrapper>
+            <InputWrapper className="pb-1 pt-1 mb-1">
+              <ToggleTitle>최신 아티클</ToggleTitle>
+              {/* <Select
+              className="form-control"
+              value={state === true ? 'true' : 'false'}
+              onChange={(e) => {
+                if (e.currentTarget.value === 'true') {
+                  setState(true);
+                } else {
+                  setState(false);
+                }
+              }}
+              >
+              <option value={'true'}>최신</option>
+              <option value={'false'}>구닥다리</option>
+            </Select> */}
+              <ToggleButton
+                state={state}
+                setState={setState}
+                style={{
+                  width: '50px',
+                  height: '25px',
+                  backgroundColor: '#77C998',
+                  padding: '0.3rem',
+                }}
+                circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
+                activeColor="#4F69E7"
+                unactiveColor="#A8A8A8"
+                activeCircleColor="#EDF0F1"
+                unactiveCircleColor="#EDF0F1"
+              />
+            </InputWrapper>
+            <InputWrapper className="pb-1 pt-1 mb-1">
+              <ToggleTitle>퍼블리시 상태</ToggleTitle>
+              {/* <Select
+              className="form-control"
+              value={isPublished === true ? 'true' : 'false'}
+              onChange={(e) => {
+                if (e.currentTarget.value === 'true') {
+                  setIsPublished(true);
+                } else {
+                  setIsPublished(false);
+                }
+              }}
+              >
+              <option value={'true'}>출간하기</option>
+              <option value={'false'}>김민재만 보기</option>
+            </Select> */}
+              <ToggleButton
+                state={isPublished}
+                setState={setIsPublished}
+                style={{
+                  width: '50px',
+                  height: '25px',
+                  backgroundColor: '#77C998',
+                  padding: '0.3rem',
+                }}
+                circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
+                activeColor="#4F69E7"
+                unactiveColor="#A8A8A8"
+                activeCircleColor="#EDF0F1"
+                unactiveCircleColor="#EDF0F1"
+              />
+            </InputWrapper>
+          </StateToggleWrapper>
+          <KeywordSetter>
+            <SubmitButton
+              title={'키워드 선택하기'}
+              click={() => {
+                setIsSelectorModalUp(true);
+              }}
+            />
+            <KeywordWrapper>
+              {keywordList.map((keyword, idx) => {
+                return <KeywordLi key={idx}>{keyword}</KeywordLi>;
+              })}
+            </KeywordWrapper>
+          </KeywordSetter>
+        </ContentEditWrapper>
+        <NewsPreviewWrapper>
+          <NewsContentPreview
+            title={title}
+            content={content}
+            state={state}
+            keywords={keywordList}
+          />
+        </NewsPreviewWrapper>
+      </TextEditWrapper>
       <ContentWrapper className="mb-5" state={id === ''}>
-        <InputWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>제목</InputTitle>
-          <Input
-            type="text"
-            className="form-control"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.currentTarget.value);
-            }}
-          ></Input>
-        </InputWrapper>
-        <InputWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>설명</InputTitle>
-          <Input
-            type="textarea"
-            className="form-control"
-            placeholder="의도적으로 줄 넘기고 싶으면 $ 넣기"
-            value={summary}
-            onChange={(e) => {
-              setSummary(e.currentTarget.value);
-            }}
-          ></Input>
-        </InputWrapper>
         <TimelineInputWrapper className="pb-1 pt-1 mb-1">
           <LayerTitleWrapper>
             <InputTitle>타임 라인</InputTitle>
@@ -570,10 +658,39 @@ interface ContentWrapperProps {
   state: boolean;
 }
 
+const TextEditWrapper = styled.div<ContentWrapperProps>`
+  width: 100%;
+  display: ${({ state }) => (state ? 'none' : 'flex')};
+
+  flex-direction: row;
+`;
+
+const ContentEditWrapper = styled.div`
+  width: 1300px;
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
+`;
+
+const NewsPreviewWrapper = styled.div`
+  width: 100%;
+
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+
+  background-color: #f1f2f3;
+`;
+
+const StateToggleWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  padding: 0.5rem 0;
+`;
+
 const ContentWrapper = styled.div<ContentWrapperProps>`
   display: ${({ state }) => (state ? 'none' : 'block')};
-  width: 50%;
-  min-width: 60rem;
+  width: 100%;
 `;
 const InputWrapper = styled.div`
   display: flex;
@@ -583,14 +700,22 @@ const InputWrapper = styled.div`
   padding-top: 5px;
   padding-bottom: 5px;
 `;
-
 const InputTitle = styled.div`
-  width: 100px;
-  font-size: 18px;
+  flex: 1 0 auto;
+  font-size: 16px;
   font-weight: bold;
+  padding: 0 1rem;
+`;
+
+const ToggleTitle = styled.div`
+  flex: 0 1 1;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 0 0.5rem;
 `;
 
 const OpinionTitle = styled.div`
+  flex: 1 0 auto;
   width: 120px;
   font-size: 18px;
 `;

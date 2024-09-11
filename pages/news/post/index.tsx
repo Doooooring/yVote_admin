@@ -19,6 +19,9 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TextEditor from '@components/common/textEditor';
 import ReactQuill from 'react-quill';
+import { useReactQuill } from '@utils/hook/useReactQuill';
+import NewsContentPreview from '@components/news/newsContentPreview';
+import ToggleButton from '@components/common/toggleButton';
 // import dynamic from 'next/dynamic';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
@@ -47,7 +50,7 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 };
 
 export default function NewsPost({ data }: pageProps) {
-  const editorRef = useRef<ReactQuill>(null);
+  const { ref, content, handleContents, resetContents } = useReactQuill();
 
   const [title, setTitle] = useState<string>('');
   const [summary, setSummary] = useState<string>('');
@@ -94,13 +97,14 @@ export default function NewsPost({ data }: pageProps) {
         comment: string;
       }>;
     };
+
     comments.forEach((item) => {
       const { type, data } = item;
       commentsToSend[type] = data;
     });
     try {
       const result: boolean = await newsRepositories.postNews({
-        summary,
+        summary: content,
         title,
         state,
         isPublished,
@@ -110,7 +114,8 @@ export default function NewsPost({ data }: pageProps) {
         keywords: keywordList,
       });
       if (result) {
-        setSummary('');
+        //setSummary('');
+        resetContents();
         setTitle('');
         setTimeline([]);
         setState(true);
@@ -227,37 +232,110 @@ export default function NewsPost({ data }: pageProps) {
 
   return (
     <Wrapper>
-      <TextEditor ref={editorRef} />
+      <TextEditWrapper>
+        <ContentEditWrapper>
+          <InputWrapper className="pb-1 pt-1 mb-1">
+            <InputTitle>제목</InputTitle>
+            <Input
+              type="text"
+              className="form-control"
+              value={title}
+              onChange={(e) => {
+                setTitle(e.currentTarget.value);
+              }}
+            ></Input>
+          </InputWrapper>
+          <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
+          <StateToggleWrapper>
+            <InputWrapper className="pb-1 pt-1 mb-1">
+              <ToggleTitle>최신 아티클</ToggleTitle>
+              {/* <Select
+              className="form-control"
+              value={state === true ? 'true' : 'false'}
+              onChange={(e) => {
+                if (e.currentTarget.value === 'true') {
+                  setState(true);
+                } else {
+                  setState(false);
+                }
+              }}
+              >
+              <option value={'true'}>최신</option>
+              <option value={'false'}>구닥다리</option>
+            </Select> */}
+              <ToggleButton
+                state={state}
+                setState={setState}
+                style={{
+                  width: '50px',
+                  height: '25px',
+                  backgroundColor: '#77C998',
+                  padding: '0.3rem',
+                }}
+                circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
+                activeColor="#4F69E7"
+                unactiveColor="#A8A8A8"
+                activeCircleColor="#EDF0F1"
+                unactiveCircleColor="#EDF0F1"
+              />
+            </InputWrapper>
+            <InputWrapper className="pb-1 pt-1 mb-1">
+              <ToggleTitle>퍼블리시 상태</ToggleTitle>
+              {/* <Select
+              className="form-control"
+              value={isPublished === true ? 'true' : 'false'}
+              onChange={(e) => {
+                if (e.currentTarget.value === 'true') {
+                  setIsPublished(true);
+                } else {
+                  setIsPublished(false);
+                }
+              }}
+              >
+              <option value={'true'}>출간하기</option>
+              <option value={'false'}>김민재만 보기</option>
+            </Select> */}
+              <ToggleButton
+                state={isPublished}
+                setState={setIsPublished}
+                style={{
+                  width: '50px',
+                  height: '25px',
+                  backgroundColor: '#77C998',
+                  padding: '0.3rem',
+                }}
+                circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
+                activeColor="#4F69E7"
+                unactiveColor="#A8A8A8"
+                activeCircleColor="#EDF0F1"
+                unactiveCircleColor="#EDF0F1"
+              />
+            </InputWrapper>
+          </StateToggleWrapper>
+          <KeywordSetter>
+            <SubmitButton
+              title={'키워드 선택하기'}
+              click={() => {
+                setIsSelectorModalUp(true);
+              }}
+            />
+            <KeywordWrapper>
+              {keywordList.map((keyword, idx) => {
+                return <KeywordLi key={idx}>{keyword}</KeywordLi>;
+              })}
+            </KeywordWrapper>
+          </KeywordSetter>
+        </ContentEditWrapper>
+        <NewsPreviewWrapper>
+          <NewsContentPreview
+            title={title}
+            content={content}
+            state={state}
+            keywords={keywordList}
+          />
+        </NewsPreviewWrapper>
+      </TextEditWrapper>
       <ContentWrapper className="mb-5">
-        <InputWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>제목</InputTitle>
-          <Input
-            type="text"
-            className="form-control"
-            value={title}
-            onChange={(e) => {
-              setTitle(e.currentTarget.value);
-            }}
-          ></Input>
-        </InputWrapper>
-        <InputWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>설명</InputTitle>
-          {/* <MDEditor
-            value={summary}
-            onChange={(v) => {
-              setSummary(v as string);
-            }}
-          /> */}
-          <Input
-            type="textarea"
-            className="form-control"
-            placeholder="의도적으로 줄 넘기고 싶으면 $ 넣기"
-            value={summary}
-            onChange={(e) => {
-              setSummary(e.currentTarget.value);
-            }}
-          ></Input>
-        </InputWrapper>
         <TimelineInputWrapper className="pb-1 pt-1 mb-1">
           <LayerTitleWrapper>
             <InputTitle>타임 라인</InputTitle>
@@ -326,150 +404,6 @@ export default function NewsPost({ data }: pageProps) {
             </BlankLayer>
           </LayerWrapper>
         </TimelineInputWrapper>
-        {/* <TimelineInputWrapper className="pb-1 pt-1 mb-1">
-          <LayerTitleWrapper>
-            <InputTitle>관련 뉴스</InputTitle>
-          </LayerTitleWrapper>
-          <LayerWrapper className="px-3 pb-3 pt-3">
-            {comments.map((comment, idx) => {
-              return (
-                <NewsInputLayer key={idx} className="shadow p-3 bg-white rounded">
-                  <div className="button_wrapper">
-                    <Button className="btn btn-primary" onClick={() => addNews(idx)}>
-                      {' '}
-                      추가{' '}
-                    </Button>
-                    <Button className="btn btn-secondary" onClick={() => deleteNews(idx)}>
-                      {' '}
-                      삭제{' '}
-                    </Button>
-                  </div className="button_wrapper">
-                  <InputWrapper>
-                    <SubInputTitle>날짜</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      placeholder="xxxx.xx 형식으로 넣으세요"
-                      value={news.date}
-                      onChange={(e) => {
-                        const curComments = clone(comments);
-                        curComments[idx].date = e.currentTarget.value;
-                        setComments(curComments);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                  <InputWrapper>
-                    <SubInputTitle>링크</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      value={news.link}
-                      onChange={(e) => {
-                        const curComments = clone(comments);
-                        curComments[idx].link = e.currentTarget.value;
-                        setComments(curComments);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                  <InputWrapper>
-                    <SubInputTitle>제목</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      value={news.title}
-                      onChange={(e) => {
-                        const curComments = clone(comments);
-                        curComments[idx].title = e.currentTarget.value;
-                        setComments(curComments);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                </NewsInputLayer>
-              );
-            })}
-            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
-              <Plus
-                onClick={() => {
-                  addNews(comments.length);
-                }}
-              >
-                +
-              </Plus>
-            </BlankLayer>
-          </LayerWrapper>
-        </TimelineInputWrapper> */}
-        {/* <NewsInputWrapper className="pb-1 pt-1 mb-1">
-          <LayerTitleWrapper>
-            <InputTitle>관련 뉴스</InputTitle>
-          </LayerTitleWrapper>
-         <LayerWrapper className="px-3 pb-3 pt-3">
-            {comments.map((news, idx) => {
-              return (
-                <NewsInputLayer key={idx} className="shadow p-3 bg-white rounded">
-                  <div className="button_wrapper">
-                    <Button className="btn btn-primary" onClick={() => addNews(idx)}>
-                      {' '}
-                      추가{' '}
-                    </Button>
-                    <Button className="btn btn-secondary" onClick={() => deleteNews(idx)}>
-                      {' '}
-                      삭제{' '}
-                    </Button>
-                  </div className="button_wrapper">
-                  <InputWrapper>
-                    <SubInputTitle>날짜</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      placeholder="xxxx.xx 형식으로 넣으세요"
-                      value={news.date}
-                      onChange={(e) => {
-                        const curComments = clone(comments);
-                        curComments[idx].date = e.currentTarget.value;
-                        setComments(curComments);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                  <InputWrapper>
-                    <SubInputTitle>링크</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      value={news.link}
-                      onChange={(e) => {
-                        const curComments = clone(comments);
-                        curComments[idx].link = e.currentTarget.value;
-                        setComments(curComments);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                  <InputWrapper>
-                    <SubInputTitle>제목</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      value={news.title}
-                      onChange={(e) => {
-                        const curComments = clone(comments);
-                        curComments[idx].title = e.currentTarget.value;
-                        setComments(curComments);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                </NewsInputLayer>
-              );
-            })}
-            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
-              <Plus
-                onClick={() => {
-                  addNews(comments.length);
-                }}
-              >
-                +
-              </Plus>
-            </BlankLayer>
-          </LayerWrapper>
-        </NewsInputWrapper> */}
         <CommentWrapper className="pb-1 pt-1 mb-1">
           <InputTitle>평론</InputTitle>
           <LayerWrapper className="px-3 pb-3 pt-3">
@@ -536,40 +470,7 @@ export default function NewsPost({ data }: pageProps) {
             </BlankLayer>
           </LayerWrapper>
         </CommentWrapper>
-        <InputWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>상태</InputTitle>
-          <Select
-            className="form-control"
-            value={state === true ? 'true' : 'false'}
-            onChange={(e) => {
-              if (e.currentTarget.value === 'true') {
-                setState(true);
-              } else {
-                setState(false);
-              }
-            }}
-          >
-            <option value={'true'}>최신</option>
-            <option value={'false'}>구닥다리</option>
-          </Select>
-        </InputWrapper>
-        <InputWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>퍼블리시 상태</InputTitle>
-          <Select
-            className="form-control"
-            value={isPublished === true ? 'true' : 'false'}
-            onChange={(e) => {
-              if (e.currentTarget.value === 'true') {
-                setIsPublished(true);
-              } else {
-                setIsPublished(false);
-              }
-            }}
-          >
-            <option value={'true'}>출간하기</option>
-            <option value={'false'}>김민재만 보기</option>
-          </Select>
-        </InputWrapper>
+
         <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
           <InputTitle>의견</InputTitle>
           <InputBody className="d-flex flex-row align-items-center w-100">
@@ -599,19 +500,6 @@ export default function NewsPost({ data }: pageProps) {
           </InputBody>
         </OpinionWrapper>
 
-        <KeywordSetter>
-          <SubmitButton
-            title={'키워드 선택하기'}
-            click={() => {
-              setIsSelectorModalUp(true);
-            }}
-          />
-          <KeywordWrapper>
-            {keywordList.map((keyword, idx) => {
-              return <KeywordLi key={idx}>{keyword}</KeywordLi>;
-            })}
-          </KeywordWrapper>
-        </KeywordSetter>
         <SubmitWrapper>
           <SubmitButton
             title="SUBMIT"
@@ -629,10 +517,11 @@ export default function NewsPost({ data }: pageProps) {
 }
 
 const Wrapper = styled.div`
+  width: 100%;
+
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 100vw;
   font-size: 18px;
   padding-top: 100px;
   & {
@@ -644,9 +533,37 @@ const Wrapper = styled.div`
   }
 `;
 
+const TextEditWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+`;
+
+const ContentEditWrapper = styled.div`
+  width: 1300px;
+  display: flex;
+  flex-direction: column;
+  padding: 0 1rem;
+`;
+
+const NewsPreviewWrapper = styled.div`
+  width: 100%;
+
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+
+  background-color: #f1f2f3;
+`;
+
 const ContentWrapper = styled.div`
-  width: 50%;
-  min-width: 60rem;
+  width: 100%;
+`;
+
+const StateToggleWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  padding: 0.5rem 0;
 `;
 
 const InputWrapper = styled.div`
@@ -659,12 +576,21 @@ const InputWrapper = styled.div`
 `;
 
 const InputTitle = styled.div`
-  width: 100px;
-  font-size: 18px;
+  flex: 1 0 auto;
+  font-size: 16px;
   font-weight: bold;
+  padding: 0 1rem;
+`;
+
+const ToggleTitle = styled.div`
+  flex: 0 1 1;
+  font-size: 14px;
+  font-weight: bold;
+  padding: 0 0.5rem;
 `;
 
 const OpinionTitle = styled.div`
+  flex: 1 0 auto;
   width: 120px;
   font-size: 18px;
 `;
@@ -702,7 +628,7 @@ const LayerWrapper = styled.div`
   display: flex;
   flex-direction: row;
   gap: 20px;
-  overflow: scroll;
+  overflow-x: scroll;
 `;
 
 const NewsInputLayer = styled.div`

@@ -12,6 +12,7 @@ import { TfiLoop } from 'react-icons/tfi';
 
 import { Keyword } from '@interface/keywords';
 import { useKeywordStore } from '@store/keyword';
+import { sortKorCallback } from '@utils/tools';
 
 interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
 
@@ -103,50 +104,56 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: key
   return (
     <Modal>
       <Wrapper>
-        <KeywordGrid>
-          <h3>전체 리스트</h3>
-          <KeywordUl>
-            {keywordRest.map((keyword) => {
-              return (
-                <KeywordLi
-                  key={keyword._id}
-                  onClick={() => {
-                    clickRest(keyword);
-                  }}
-                  state={restSelected.includes(keyword)}
-                >
-                  {keyword.keyword}
-                </KeywordLi>
-              );
-            })}
-          </KeywordUl>
-        </KeywordGrid>
-        <ButtonWrapper
-          onClick={() => {
-            reBuild();
-          }}
-        >
-          <TfiLoop className="reload" />
-        </ButtonWrapper>
-        <KeywordGrid>
-          <h3>선택 리스트</h3>
-          <KeywordUl>
-            {keywordContain.map((keyword) => {
-              return (
-                <KeywordLi
-                  key={keyword._id}
-                  onClick={() => {
-                    clickContain(keyword);
-                  }}
-                  state={containSelected.includes(keyword)}
-                >
-                  {keyword.keyword}
-                </KeywordLi>
-              );
-            })}
-          </KeywordUl>
-          <Loader />
-        </KeywordGrid>
+        <KeywordWrapper>
+          <KeywordGrid>
+            <h3>전체 리스트</h3>
+            <KeywordUl>
+              {keywordRest
+                .sort((a, b) => sortKorCallback(a.keyword!, b.keyword!))
+                .map((keyword) => {
+                  return (
+                    <KeywordLi
+                      key={keyword._id}
+                      onClick={() => {
+                        clickRest(keyword);
+                      }}
+                      state={restSelected.includes(keyword)}
+                    >
+                      {keyword.keyword}
+                    </KeywordLi>
+                  );
+                })}
+            </KeywordUl>
+          </KeywordGrid>
+          <ButtonWrapper
+            onClick={() => {
+              reBuild();
+            }}
+          >
+            <TfiLoop className="reload" />
+          </ButtonWrapper>
+          <KeywordGrid>
+            <h3>선택 리스트</h3>
+            <KeywordUl>
+              {keywordContain
+                .sort((a, b) => sortKorCallback(a.keyword!, b.keyword!))
+                .map((keyword) => {
+                  return (
+                    <KeywordLi
+                      key={keyword._id}
+                      onClick={() => {
+                        clickContain(keyword);
+                      }}
+                      state={containSelected.includes(keyword)}
+                    >
+                      {keyword.keyword}
+                    </KeywordLi>
+                  );
+                })}
+            </KeywordUl>
+            <Loader />
+          </KeywordGrid>
+        </KeywordWrapper>
         <SubmitWrapper>
           <SubmitButton
             title={'선택 완료'}
@@ -173,16 +180,28 @@ const Wrapper = styled.div`
   padding-bottom: 50px;
 `;
 
+const KeywordWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+
+  width: 100%;
+
+  padding: 0 1rem;
+`;
+
 const KeywordGrid = styled.div`
-  width: 50%;
-  max-height: 400px;
-  overflow: scroll;
+  width: 100%;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
   padding: 0.375rem 0.75rem;
 `;
 
 const KeywordUl = styled.ul`
+  width: 100%;
+  height: 400px;
+  overflow-y: scroll;
   list-style-type: none;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
