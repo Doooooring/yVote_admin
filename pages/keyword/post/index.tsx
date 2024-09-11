@@ -27,8 +27,6 @@ interface pageProps {
 export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
   const newsTitles: Array<NewsTitle> = await newsRepositories.getNewsTitles('');
   const keywordTitles: Array<KeywordTitle> = await keywordRepositories.getKeywordTitles('');
-  console.log('is her');
-  console.log(keywordTitles);
 
   return {
     props: {

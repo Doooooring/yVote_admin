@@ -571,51 +571,6 @@ export default function NewsPatch({ data }: pageProps) {
             <option value={'false'}>구닥다리</option>
           </Select>
         </InputWrapper>
-        <InputWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>퍼블리시 상태</InputTitle>
-          <Select
-            className="form-control"
-            value={isPublished === true ? 'true' : 'false'}
-            onChange={(e) => {
-              if (e.currentTarget.value === 'true') {
-                setIsPublished(true);
-              } else {
-                setIsPublished(false);
-              }
-            }}
-          >
-            <option value={'true'}>출간하기</option>
-            <option value={'false'}>김민재만 보기</option>
-          </Select>
-        </InputWrapper>
-        <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
-          <InputTitle>의견</InputTitle>
-          <InputBody className="d-flex flex-row align-items-center w-100">
-            <OpinionLeft>왼쪽</OpinionLeft>
-            <Input
-              type="text"
-              className="form-control"
-              value={opinions.left}
-              onChange={(e) => {
-                const curOpinions = clone(opinions);
-                curOpinions.left = e.currentTarget.value;
-                setOpinions(curOpinions);
-              }}
-            ></Input>
-
-            <OpinionRight>오른쪽</OpinionRight>
-            <Input
-              type="text"
-              className="form-control"
-              value={opinions.right}
-              onChange={(e) => {
-                const curOpinions = clone(opinions);
-                curOpinions.right = e.currentTarget.value;
-                setOpinions(curOpinions);
-              }}
-            ></Input>
-          </InputBody>
-        </OpinionWrapper>
         <KeywordSetter>
           <SubmitButton
             title={'키워드 선택하기'}

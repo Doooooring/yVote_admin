@@ -22,6 +22,7 @@ import ReactQuill from 'react-quill';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import ToggleButton from '@components/common/toggleButton';
+import TimelineInput from '@components/news/timelineInput';
 // import dynamic from 'next/dynamic';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
@@ -203,33 +204,6 @@ export default function NewsPost({ data }: pageProps) {
     setComments(newComments);
   };
 
-  const addTimeline = (idx: number) => {
-    const curTimeline = clone(timeline);
-    const newData = { date: '', title: '' };
-    curTimeline.splice(idx + 1, 0, newData);
-    setTimeline(curTimeline);
-  };
-
-  const deleteTimeline = (idx: number) => {
-    const curTimeline = clone(timeline);
-    curTimeline.splice(idx, 1);
-    setTimeline(curTimeline);
-  };
-
-  const moveTimelineLeft = (idx: number) => {
-    if (idx === 0) return;
-
-    const newTimeline = changeItemsOrder(timeline, idx, idx - 1);
-    setTimeline(newTimeline);
-  };
-
-  const moveTimelineRight = (idx: number) => {
-    if (idx === timeline.length - 1) return;
-
-    const newTimline = changeItemsOrder(timeline, idx, idx + 1);
-    setTimeline(newTimline);
-  };
-
   return (
     <Wrapper>
       <TextEditWrapper>
@@ -336,74 +310,7 @@ export default function NewsPost({ data }: pageProps) {
         </NewsPreviewWrapper>
       </TextEditWrapper>
       <ContentWrapper className="mb-5">
-        <TimelineInputWrapper className="pb-1 pt-1 mb-1">
-          <LayerTitleWrapper>
-            <InputTitle>타임 라인</InputTitle>
-          </LayerTitleWrapper>
-          <LayerWrapper className="px-3 pb-3 pt-3">
-            {timeline.map((item, idx) => {
-              return (
-                <NewsInputLayer className="shadow p-3 bg-white rounded">
-                  <div className="input_layer_header">
-                    <div className="button_wrapper">
-                      <Button className="btn btn-primary" onClick={() => addTimeline(idx)}>
-                        {' '}
-                        추가{' '}
-                      </Button>
-                      <Button className="btn btn-secondary" onClick={() => deleteTimeline(idx)}>
-                        {' '}
-                        삭제{' '}
-                      </Button>
-                    </div>
-                    <div className="left-right-buttons">
-                      <div className="left order-button" onClick={() => moveTimelineLeft(idx)}>
-                        <FontAwesomeIcon icon={faChevronLeft} />
-                      </div>
-                      <div className="right order-button" onClick={() => moveTimelineRight(idx)}>
-                        <FontAwesomeIcon icon={faChevronRight} />
-                      </div>
-                    </div>
-                  </div>
-                  <InputWrapper>
-                    <SubInputTitle>날짜</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      value={item.date}
-                      onChange={(e) => {
-                        const curTimeline = clone(timeline);
-                        curTimeline[idx].date = e.currentTarget.value;
-                        setTimeline(curTimeline);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                  <InputWrapper>
-                    <SubInputTitle>제목</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      value={item.title}
-                      onChange={(e) => {
-                        const curTimeline = clone(timeline);
-                        curTimeline[idx].title = e.currentTarget.value;
-                        setTimeline(curTimeline);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                </NewsInputLayer>
-              );
-            })}
-            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
-              <Plus
-                onClick={() => {
-                  addTimeline(timeline.length);
-                }}
-              >
-                +
-              </Plus>
-            </BlankLayer>
-          </LayerWrapper>
-        </TimelineInputWrapper>
+        <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
         <CommentWrapper className="pb-1 pt-1 mb-1">
           <InputTitle>평론</InputTitle>
           <LayerWrapper className="px-3 pb-3 pt-3">
