@@ -23,6 +23,7 @@ import { useReactQuill } from '@utils/hook/useReactQuill';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import ToggleButton from '@components/common/toggleButton';
 import TimelineInput from '@components/news/timelineInput';
+import CommentInput from '@components/news/commentInput';
 // import dynamic from 'next/dynamic';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
@@ -57,8 +58,8 @@ export default function NewsPost({ data }: pageProps) {
   const [summary, setSummary] = useState<string>('');
   const [timeline, setTimeline] = useState<News['timeline']>([
     {
-      date: '2024.01.01',
-      title: '테스트 제목입니다',
+      date: '',
+      title: '',
     },
   ]);
   const [state, setState] = useState<boolean>(true);
@@ -139,7 +140,12 @@ export default function NewsPost({ data }: pageProps) {
     }
   };
 
-  const commentRest: commentType[] = useMemo(() => {
+  const commentRest = (
+    comments: Array<{
+      type: commentType;
+      data: Array<{ title: string; comment: string }>;
+    }>,
+  ) => {
     const curComments = comments;
     let restComment: commentType[] = [];
     commentTypeKey.forEach((commentType) => {
@@ -151,7 +157,7 @@ export default function NewsPost({ data }: pageProps) {
       }
     });
     return restComment;
-  }, [comments]);
+  };
 
   const editComment = (comment: {
     type: commentType;
@@ -175,7 +181,7 @@ export default function NewsPost({ data }: pageProps) {
   const addComments = (idx: number) => {
     if (commentRest.length === 0) return;
     const curComments = clone(comments);
-    const curType = commentRest[0];
+    const curType = commentRest(comments)[0];
     const newComment = { type: curType, data: [] };
     curComments.splice(idx + 1, 0, newComment);
     setComments(curComments);
@@ -311,73 +317,7 @@ export default function NewsPost({ data }: pageProps) {
       </TextEditWrapper>
       <ContentWrapper className="mb-5">
         <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
-        <CommentWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>평론</InputTitle>
-          <LayerWrapper className="px-3 pb-3 pt-3">
-            {comments.map((comment, idx) => {
-              return (
-                <JournalLayer key={idx} className="shadow p-3 bg-white rounded">
-                  <div className="input_layer_header">
-                    <div className="button_wrapper">
-                      <Button className="btn btn-primary" onClick={() => addComments(idx)}>
-                        {' '}
-                        추가{' '}
-                      </Button>
-                      <Button className="btn btn-secondary" onClick={() => deleteComments(idx)}>
-                        {' '}
-                        삭제{' '}
-                      </Button>
-                    </div>
-                    <div className="left-right-buttons">
-                      <div className="left order-button" onClick={() => moveCommentLeft(idx)}>
-                        <FontAwesomeIcon icon={faChevronLeft} />
-                      </div>
-                      <div className="right order-button" onClick={() => moveCommentRight(idx)}>
-                        <FontAwesomeIcon icon={faChevronRight} />
-                      </div>
-                    </div>
-                  </div>
-                  <InputWrapper>
-                    <SubInputTitle>평론 타입</SubInputTitle>
-                    <CommentSelect
-                      className="form-select"
-                      value={comment.type}
-                      onChange={(e) => {
-                        const curComments = clone(comments);
-                        curComments[idx].type = e.currentTarget.value as commentType;
-                        setComments(curComments);
-                      }}
-                    >
-                      {commentTypeKey.map((comment, idx) => {
-                        return (
-                          <option key={comment + JSON.stringify(idx)} value={comment}>
-                            {comment}
-                          </option>
-                        );
-                      })}
-                    </CommentSelect>
-                    <div
-                      className="comment-modal-button btn btn-primary"
-                      onClick={() => setCommentSelected(comment)}
-                    >
-                      내용 채우기
-                    </div>
-                  </InputWrapper>
-                </JournalLayer>
-              );
-            })}
-            <BlankLayer className="shadow p-3 bg-white rounded justify-content-center align-items-center">
-              <Plus
-                onClick={() => {
-                  addComments(comments.length);
-                }}
-              >
-                +
-              </Plus>
-            </BlankLayer>
-          </LayerWrapper>
-        </CommentWrapper>
-
+        <CommentInput comments={comments} setComments={setComments} />
         <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
           <InputTitle>의견</InputTitle>
           <InputBody className="d-flex flex-row align-items-center w-100">
@@ -651,4 +591,6 @@ const KeywordLi = styled.li`
   margin-bottom: 5px;
 `;
 
-const SubmitWrapper = styled.div``;
+const SubmitWrapper = styled.div`
+  padding: 0.5rem;
+`;

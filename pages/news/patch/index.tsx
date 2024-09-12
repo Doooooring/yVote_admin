@@ -4,9 +4,11 @@ import ToggleButton from '@components/common/toggleButton';
 import SearchBox from '@components/keyword/search';
 import { SearchState } from '@components/keyword/searchState';
 import CommentModal from '@components/news/commenModal';
+import CommentInput from '@components/news/commentInput';
 import IdSelector from '@components/news/idSelector';
 import KeywordSelect from '@components/news/keywordSelect';
 import NewsContentPreview from '@components/news/newsContentPreview';
+import TimelineInput from '@components/news/timelineInput';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Keyword } from '@interface/keywords';
@@ -420,170 +422,8 @@ export default function NewsPatch({ data }: pageProps) {
         </NewsPreviewWrapper>
       </TextEditWrapper>
       <ContentWrapper className="mb-5" state={id === ''}>
-        <TimelineInputWrapper className="pb-1 pt-1 mb-1">
-          <LayerTitleWrapper>
-            <InputTitle>타임 라인</InputTitle>
-          </LayerTitleWrapper>
-          <LayerWrapper className="px-3 pb-3 pt-3">
-            {timeline.map((item, idx) => {
-              return (
-                <NewsInputLayer className="shadow p-3 bg-white rounded">
-                  <div className="input_layer_header">
-                    <div className="button-wrapper">
-                      <Button className="btn btn-primary" onClick={() => addTimeline(idx)}>
-                        {' '}
-                        추가{' '}
-                      </Button>
-                      <Button className="btn btn-secondary" onClick={() => deleteTimeline(idx)}>
-                        {' '}
-                        삭제{' '}
-                      </Button>
-                    </div>
-                    <div className="left-right-buttons">
-                      <div className="left order-button" onClick={() => moveTimelineLeft(idx)}>
-                        <FontAwesomeIcon icon={faChevronLeft} />
-                      </div>
-                      <div className="right order-button" onClick={() => moveTimelineRight(idx)}>
-                        <FontAwesomeIcon icon={faChevronRight} />
-                      </div>
-                    </div>
-                  </div>
-                  <InputWrapper>
-                    <SubInputTitle>날짜</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      value={item.date}
-                      onChange={(e) => {
-                        const curTimeline = clone(timeline);
-                        curTimeline[idx].date = e.currentTarget.value;
-                        setTimeline(curTimeline);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                  <InputWrapper>
-                    <SubInputTitle>제목</SubInputTitle>
-                    <SubInput
-                      type="text"
-                      className="form-control"
-                      value={item.title}
-                      onChange={(e) => {
-                        const curTimeline = clone(timeline);
-                        curTimeline[idx].title = e.currentTarget.value;
-                        setTimeline(curTimeline);
-                      }}
-                    ></SubInput>
-                  </InputWrapper>
-                </NewsInputLayer>
-              );
-            })}
-            <div className="blank-layer shadow p-3 bg-white rounded justify-content-center align-items-center">
-              <Plus
-                onClick={() => {
-                  addTimeline(timeline.length);
-                }}
-              >
-                +
-              </Plus>
-            </div>
-          </LayerWrapper>
-        </TimelineInputWrapper>
-        <CommentWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>평론</InputTitle>
-          <LayerWrapper className="px-3 pb-3 pt-3">
-            {comments.map((comment, idx) => {
-              return (
-                <JournalLayer key={idx} className="shadow p-3 bg-white rounded">
-                  <div className="input_layer_header">
-                    <div className="button_wrapper">
-                      <Button className="btn btn-primary" onClick={() => addComments(idx)}>
-                        {' '}
-                        추가{' '}
-                      </Button>
-                      <Button className="btn btn-secondary" onClick={() => deleteComments(idx)}>
-                        {' '}
-                        삭제{' '}
-                      </Button>
-                    </div>
-                    <div className="left-right-buttons">
-                      <div className="left order-button" onClick={() => moveCommentLeft(idx)}>
-                        <FontAwesomeIcon icon={faChevronLeft} />
-                      </div>
-                      <div className="right order-button" onClick={() => moveCommentRight(idx)}>
-                        <FontAwesomeIcon icon={faChevronRight} />
-                      </div>
-                    </div>
-                  </div>
-                  <InputWrapper>
-                    <SubInputTitle>평론 타입</SubInputTitle>
-                    <CommentSelect
-                      className="form-select"
-                      value={comment.type}
-                      onChange={(e) => {
-                        const curComments = clone(comments);
-                        curComments[idx].type = e.currentTarget.value as commentType;
-                        setComments(curComments);
-                      }}
-                    >
-                      {commentTypeKey.map((comment, idx) => {
-                        return (
-                          <option key={comment + JSON.stringify(idx)} value={comment}>
-                            {comment}
-                          </option>
-                        );
-                      })}
-                    </CommentSelect>
-                    <div
-                      className="comment-modal-button btn btn-primary"
-                      onClick={() => setCommentSelected(comment)}
-                    >
-                      내용 채우기
-                    </div>
-                  </InputWrapper>
-                </JournalLayer>
-              );
-            })}
-            <div className="blank-layer shadow p-3 bg-white rounded justify-content-center align-items-center">
-              <Plus
-                onClick={() => {
-                  addComments(comments.length);
-                }}
-              >
-                +
-              </Plus>
-            </div>
-          </LayerWrapper>
-        </CommentWrapper>
-        <InputWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>상태</InputTitle>
-          <Select
-            className="form-control"
-            value={state === true ? 'true' : 'false'}
-            onChange={(e) => {
-              if (e.currentTarget.value === 'true') {
-                setState(true);
-              } else {
-                setState(false);
-              }
-            }}
-          >
-            <option value={'true'}>최신</option>
-            <option value={'false'}>구닥다리</option>
-          </Select>
-        </InputWrapper>
-        <KeywordSetter>
-          <SubmitButton
-            title={'키워드 선택하기'}
-            click={() => {
-              setIsSelectorModalUp(true);
-            }}
-          />
-          <KeywordWrapper>
-            {keywordList.map((keyword, idx) => {
-              return <KeywordLi key={idx}>{keyword}</KeywordLi>;
-            })}
-          </KeywordWrapper>
-        </KeywordSetter>
+        <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
+        <CommentInput comments={comments} setComments={setComments} />
         <SubmitWrapper>
           <SubmitButton
             title="SUBMIT"
@@ -846,4 +686,6 @@ const KeywordLi = styled.li`
   margin-bottom: 5px;
 `;
 
-const SubmitWrapper = styled.div``;
+const SubmitWrapper = styled.div`
+  padding: 0.5rem;
+`;
