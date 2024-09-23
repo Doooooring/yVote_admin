@@ -9,8 +9,6 @@ import IdSelector from '@components/news/idSelector';
 import KeywordSelect from '@components/news/keywordSelect';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Keyword } from '@interface/keywords';
 import { News, commentType } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
@@ -18,13 +16,14 @@ import { NewsToPatch, newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
-import { changeItemsOrder, clone } from '@utils';
+import { clone } from '@utils';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { GetServerSideProps } from 'next';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
@@ -52,6 +51,7 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 };
 
 export default function NewsPatch({ data }: pageProps) {
+  const router = useRouter();
   const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
 
   const [id, setId] = useState<string>('');
@@ -193,19 +193,8 @@ export default function NewsPatch({ data }: pageProps) {
         Error();
         return;
       }
-
-      setId('');
-      //setSummary('');
-      resetContents();
-      setTitle('');
-      setTimeline([]);
-      setState(true);
-      setIsPublished(true);
-      setOpinions({
-        left: '',
-        right: '',
-      });
-      setKeywordList([]);
+      alert('저장되었습니다~');
+      router.reload();
 
       return result;
     } catch (e) {
@@ -214,24 +203,6 @@ export default function NewsPatch({ data }: pageProps) {
       setIsLoading(false);
     }
   };
-
-  const commentRest: commentType[] = useMemo(() => {
-    const curComments = comments;
-    let restComment: commentType[] = [];
-    commentTypeKey.forEach((commentType) => {
-      const result = curComments.filter((comment) => {
-        return comment.type === commentType;
-      });
-      if (result.length === 0) {
-        restComment.push(commentType);
-      }
-    });
-    return restComment;
-  }, [comments]);
-
-  useEffect(() => {
-    console.log(comments);
-  }, [comments]);
 
   const editComment = (comment: {
     type: commentType;
@@ -251,62 +222,6 @@ export default function NewsPatch({ data }: pageProps) {
     newComments[index] = comment;
     setComments(newComments);
     setCommentSelected(comment);
-  };
-
-  const addComments = (idx: number) => {
-    if (commentRest.length === 0) return;
-    const curComments = clone(comments);
-    const curType = commentRest[0];
-    const newComment = { type: curType, data: [] };
-    curComments.splice(idx + 1, 0, newComment);
-    setComments(curComments);
-  };
-
-  const deleteComments = (idx: number) => {
-    const curComments = clone(comments);
-    curComments.splice(idx, 1);
-    setComments(curComments);
-  };
-
-  const moveCommentLeft = (idx: number) => {
-    if (idx === 0) return;
-
-    const newComments = changeItemsOrder(comments, idx, idx - 1);
-    setComments(newComments);
-  };
-
-  const moveCommentRight = (idx: number) => {
-    if (idx === comments.length - 1) return;
-
-    const newComments = changeItemsOrder(comments, idx, idx + 1);
-    setComments(newComments);
-  };
-
-  const addTimeline = (idx: number) => {
-    const curTimeline = clone(timeline);
-    const newData = { date: '', title: '' };
-    curTimeline.splice(idx + 1, 0, newData);
-    setTimeline(curTimeline);
-  };
-
-  const deleteTimeline = (idx: number) => {
-    const curTimeline = clone(timeline);
-    curTimeline.splice(idx, 1);
-    setTimeline(curTimeline);
-  };
-
-  const moveTimelineLeft = (idx: number) => {
-    if (idx === 0) return;
-
-    const newTimeline = changeItemsOrder(timeline, idx, idx - 1);
-    setTimeline(newTimeline);
-  };
-
-  const moveTimelineRight = (idx: number) => {
-    if (idx === timeline.length - 1) return;
-
-    const newTimline = changeItemsOrder(timeline, idx, idx + 1);
-    setTimeline(newTimline);
   };
 
   return (

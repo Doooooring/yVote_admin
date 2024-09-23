@@ -1,13 +1,12 @@
-import { News, commentType } from '@interface/news';
-import styled from 'styled-components';
 import { Center, Column, Row } from '@components/common/figure';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { clone } from '@utils';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
-import { useArr } from '@utils/hook/useArr';
-import { useNewsStore } from '@store/news';
 import ListEditView from '@components/common/listEditView';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { commentType } from '@interface/news';
+import { useNewsStore } from '@store/news';
+import { clone } from '@utils';
+import { useArr } from '@utils/hook/useArr';
+import styled from 'styled-components';
 
 interface Comment {
   type: commentType;

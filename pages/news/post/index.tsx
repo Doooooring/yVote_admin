@@ -1,9 +1,9 @@
 import { News, commentType } from '@interface/news';
 import { useCommonStore } from '@store/common';
-import { changeItemsOrder, clone } from '@utils';
+import { clone } from '@utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
@@ -13,17 +13,14 @@ import { Keyword } from '@interface/keywords';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useKeywordStore } from '@store/keyword';
-import { useNewsStore } from '@store/news';
 
-import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import TextEditor from '@components/common/textEditor';
-import ReactQuill from 'react-quill';
-import { useReactQuill } from '@utils/hook/useReactQuill';
-import NewsContentPreview from '@components/news/newsContentPreview';
 import ToggleButton from '@components/common/toggleButton';
-import TimelineInput from '@components/news/timelineInput';
 import CommentInput from '@components/news/commentInput';
+import NewsContentPreview from '@components/news/newsContentPreview';
+import TimelineInput from '@components/news/timelineInput';
+import { useReactQuill } from '@utils/hook/useReactQuill';
+import { useRouter } from 'next/router';
 // import dynamic from 'next/dynamic';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
@@ -52,10 +49,11 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 };
 
 export default function NewsPost({ data }: pageProps) {
+  const router = useRouter();
+
   const { ref, content, handleContents, resetContents } = useReactQuill();
 
   const [title, setTitle] = useState<string>('');
-  const [summary, setSummary] = useState<string>('');
   const [timeline, setTimeline] = useState<News['timeline']>([
     {
       date: '',
@@ -79,8 +77,6 @@ export default function NewsPost({ data }: pageProps) {
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
   const setIsSelectorModalUp = useCommonStore((state) => state.setIsSelectorModalUp);
-
-  const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
 
   const setKeywordTitleList = useKeywordStore((state) => state.setKeywordTitleList);
   const keywordTitleList = useKeywordStore((state) => state.keywordTitleList);
@@ -117,18 +113,8 @@ export default function NewsPost({ data }: pageProps) {
       });
       if (result) {
         //setSummary('');
-        resetContents();
-        setTitle('');
-        setTimeline([]);
-        setState(true);
-        setIsPublished(true);
-        setOpinions({
-          left: '',
-          right: '',
-        });
-        setComments([]);
-        setKeywordList([]);
-        alert('잘감');
+        alert('저장되었습니다~');
+        router.reload();
       } else {
         alert('안감');
       }
@@ -138,25 +124,6 @@ export default function NewsPost({ data }: pageProps) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const commentRest = (
-    comments: Array<{
-      type: commentType;
-      data: Array<{ title: string; comment: string }>;
-    }>,
-  ) => {
-    const curComments = comments;
-    let restComment: commentType[] = [];
-    commentTypeKey.forEach((commentType) => {
-      const result = curComments.filter((comment) => {
-        return comment.type === commentType;
-      });
-      if (result.length === 0) {
-        restComment.push(commentType);
-      }
-    });
-    return restComment;
   };
 
   const editComment = (comment: {
@@ -175,38 +142,6 @@ export default function NewsPost({ data }: pageProps) {
     if (index === null) return;
     const newComments = clone(comments);
     newComments[index] = comment;
-    setComments(newComments);
-  };
-
-  const addComments = (idx: number) => {
-    if (commentRest.length === 0) return;
-    const curComments = clone(comments);
-    const curType = commentRest(comments)[0];
-    const newComment = { type: curType, data: [] };
-    curComments.splice(idx + 1, 0, newComment);
-    setComments(curComments);
-  };
-
-  const deleteComments = useCallback(
-    (idx: number) => {
-      const curComments = clone(comments);
-      curComments.splice(idx, 1);
-      setComments(curComments);
-    },
-    [comments],
-  );
-
-  const moveCommentLeft = (idx: number) => {
-    if (idx === 0) return;
-
-    const newComments = changeItemsOrder(comments, idx, idx - 1);
-    setComments(newComments);
-  };
-
-  const moveCommentRight = (idx: number) => {
-    if (idx === comments.length - 1) return;
-
-    const newComments = changeItemsOrder(comments, idx, idx + 1);
     setComments(newComments);
   };
 
