@@ -56,7 +56,6 @@ export default function NewsPatch({ data }: pageProps) {
 
   const [id, setId] = useState<string>('');
   const [title, setTitle] = useState<string>('');
-  const [summary, setSummary] = useState<string>('');
   const [timeline, setTimeline] = useState<News['timeline']>([]);
   const [state, setState] = useState<boolean>(true);
   const [isPublished, setIsPublished] = useState<boolean>(true);
