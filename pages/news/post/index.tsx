@@ -260,6 +260,7 @@ export default function NewsPost({ data }: pageProps) {
             }}
           />
         </SubmitWrapper>
+      
         <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
         <CommentModal editComment={editComment} />
       </ContentWrapper>

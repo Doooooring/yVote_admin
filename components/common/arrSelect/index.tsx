@@ -33,9 +33,6 @@ export default function ArrSelect<T>({
 
   const setIsSelectorModalUp = useCommonStore((store) => store.setIsSelectorModalUp);
 
-  const isLoading = useCommonStore((store) => store.isLoading);
-  const setIsLoading = useCommonStore((store) => store.setIsLoading);
-
   useEffect(() => {
     const curRest: Array<T> = [];
     const curContain: Array<T> = [];
@@ -78,10 +75,6 @@ export default function ArrSelect<T>({
   }
 
   function reBuild() {
-    if (isLoading) {
-      return;
-    }
-    setIsLoading(true);
     const newRest: Array<T> = [];
     const newContain: Array<T> = [];
     totalArrSrc.map((s) => {
@@ -103,7 +96,6 @@ export default function ArrSelect<T>({
     setArrContain(newContain);
     setContainSelected([]);
     setRestSelected([]);
-    setIsLoading(false);
   }
 
   return (

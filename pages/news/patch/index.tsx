@@ -308,7 +308,6 @@ export default function NewsPatch({ data }: pageProps) {
       <ContentWrapper className="mb-5" state={id === ''}>
         <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
         <CommentInput comments={comments} setComments={setComments} />
-
         <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
           <InputTitle>의견</InputTitle>
           <InputBody className="d-flex flex-row align-items-center w-100">

@@ -1,4 +1,5 @@
 import { SubmitButton } from '@components/common/button';
+import TextEditor from '@components/common/textEditor';
 import NewsSelect from '@components/keyword/newsSelect';
 import SearchBox from '@components/keyword/search';
 import { SearchState } from '@components/keyword/searchState';
@@ -9,6 +10,7 @@ import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
+import { useReactQuill } from '@utils/hook/useReactQuill';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
@@ -39,6 +41,8 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
   };
 };
 export default function KeywordPatch({ data }: pageProps) {
+  const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
+
   const [id, setId] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
   const [explain, setExplain] = useState<string>('');
@@ -69,6 +73,7 @@ export default function KeywordPatch({ data }: pageProps) {
       setKeyword(keyword);
       setCategory(category);
       setExplain(explain);
+      initializeQuillContents(explain);
       setNewsList(news);
       setKeywordSearchErr(false);
     } catch {
@@ -87,6 +92,7 @@ export default function KeywordPatch({ data }: pageProps) {
     setKeyword('');
     setCategory(Category.economics);
     setExplain('');
+    resetContents();
     setNewsList([]);
   };
 
@@ -140,6 +146,7 @@ export default function KeywordPatch({ data }: pageProps) {
             }}
           ></Input>
         </InputWrapper>
+        <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
         <InputWrapper>
           <InputTitle>카테고리</InputTitle>
           <Select
