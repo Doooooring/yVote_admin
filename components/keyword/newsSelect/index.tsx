@@ -35,7 +35,6 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
   useEffect(() => {
     const curRest: Array<NewsTitle> = [];
     const curContain: Array<NewsTitle> = [];
-    console.log(curNewsList);
     newsTitleList.forEach((news) => {
       if (curNewsList.includes(news._id!)) {
         curContain.push(news);
@@ -43,8 +42,6 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
         curRest.push(news);
       }
     });
-    console.log(curRest);
-    console.log(curContain);
     setNewsRest(curRest);
     setNewsContain(curContain);
   }, [newsTitleList]);

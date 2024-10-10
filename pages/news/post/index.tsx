@@ -21,7 +21,6 @@ import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { useRouter } from 'next/router';
-// import dynamic from 'next/dynamic';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
@@ -32,8 +31,6 @@ interface pageProps {
     keywordTitles: Array<any>;
   };
 }
-
-// const MDEditor = dynamic(() => import('@uiw/react-md-editor'), { ssr: false });
 
 export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
   const newsTitles: Array<NewsTitle> = await newsRepositories.getNewsTitles('');
@@ -164,20 +161,6 @@ export default function NewsPost({ data }: pageProps) {
           <StateToggleWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>최신 아티클</ToggleTitle>
-              {/* <Select
-              className="form-control"
-              value={state === true ? 'true' : 'false'}
-              onChange={(e) => {
-                if (e.currentTarget.value === 'true') {
-                  setState(true);
-                } else {
-                  setState(false);
-                }
-              }}
-              >
-              <option value={'true'}>최신</option>
-              <option value={'false'}>구닥다리</option>
-            </Select> */}
               <ToggleButton
                 state={state}
                 setState={setState}
@@ -196,20 +179,6 @@ export default function NewsPost({ data }: pageProps) {
             </InputWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>퍼블리시 상태</ToggleTitle>
-              {/* <Select
-              className="form-control"
-              value={isPublished === true ? 'true' : 'false'}
-              onChange={(e) => {
-                if (e.currentTarget.value === 'true') {
-                  setIsPublished(true);
-                } else {
-                  setIsPublished(false);
-                }
-              }}
-              >
-              <option value={'true'}>출간하기</option>
-              <option value={'false'}>김민재만 보기</option>
-            </Select> */}
               <ToggleButton
                 state={isPublished}
                 setState={setIsPublished}
