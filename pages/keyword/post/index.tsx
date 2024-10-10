@@ -13,6 +13,8 @@ import { useNewsStore } from '@store/news';
 
 import { keywordRepositories } from '@repositories/keyword';
 import { GetServerSideProps } from 'next';
+import { useReactQuill } from '@utils/hook/useReactQuill';
+import TextEditor from '@components/common/textEditor';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
@@ -39,6 +41,8 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 };
 
 export default function KeywordPost({ data }: pageProps) {
+  const { ref, content, handleContents, resetContents } = useReactQuill();
+
   const [keyword, setKeyword] = useState<string>('');
   const [explain, setExplain] = useState<string>('');
   const [category, setCategory] = useState<Keyword['category']>(Category.human);
@@ -79,9 +83,11 @@ export default function KeywordPost({ data }: pageProps) {
   const resetInput = () => {
     setKeyword('');
     setExplain('');
+    resetContents();
     setCategory(Category.human);
     setNewsList([]);
   };
+
   return (
     <Wrapper>
       <ContentWrapper>
@@ -108,6 +114,7 @@ export default function KeywordPost({ data }: pageProps) {
             }}
           ></Input>
         </InputWrapper>
+        <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
         <InputWrapper>
           <InputTitle>카테고리</InputTitle>
           <Select
@@ -154,7 +161,7 @@ export default function KeywordPost({ data }: pageProps) {
             }}
           />
         </SubmitWrapper>
-        <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList}></NewsSelect>
+        <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList} />
       </ContentWrapper>
     </Wrapper>
   );

@@ -88,8 +88,6 @@ export default function NewsPatch({ data }: pageProps) {
     setKeywordTitleList(data.keywordTitles);
   }, []);
 
-  const commentTypeKey = Object.keys(commentType) as Array<commentType>;
-
   const findNews = useCallback(async (searchWord: string) => {
     try {
       setIsLoading(true);
@@ -249,20 +247,6 @@ export default function NewsPatch({ data }: pageProps) {
           <StateToggleWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>최신 아티클</ToggleTitle>
-              {/* <Select
-              className="form-control"
-              value={state === true ? 'true' : 'false'}
-              onChange={(e) => {
-                if (e.currentTarget.value === 'true') {
-                  setState(true);
-                } else {
-                  setState(false);
-                }
-              }}
-              >
-              <option value={'true'}>최신</option>
-              <option value={'false'}>구닥다리</option>
-            </Select> */}
               <ToggleButton
                 state={state}
                 setState={setState}
@@ -281,20 +265,6 @@ export default function NewsPatch({ data }: pageProps) {
             </InputWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>퍼블리시 상태</ToggleTitle>
-              {/* <Select
-              className="form-control"
-              value={isPublished === true ? 'true' : 'false'}
-              onChange={(e) => {
-                if (e.currentTarget.value === 'true') {
-                  setIsPublished(true);
-                } else {
-                  setIsPublished(false);
-                }
-              }}
-              >
-              <option value={'true'}>출간하기</option>
-              <option value={'false'}>김민재만 보기</option>
-            </Select> */}
               <ToggleButton
                 state={isPublished}
                 setState={setIsPublished}
@@ -338,6 +308,35 @@ export default function NewsPatch({ data }: pageProps) {
       <ContentWrapper className="mb-5" state={id === ''}>
         <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
         <CommentInput comments={comments} setComments={setComments} />
+
+        <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
+          <InputTitle>의견</InputTitle>
+          <InputBody className="d-flex flex-row align-items-center w-100">
+            <OpinionLeft>왼쪽</OpinionLeft>
+            <Input
+              type="text"
+              className="form-control"
+              value={opinions.left}
+              onChange={(e) => {
+                const curOpinions = clone(opinions);
+                curOpinions.left = e.currentTarget.value;
+                setOpinions(curOpinions);
+              }}
+            ></Input>
+
+            <OpinionRight>오른쪽</OpinionRight>
+            <Input
+              type="text"
+              className="form-control"
+              value={opinions.right}
+              onChange={(e) => {
+                const curOpinions = clone(opinions);
+                curOpinions.right = e.currentTarget.value;
+                setOpinions(curOpinions);
+              }}
+            ></Input>
+          </InputBody>
+        </OpinionWrapper>
         <SubmitWrapper>
           <SubmitButton
             title="SUBMIT"
