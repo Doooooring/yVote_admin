@@ -15,6 +15,7 @@ import { keywordRepositories } from '@repositories/keyword';
 import { GetServerSideProps } from 'next';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import TextEditor from '@components/common/textEditor';
+import ExplainPreview from '@components/keyword/explainPreview';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
@@ -64,7 +65,7 @@ export default function KeywordPost({ data }: pageProps) {
       const result: boolean = await keywordRepositories.postKeyword({
         keyword: keyword,
         category: category,
-        explain: explain,
+        explain: content,
         news: newsList,
       });
       if (result) {
@@ -102,19 +103,8 @@ export default function KeywordPost({ data }: pageProps) {
             }}
           ></Input>
         </InputWrapper>
-        <InputWrapper>
-          <InputTitle>설명</InputTitle>
-          <Input
-            type="textarea"
-            className="form-control"
-            placeholder="의도적으로 줄 넘기고 싶으면 $ 넣기"
-            value={explain}
-            onChange={(e) => {
-              setExplain(e.currentTarget.value);
-            }}
-          ></Input>
-        </InputWrapper>
         <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
+        <ExplainPreview keyword={keyword} explain={content} />
         <InputWrapper>
           <InputTitle>카테고리</InputTitle>
           <Select
@@ -187,6 +177,7 @@ const InputWrapper = styled.div`
   justify-content: center;
   padding-top: 5px;
   padding-bottom: 5px;
+  margin-top: 20px;
 `;
 
 const InputTitle = styled.div`

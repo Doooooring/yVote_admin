@@ -1,5 +1,6 @@
 import { SubmitButton } from '@components/common/button';
 import TextEditor from '@components/common/textEditor';
+import ExplainPreview from '@components/keyword/explainPreview';
 import NewsSelect from '@components/keyword/newsSelect';
 import SearchBox from '@components/keyword/search';
 import { SearchState } from '@components/keyword/searchState';
@@ -45,7 +46,6 @@ export default function KeywordPatch({ data }: pageProps) {
 
   const [id, setId] = useState<string>('');
   const [keyword, setKeyword] = useState<string>('');
-  const [explain, setExplain] = useState<string>('');
   const [category, setCategory] = useState<Keyword['category']>(Category.human);
   const [newsList, setNewsList] = useState<Array<string>>([]);
   const [keywordSearchErr, setKeywordSearchErr] = useState<boolean>(false);
@@ -72,7 +72,6 @@ export default function KeywordPatch({ data }: pageProps) {
       setId(_id);
       setKeyword(keyword);
       setCategory(category);
-      setExplain(explain);
       initializeQuillContents(explain);
       setNewsList(news);
       setKeywordSearchErr(false);
@@ -91,7 +90,6 @@ export default function KeywordPatch({ data }: pageProps) {
     setId('');
     setKeyword('');
     setCategory(Category.economics);
-    setExplain('');
     resetContents();
     setNewsList([]);
   };
@@ -103,7 +101,7 @@ export default function KeywordPatch({ data }: pageProps) {
         _id: id,
         keyword: keyword,
         category: category,
-        explain: explain,
+        explain: content,
         news: newsList,
       });
       if (result) {
@@ -134,19 +132,8 @@ export default function KeywordPatch({ data }: pageProps) {
             }}
           ></Input>
         </InputWrapper>
-        <InputWrapper>
-          <InputTitle>설명</InputTitle>
-          <Input
-            type="textarea"
-            className="form-control"
-            placeholder="의도적으로 줄 넘기고 싶으면 $ 넣기"
-            value={explain}
-            onChange={(e) => {
-              setExplain(e.currentTarget.value);
-            }}
-          ></Input>
-        </InputWrapper>
         <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
+        <ExplainPreview keyword={keyword} explain={content} />
         <InputWrapper>
           <InputTitle>카테고리</InputTitle>
           <Select
@@ -224,6 +211,7 @@ const InputWrapper = styled.div`
   justify-content: center;
   padding-top: 5px;
   padding-bottom: 5px;
+  margin-top: 20px;
 `;
 
 const InputTitle = styled.div`
