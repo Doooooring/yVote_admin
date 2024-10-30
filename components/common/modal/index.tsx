@@ -11,7 +11,7 @@ export default function Modal({ children }: ModalProps) {
     state.setIsSelectorModalUp,
   ]);
 
-  return (
+  return isSelectorModalUp ? (
     <Wrapper
       state={isSelectorModalUp}
       onClick={(e) => {
@@ -22,6 +22,8 @@ export default function Modal({ children }: ModalProps) {
     >
       {children}
     </Wrapper>
+  ) : (
+    <></>
   );
 }
 

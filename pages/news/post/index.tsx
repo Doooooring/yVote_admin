@@ -21,6 +21,7 @@ import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { useRouter } from 'next/router';
+import { useNewsStore } from '@store/news';
 
 interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
@@ -74,6 +75,7 @@ export default function NewsPost({ data }: pageProps) {
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
   const setIsSelectorModalUp = useCommonStore((state) => state.setIsSelectorModalUp);
+  const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
 
   const setKeywordTitleList = useKeywordStore((state) => state.setKeywordTitleList);
   const keywordTitleList = useKeywordStore((state) => state.keywordTitleList);
@@ -140,6 +142,7 @@ export default function NewsPost({ data }: pageProps) {
     const newComments = clone(comments);
     newComments[index] = comment;
     setComments(newComments);
+    setCommentSelected(comment);
   };
 
   return (
@@ -260,7 +263,7 @@ export default function NewsPost({ data }: pageProps) {
             }}
           />
         </SubmitWrapper>
-      
+
         <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
         <CommentModal editComment={editComment} />
       </ContentWrapper>

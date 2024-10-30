@@ -5,6 +5,13 @@ import styled from 'styled-components';
 
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useArr } from '@utils/hook/useArr';
+import { comment } from '@uiw/react-md-editor';
+import { useCallback, useMemo } from 'react';
+import ListEditView from '@components/common/listEditView';
+
+import { Row, Center, Column } from '@components/common/figure';
+import CommonModal from '@components/common/comonModal';
 
 interface CommentModalProps {
   editComment: (v: { type: commentType; data: Array<{ title: string; comment: string }> }) => void;
@@ -16,140 +23,138 @@ export default function CommentModal({ editComment }: CommentModalProps) {
     state.setCommentSelected,
   ]);
 
-  const addComments = (idx: number) => {
-    const curComment = clone(commentSelected);
-    const curComments = curComment?.data!;
-    curComments.splice(idx + 1, 0, {
-      title: '',
-      comment: '',
-    });
-    editComment(curComment!);
-    setCommentSelected(curComment);
-  };
-
-  const deleteComments = (idx: number) => {
-    const curComment = clone(commentSelected);
-    const curComments = curComment?.data!;
-    curComments.splice(idx, 1);
-    editComment(curComment!);
-    setCommentSelected(curComment);
-  };
-
-  const moveCommentUp = (idx: number) => {
-    if (idx === 0) return;
-    const curComment = clone(commentSelected);
-    const curComments = curComment?.data!;
-    const newComments = changeItemsOrder(curComments, idx - 1, idx);
-    curComment!.data = newComments as {
-      title: string;
-      comment: string;
-    }[];
-    editComment(curComment!);
-  };
-  
-  const moveCommentDown = (idx: number) => {
-    const curComment = clone(commentSelected);
-    const curComments = curComment?.data!;
-    if (idx === curComments.length - 1) return;
-    const newComments = changeItemsOrder(curComments, idx, idx + 1);
-    curComment!.data = newComments as {
-      title: string;
-      comment: string;
-    }[];
-    editComment(curComment!);
-  };
-
-  return commentSelected !== null ? (
-    <Wrapper
+  return (
+    <CommonModal
       state={commentSelected !== null}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) {
-          setCommentSelected(null);
-        }
+      outClickAction={() => {
+        setCommentSelected(null);
       }}
     >
-      <div className="dialog">
-        <div className="dialog-head p-3">{commentSelected.type}</div>
-        <div className="dialog-body p-3">
-          {commentSelected.data.map((comment, idx) => {
-            return (
-              <InputLayer key={idx} className="shadow p-3 bg-white rounded">
-                <div className="button-wrapper">
-                  <button className="btn btn-primary" onClick={() => addComments(idx)}>
-                    추가
-                  </button>
-                  <button className="btn btn-secondary" onClick={() => deleteComments(idx)}>
-                    제거
-                  </button>
-                  <div className="left-right-buttons">
-                    <div
-                      className="left order-button"
-                      onClick={() => {
-                        moveCommentUp(idx);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faChevronUp} />
-                    </div>
-                    <div
-                      className="right order-button"
-                      onClick={() => {
-                        moveCommentDown(idx);
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faChevronDown} />
-                    </div>
-                  </div>
+      <ModalBody editComment={editComment} />
+    </CommonModal>
+  );
+}
+
+function ModalBody({ editComment }: CommentModalProps) {
+  const [commentSelected] = useNewsStore((state) => [state.commentSelected]);
+
+  const commentArr = useMemo(() => {
+    return commentSelected?.data ?? [];
+  }, [commentSelected]);
+
+  const setCommentArr = useCallback(
+    (arr: { title: string; comment: string }[]) => {
+      if (!commentSelected) return;
+      editComment({
+        type: commentSelected?.type,
+        data: arr,
+      });
+    },
+    [commentSelected, editComment],
+  );
+
+  const {
+    curFocus,
+    setCurFocus,
+    addArr: addComments,
+    deleteArr: deleteComments,
+    moveArrLeft: moveCommentUp,
+    moveArrRight: moveCommentDown,
+  } = useArr(commentArr, setCommentArr, () => {
+    return { title: '', comment: '' };
+  });
+
+  return (
+    <ContentWrapper>
+      <ListEditView
+        title={`${commentSelected?.type} 평론 수정`}
+        isRightOpen={curFocus !== null}
+        listView={
+          <>
+            {commentArr?.map((item, idx) => {
+              return (
+                <CommentInputLayer
+                  id={`comment-${idx}`}
+                  key={idx}
+                  $focus={idx === curFocus}
+                  onClick={() => setCurFocus(curFocus === idx ? null : idx)}
+                  className="p-3"
+                >
+                  <p className="title">
+                    {item.title}{' '}
+                    {item.title === '' ? <span className="example">예시 제목 입니다.</span> : <></>}
+                  </p>
+                </CommentInputLayer>
+              );
+            })}
+            {commentArr.length == 0 ? (
+              <VacantInputLayer $focus={false} onClick={() => addComments(0)}>
+                <div className="row_layer">
+                  <div className="plus">+</div>
                 </div>
-                <div className="input-wrapper">
-                  <div className="sub-input-title">제목</div>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="제목 입력하세요"
-                    value={comment.title}
-                    onChange={(e) => {
-                      const curComment = clone(commentSelected);
-                      const curInput = curComment.data[idx];
-                      curInput.title = e.target.value;
-                      editComment(curComment);
-                      setCommentSelected(curComment);
-                    }}
-                  ></input>
-                </div>
-                <div className="input-wrapper">
-                  <div className="sub-input-title">내용</div>
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="내용 입력하세요"
-                    value={comment.comment}
-                    onChange={(e) => {
-                      const curComment = clone(commentSelected);
-                      const curInput = curComment.data[idx];
-                      curInput.comment = e.target.value;
-                      editComment(curComment);
-                      setCommentSelected(curComment);
-                    }}
-                  ></input>
-                </div>
-              </InputLayer>
-            );
-          })}
-          <InputLayer className="shadow p-3 bg-white rounded">
-            <div
-              className="plus"
-              onClick={() => {
-                addComments(commentSelected.data.length);
-              }}
-            >
-              +
-            </div>
-          </InputLayer>
-        </div>
-      </div>
-    </Wrapper>
-  ) : (
-    <></>
+              </VacantInputLayer>
+            ) : (
+              <></>
+            )}
+          </>
+        }
+        editView={
+          curFocus != null ? (
+            <RightColumnLayer>
+              <InputLayerHeader>
+                <UpdowButtonWrapper>
+                  <OrderButton onClick={() => moveCommentUp(curFocus!)}>
+                    <FontAwesomeIcon icon={faChevronUp} width="12px" />
+                  </OrderButton>
+                  <OrderButton onClick={() => moveCommentDown(curFocus!)}>
+                    <FontAwesomeIcon icon={faChevronDown} width="12px" />
+                  </OrderButton>
+                </UpdowButtonWrapper>
+                <AddDelButtonWrapper>
+                  <Button className="btn btn-primary" onClick={() => addComments(curFocus!)}>
+                    {' '}
+                    추가{' '}
+                  </Button>
+                  <Button className="btn btn-secondary" onClick={() => deleteComments(curFocus!)}>
+                    {' '}
+                    삭제{' '}
+                  </Button>
+                </AddDelButtonWrapper>
+              </InputLayerHeader>
+
+              <InputWrapper>
+                <SubInputTitle>제목</SubInputTitle>
+                <TitleInput
+                  type="text"
+                  className="form-control"
+                  value={commentArr[curFocus].title}
+                  onChange={(e) => {
+                    const curCommentArr = clone(commentArr);
+                    curCommentArr[curFocus!].title = e.currentTarget.value;
+                    setCommentArr(curCommentArr);
+                  }}
+                ></TitleInput>
+              </InputWrapper>
+              <InputWrapper>
+                <SubInputTitle>내용</SubInputTitle>
+                <TitleInput
+                  type="text"
+                  className="form-control"
+                  value={commentArr[curFocus!].comment}
+                  onChange={(e) => {
+                    const curCommentArr = clone(commentArr);
+                    curCommentArr[curFocus!].comment = e.currentTarget.value;
+                    setCommentArr(curCommentArr);
+                  }}
+                ></TitleInput>
+              </InputWrapper>
+            </RightColumnLayer>
+          ) : (
+            <RightColumnLayer></RightColumnLayer>
+          )
+        }
+      />
+    </ContentWrapper>
   );
 }
 
@@ -157,65 +162,131 @@ interface WrapperProps {
   state: boolean;
 }
 
-const Wrapper = styled.div<WrapperProps>`
+const ContentWrapper = styled.div`
+  min-width: 1100px;
+
+  max-height: 700px;
+  border: 1px solid #ced4da;
+  border-radius: 1rem;
+  background-color: white;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
+const RightColumnLayer = styled.div`
   width: 100%;
-  height: 100%;
-  display: ${({ state }) => (state ? 'flex' : 'none')};
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: rgb(0, 0, 0, 0.5);
-  padding-bottom: 50px;
-  z-index: 999;
-  div.dialog {
-    background-color: white;
-    height: 600px;
-    overflow: scroll;
-  }
-  div.dialog-body {
+  min-height: 100px;
+  div.input_layer_header {
     display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-  div.blank-layer {
-    display: flex;
-    flex-direction: column;
-    height: 220px;
-    width: 280px;
+    flex-direction: row;
   }
 `;
 
-const InputLayer = styled.div`
-  display: flex;
-  flex-direction: column;
+interface CommentInputLayerProps {
+  $focus: boolean;
+}
+
+const CommentInputLayer = styled.div<CommentInputLayerProps>`
   width: 500px;
-  height: 300px;
-  justify-content: center;
+  height: 80px;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  div.button-wrapper {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    margin-bottom: 10px;
+  gap: 10px;
+  background-color: ${({ $focus }) => ($focus ? 'rgb(200,200,200)' : 'white')};
+  border: 0.8px solid rgb(170, 170, 170);
+  border-radius: 20px;
+  cursor: pointer;
+
+  p {
+    font-size: 14px;
+    margin: 0;
+    padding: 0;
   }
-  div.input-wrapper {
+
+  .date {
+    font-weight: 700;
+  }
+
+  .example {
+    color: ${({ $focus }) => ($focus ? 'white' : 'rgb(200, 200, 200)')};
+  }
+
+  div.button_wrapper {
+  }
+`;
+
+const VacantInputLayer = styled(CommentInputLayer)`
+  .row_layer {
+    width: 100%;
+    height: 100%;
     display: flex;
     flex-direction: row;
-    align-items: center;
     justify-content: center;
-    padding-top: 5px;
-    padding-bottom: 5px;
+    align-items: center;
+    padding: 0.5rem;
   }
-  div.input-title {
-    width: 100px;
-    font-size: 18px;
-    font-weight: bold;
+
+  .plus {
+    width: 30px;
+    height: 30px;
+    border-radius: 30px;
+    font-size: 16px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
   }
-  div.sub-input-title {
-    width: 50px;
-    font-size: 18px;
-  }
+`;
+
+const InputLayerHeader = styled(Row)`
+  align-items: center;
+  gap: 10px;
+`;
+
+const Button = styled.button`
+  height: 40px;
+`;
+
+const SubInputTitle = styled.div`
+  width: 40px;
+  flex: 0 0 auto;
+  font-size: 14px;
+`;
+
+const DateInput = styled.input`
+  width: 110px;
+`;
+
+const TitleInput = styled.input`
+  width: 400px;
+`;
+
+const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+
+  padding-top: 5px;
+  padding-bottom: 5px;
+`;
+
+const UpdowButtonWrapper = styled(Column)`
+  gap: 10px;
+`;
+
+const AddDelButtonWrapper = styled(Row)`
+  gap: 10px;
+  margin-bottom: 10px;
+`;
+
+const OrderButton = styled(Center)`
+  width: 30px;
+  height: 30px;
+  border-radius: 20px;
+  border: 2px solid rgb(150, 150, 150);
+  cursor: pointer;
 `;
