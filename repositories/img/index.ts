@@ -1,0 +1,3 @@
+class imgRepositories {
+  async uploadImg() {}
+}

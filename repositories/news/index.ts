@@ -97,15 +97,23 @@ class NewsRepositories {
 
   async postImage(id: string, img: File) {
     try {
+      // const formData = new FormData();
+      // formData.append('img', img);
+
+      // const response = await axios.post(`${HOST_URL}/admin/news/img/${id}`, formData, {
+      //   headers: {
+      //     'Content-Type': 'multipart/form-data',
+      //   },
+      // });
+      // return response.data.success;
+
       const formData = new FormData();
       formData.append('img', img);
-
-      const response = await axios.post(`${HOST_URL}/admin/news/img/${id}`, formData, {
+      const response = await axios.post(`${HOST_URL}/admin/img/${id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      return response.data.success;
     } catch (e) {
       console.log(e);
       return false;
