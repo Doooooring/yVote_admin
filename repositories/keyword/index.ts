@@ -4,7 +4,7 @@ import { Keyword } from '@interface/keywords';
 import axios from 'axios';
 
 interface keywordToPatch
-  extends Partial<Pick<Keyword, '_id' | 'keyword' | 'category' | 'explain' | 'news'>> {}
+  extends Partial<Pick<Keyword, 'id' | 'keyword' | 'category' | 'explain' | 'news'>> {}
 
 interface keywordToPost
   extends Partial<Pick<Keyword, 'keyword' | 'category' | 'explain' | 'news'>> {}
