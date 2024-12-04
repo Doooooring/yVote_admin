@@ -3,7 +3,7 @@ import { Response } from '@interface/basic';
 import { News } from '@interface/news';
 import axios from 'axios';
 
-export interface NewsTitle extends Partial<Pick<News, '_id' | 'order' | 'title'>> {}
+export interface NewsTitle extends Partial<Pick<News, 'id' | 'title'>> {}
 
 export interface NewsToPost
   extends Pick<
@@ -15,66 +15,37 @@ export interface NewsToPost
     | 'isPublished'
     | 'timeline'
     | 'comments'
-    | 'opinions'
+    | 'opinionLeft'
+    | 'opinionRight'
   > {}
+
 export interface NewsToPatch extends NewsToPost {
-  _id: string;
+  id: number;
 }
+
 class NewsRepositories {
   async getNewsTitles(search: string) {
-    try {
-      const response: {
-        data: Response<{
-          news: Array<NewsTitle>;
-        }>;
-      } = await axios.get(`${HOST_URL}/admin/news/title?search=${search}`);
-      return response.data.result.news;
-    } catch (e) {
-      console.log(e);
-      return [];
-    }
+    const response: {
+      data: Response<Array<NewsTitle>>;
+    } = await axios.get(`${HOST_URL}/news/titles?search=${search}`);
+    return response.data.result;
   }
 
   async getNewsDetails(id: string) {
-    try {
-      const response: {
-        data: Response<{
-          news: NewsToPatch;
-        }>;
-      } = await axios.get(`${HOST_URL}/admin/news/${id}`);
-      return response.data.result.news;
-    } catch {
-      return false;
-    }
-  }
-
-  async getNewsLists(search: string) {
-    try {
-      const response: {
-        data: Response<{
-          news: News;
-        }>;
-      } = await axios.get(`${HOST_URL}/admin/news/title?search=${search}`);
-      return response.data.result.news;
-    } catch {}
+    const response: {
+      data: Response<NewsToPatch>;
+    } = await axios.get(`${HOST_URL}/news/edit/${id}`);
+    return response.data.result;
   }
 
   async postNews(news: NewsToPost) {
-    try {
-      const response: { data: Response<{ state: boolean }> } = await axios.post(
-        `${HOST_URL}/admin/news`,
-        {
-          news: news,
-        },
-      );
-      if (response.data.success) {
-        return true;
-      } else {
-        return false;
-      }
-    } catch {
-      return false;
-    }
+    const response: { data: Response<{ state: boolean }> } = await axios.post(
+      `${HOST_URL}/news/edit`,
+      {
+        news: news,
+      },
+    );
+    return response.data.success;
   }
 
   async patchNews(news: NewsToPatch) {
@@ -91,31 +62,6 @@ class NewsRepositories {
         return false;
       }
     } catch {
-      return false;
-    }
-  }
-
-  async postImage(id: string, img: File) {
-    try {
-      // const formData = new FormData();
-      // formData.append('img', img);
-
-      // const response = await axios.post(`${HOST_URL}/admin/news/img/${id}`, formData, {
-      //   headers: {
-      //     'Content-Type': 'multipart/form-data',
-      //   },
-      // });
-      // return response.data.success;
-
-      const formData = new FormData();
-      formData.append('img', img);
-      const response = await axios.post(`${HOST_URL}/admin/img/${id}`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-    } catch (e) {
-      console.log(e);
       return false;
     }
   }

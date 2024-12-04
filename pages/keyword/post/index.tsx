@@ -1,24 +1,24 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
 import NewsSelect from '@components/keyword/newsSelect';
-import { category as Category, Keyword } from '@interface/keywords';
 import { News } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
 
-import { keywordRepositories } from '@repositories/keyword';
-import { GetServerSideProps } from 'next';
-import { useReactQuill } from '@utils/hook/useReactQuill';
 import TextEditor from '@components/common/textEditor';
 import ExplainPreview from '@components/keyword/explainPreview';
+import { Keyword, KeywordCategory } from '@interface/keywords';
+import { keywordRepositories } from '@repositories/keyword';
+import { useReactQuill } from '@utils/hook/useReactQuill';
+import { GetServerSideProps } from 'next';
 
-interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
-interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
+interface NewsTitle extends Partial<Pick<News, 'id' | 'title' | 'order'>> {}
+interface KeywordTitle extends Partial<Pick<Keyword, 'id' | 'keyword'>> {}
 
 interface pageProps {
   data: {
@@ -46,7 +46,7 @@ export default function KeywordPost({ data }: pageProps) {
 
   const [keyword, setKeyword] = useState<string>('');
   const [explain, setExplain] = useState<string>('');
-  const [category, setCategory] = useState<Keyword['category']>(Category.human);
+  const [category, setCategory] = useState<Keyword['category']>(KeywordCategory.Human);
   const [newsList, setNewsList] = useState<Array<string>>([]);
 
   const isLoading = useCommonStore((state) => state.isLoading);
@@ -81,13 +81,13 @@ export default function KeywordPost({ data }: pageProps) {
     }
   };
 
-  const resetInput = () => {
+  const resetInput = useCallback(() => {
     setKeyword('');
     setExplain('');
     resetContents();
-    setCategory(Category.human);
+    setCategory(KeywordCategory.Human);
     setNewsList([]);
-  };
+  }, [setKeyword, setExplain, resetContents, setCategory, setNewsList]);
 
   return (
     <Wrapper>
@@ -111,16 +111,16 @@ export default function KeywordPost({ data }: pageProps) {
             className="form-select"
             value={category}
             onChange={(e) => {
-              setCategory(e.currentTarget.value as Category);
+              setCategory(e.currentTarget.value as KeywordCategory);
             }}
           >
-            <option value={Category.human}>인물</option>
-            <option value={Category.politics}>정치</option>
-            <option value={Category.policy}>정책</option>
-            <option value={Category.economics}>경제</option>
-            <option value={Category.social}>사회</option>
-            <option value={Category.organization}>조직</option>
-            <option value={Category.etc}>기타</option>
+            <option value={KeywordCategory.Human}>인물</option>
+            <option value={KeywordCategory.Politics}>정치</option>
+            <option value={KeywordCategory.Policy}>정책</option>
+            <option value={KeywordCategory.Economics}>경제</option>
+            <option value={KeywordCategory.Social}>사회</option>
+            <option value={KeywordCategory.Organization}>조직</option>
+            <option value={KeywordCategory.Etc}>기타</option>
           </Select>
         </InputWrapper>
         <NewsSetter>
