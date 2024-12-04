@@ -12,11 +12,11 @@ import { SubmitButton } from '@components/common/button';
 import Loader from '@components/common/loader';
 import { TfiLoop } from 'react-icons/tfi';
 
-interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
+interface NewsTitle extends Pick<News, 'id' | 'title'> {}
 
 interface NewsSelectProps {
-  curNewsList: Array<string>;
-  setCurNewsList: (curList: Array<string>) => void;
+  curNewsList: Array<NewsTitle>;
+  setCurNewsList: (curList: Array<NewsTitle>) => void;
 }
 
 export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectProps) {
@@ -36,7 +36,7 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
     const curRest: Array<NewsTitle> = [];
     const curContain: Array<NewsTitle> = [];
     newsTitleList.forEach((news) => {
-      if (curNewsList.includes(news._id!)) {
+      if (curNewsList.includes(news.id!)) {
         curContain.push(news);
       } else {
         curRest.push(news);
@@ -50,7 +50,7 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
     if (restSelected.includes(news)) {
       setRestSelected(
         restSelected.filter((rest) => {
-          return rest._id != news._id;
+          return rest.id != news.id;
         }),
       );
       return;

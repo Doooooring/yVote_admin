@@ -1,3 +1,5 @@
+import { News } from '@interface/news';
+
 export enum KeywordCategory {
   Human = 'human',
   Politics = 'politics',
@@ -15,6 +17,7 @@ export interface Keyword {
   category: KeywordCategory;
   recent: boolean;
   keywordImage: string;
+  news: Array<News>;
 }
 
 export interface KeywordToView
@@ -22,3 +25,5 @@ export interface KeywordToView
 
 export interface KeywordOnDetail
   extends Partial<Pick<Keyword, 'id' | 'keyword' | 'explain' | 'category' | 'keywordImage'>> {}
+
+export interface KeywordTitle extends Partial<Pick<Keyword, 'id' | 'keyword'>> {}

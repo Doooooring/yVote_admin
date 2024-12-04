@@ -5,7 +5,7 @@ import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
 import NewsSelect from '@components/keyword/newsSelect';
-import { News } from '@interface/news';
+import { News, NewsTitle } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
@@ -17,8 +17,7 @@ import { keywordRepositories } from '@repositories/keyword';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { GetServerSideProps } from 'next';
 
-interface NewsTitle extends Partial<Pick<News, 'id' | 'title' | 'order'>> {}
-interface KeywordTitle extends Partial<Pick<Keyword, 'id' | 'keyword'>> {}
+
 
 interface pageProps {
   data: {
@@ -47,7 +46,7 @@ export default function KeywordPost({ data }: pageProps) {
   const [keyword, setKeyword] = useState<string>('');
   const [explain, setExplain] = useState<string>('');
   const [category, setCategory] = useState<Keyword['category']>(KeywordCategory.Human);
-  const [newsList, setNewsList] = useState<Array<string>>([]);
+  const [newsList, setNewsList] = useState<Array<{ id: number; title: string }>>([]);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);

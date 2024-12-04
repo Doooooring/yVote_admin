@@ -3,12 +3,21 @@ import { Response } from '@interface/basic';
 import { Keyword } from '@interface/keywords';
 import axios from 'axios';
 
-interface keywordToPatch
-  extends Partial<Pick<Keyword, 'id' | 'keyword' | 'category' | 'explain' | 'news'>> {}
+export interface keywordToPatch
+  extends Partial<Pick<Keyword, 'id' | 'keyword' | 'category' | 'explain'>> {
+  news: {
+    id: number;
+    title: string;
+  }[];
+}
 
-interface keywordToPost
-  extends Partial<Pick<Keyword, 'keyword' | 'category' | 'explain' | 'news'>> {}
-export interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
+export interface keywordToPost extends Partial<Pick<Keyword, 'keyword' | 'category' | 'explain'>> {
+  news: {
+    id: number;
+    title: string;
+  }[];
+}
+export interface KeywordTitle extends Partial<Pick<Keyword, 'id' | 'keyword'>> {}
 
 class KeywordRepositories {
   async getKeyword(keyname: string) {

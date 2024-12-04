@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 
-import { News, commentType } from '@interface/news';
-
-interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
+import { commentType, NewsTitle } from '@interface/news';
 
 interface NewsState {
   newsTitleList: Array<NewsTitle>;
