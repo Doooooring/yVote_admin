@@ -1,4 +1,4 @@
-import { News, commentType } from '@interface/news';
+import { News, NewsToPost, commentType } from '@interface/news';
 import { useCommonStore } from '@store/common';
 import { clone } from '@utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -50,6 +50,10 @@ export default function NewsPost({ data }: pageProps) {
   const router = useRouter();
 
   const { ref, content, handleContents, resetContents } = useReactQuill();
+
+  const [news, setNews] = useState<NewsToPost>({
+    title: '',
+  });
 
   const [title, setTitle] = useState<string>('');
   const [timeline, setTimeline] = useState<News['timeline']>([

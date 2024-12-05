@@ -36,6 +36,15 @@ export enum CommentQualification {
   ETC = 3,
 }
 
+export interface Comment {
+  id: number;
+  order: number;
+  commentType: commentType;
+  title: string;
+  comment: string;
+  date: Date;
+}
+
 export interface Timeline {
   id: number;
   date: string;
@@ -80,3 +89,39 @@ export interface Preview
   extends Pick<News, 'id' | 'order' | 'newsImage' | 'title' | 'summary' | 'keywords' | 'state'> {}
 
 export interface NewsTitle extends Pick<News, 'id' | 'title'> {}
+
+export interface NewsToPost
+  extends Pick<
+    News,
+    | 'title'
+    | 'summary'
+    | 'state'
+    | 'isPublished'
+    | 'timeline'
+    | 'comments'
+    | 'opinionLeft'
+    | 'opinionRight'
+  > {
+  keywords: {
+    id: number;
+    keyword: string;
+  }[];
+}
+
+export interface NewsToPatch extends NewsToPost {
+  id: number;
+}
+
+export const initNews = () => {
+  const news = {
+    title: '',
+    summary: '',
+    state: true,
+    isPublished: false,
+    timeline: [] as Timeline[],
+    comments: [] as Comment[],
+    opinionLeft: '',
+    opinionRight: '',
+    keywords: [] as Array<{ id?: number; keyword: string }>,
+  } as NewsToPost;
+};

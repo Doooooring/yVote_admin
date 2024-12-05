@@ -9,10 +9,10 @@ import IdSelector from '@components/news/idSelector';
 import KeywordSelect from '@components/news/keywordSelect';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
-import { Keyword } from '@interface/keywords';
-import { News, commentType } from '@interface/news';
+import { Keyword, KeywordTitle } from '@interface/keywords';
+import { News, NewsTitle, NewsToPatch, commentType } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
-import { NewsToPatch, newsRepositories } from '@repositories/news';
+import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
@@ -25,9 +25,6 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
-
-interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
-interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
 
 interface pageProps {
   data: {
@@ -59,17 +56,15 @@ export default function NewsPatch({ data }: pageProps) {
   const [timeline, setTimeline] = useState<News['timeline']>([]);
   const [state, setState] = useState<boolean>(true);
   const [isPublished, setIsPublished] = useState<boolean>(true);
-  const [opinions, setOpinions] = useState<News['opinions']>({
-    left: '',
-    right: '',
-  });
+  const [leftOpinion, setLeftOpinion] = useState<string>('');
+  const [RightOpinion, setRightOpinion] = useState<string>('');
   const [comments, setComments] = useState<
     Array<{
       type: commentType;
       data: Array<{ title: string; comment: string }>;
     }>
   >([]);
-  const [keywordList, setKeywordList] = useState<Array<string>>([]);
+  const [keywordList, setKeywordList] = useState<Array<{ id: number; keyword: string }>>([]);
 
   const [newsSearchList, setNewsSearchList] = useState<NewsTitle[]>([]);
   const [newsSearchErr, setNewsSearchErr] = useState<boolean>(false);
@@ -113,45 +108,44 @@ export default function NewsPatch({ data }: pageProps) {
     setIsLoading(true);
     try {
       const response = await newsRepositories.getNewsDetails(id);
-      if (response === false) Error();
-      else {
-        const {
-          _id,
-          title,
-          summary,
-          keywords,
-          state,
-          isPublished,
-          timeline,
-          opinions,
-          comments,
-        }: NewsToPatch = response;
 
-        setId(_id);
-        setTitle(title!);
-        //setSummary(summary!);
-        initializeQuillContents(summary!);
-        setTimeline(timeline);
-        setKeywordList(keywords!);
-        setState(state!);
-        setIsPublished(isPublished ?? true);
-        setOpinions(opinions!);
+      const {
+        id,
+        title,
+        summary,
+        keywords,
+        state,
+        isPublished,
+        timeline,
+        opinionLeft,
+        opinionRight,
+        comments,
+      }: NewsToPatch = response;
 
-        /**
-         * @FIXME comment process error
-         */
-        if (Array.isArray(comments)) {
-          setComments([]);
-        } else {
-          const curCommentKeys = Object.keys(comments ?? {}) as commentType[];
-          const commentsToStore = curCommentKeys.map((comment) => {
-            return {
-              type: comment,
-              data: comments[comment]!,
-            };
-          });
-          setComments(commentsToStore);
-        }
+      setId(id);
+      setTitle(title!);
+      //setSummary(summary!);
+      initializeQuillContents(summary!);
+      setTimeline(timeline);
+      setKeywordList(keywords);
+      setState(state!);
+      setIsPublished(isPublished ?? true);
+      setOpinions(opinions!);
+
+      /**
+       * @FIXME comment process error
+       */
+      if (Array.isArray(comments)) {
+        setComments([]);
+      } else {
+        const curCommentKeys = Object.keys(comments ?? {}) as commentType[];
+        const commentsToStore = curCommentKeys.map((comment) => {
+          return {
+            type: comment,
+            data: comments[comment]!,
+          };
+        });
+        setComments(commentsToStore);
       }
     } catch (e) {
       console.log(e);

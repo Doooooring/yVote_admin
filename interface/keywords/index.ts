@@ -26,4 +26,18 @@ export interface KeywordToView
 export interface KeywordOnDetail
   extends Partial<Pick<Keyword, 'id' | 'keyword' | 'explain' | 'category' | 'keywordImage'>> {}
 
+export interface keywordToPatch
+  extends Partial<Pick<Keyword, 'id' | 'keyword' | 'category' | 'explain'>> {
+  news: {
+    id: number;
+    title: string;
+  }[];
+}
+
+export interface keywordToPost extends Partial<Pick<Keyword, 'keyword' | 'category' | 'explain'>> {
+  news: {
+    id: number;
+    title: string;
+  }[];
+}
 export interface KeywordTitle extends Partial<Pick<Keyword, 'id' | 'keyword'>> {}
