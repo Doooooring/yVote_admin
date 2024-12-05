@@ -1,7 +1,6 @@
-import { News } from '@interface/news';
+import { NewsTitle } from '@interface/news';
 import styled from 'styled-components';
 
-interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 export default function IdSelector({
   newsSearchList,
   getNews,
@@ -9,7 +8,7 @@ export default function IdSelector({
   setNewsSelectorUp,
 }: {
   newsSearchList: Array<NewsTitle>;
-  getNews: (id: string) => Promise<void>;
+  getNews: (id: number) => Promise<void>;
   newsSelectorUp: boolean;
   setNewsSelectorUp: (state: boolean) => void;
 }) {
@@ -29,7 +28,7 @@ export default function IdSelector({
               <NewsLi
                 key={idx}
                 onClick={async () => {
-                  await getNews(news._id!);
+                  await getNews(news.id);
                   setNewsSelectorUp(false);
                 }}
               >

@@ -1,4 +1,4 @@
-import { News, NewsToPost, commentType } from '@interface/news';
+import { News, NewsTitle, commentType } from '@interface/news';
 import { useCommonStore } from '@store/common';
 import { clone } from '@utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -9,7 +9,6 @@ import styled from 'styled-components';
 import { SubmitButton } from '@components/common/button';
 import CommentModal from '@components/news/commenModal';
 import KeywordSelect from '@components/news/keywordSelect';
-import { Keyword } from '@interface/keywords';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useKeywordStore } from '@store/keyword';
@@ -19,17 +18,15 @@ import ToggleButton from '@components/common/toggleButton';
 import CommentInput from '@components/news/commentInput';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
+import { KeywordTitle } from '@interface/keywords';
+import { useNewsStore } from '@store/news';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { useRouter } from 'next/router';
-import { useNewsStore } from '@store/news';
-
-interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
-interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
 
 interface pageProps {
   data: {
     newsTitles: Array<NewsTitle>;
-    keywordTitles: Array<any>;
+    keywordTitles: Array<KeywordTitle>;
   };
 }
 
@@ -51,30 +48,19 @@ export default function NewsPost({ data }: pageProps) {
 
   const { ref, content, handleContents, resetContents } = useReactQuill();
 
-  const [news, setNews] = useState<NewsToPost>({
-    title: '',
-  });
-
   const [title, setTitle] = useState<string>('');
-  const [timeline, setTimeline] = useState<News['timeline']>([
-    {
-      date: '',
-      title: '',
-    },
-  ]);
+  const [timeline, setTimeline] = useState<News['timeline']>([]);
   const [state, setState] = useState<boolean>(true);
   const [isPublished, setIsPublished] = useState<boolean>(false);
-  const [opinions, setOpinions] = useState<News['opinions']>({
-    left: '민주당/좌파/진보',
-    right: '국민의힘/우파/보수',
-  });
+  const [opinionLeft, setOpinionLeft] = useState<string>('');
+  const [opinionRight, setOpinionRight] = useState<string>('');
   const [comments, setComments] = useState<
     Array<{
       type: commentType;
       data: Array<{ title: string; comment: string }>;
     }>
   >([]);
-  const [keywordList, setKeywordList] = useState<Array<string>>([]);
+  const [keywordList, setKeywordList] = useState<Array<KeywordTitle>>([]);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
@@ -109,7 +95,8 @@ export default function NewsPost({ data }: pageProps) {
         title,
         state,
         isPublished,
-        opinions,
+        opinionLeft,
+        opinionRight,
         timeline,
         comments: commentsToSend,
         keywords: keywordList,
@@ -212,7 +199,7 @@ export default function NewsPost({ data }: pageProps) {
             />
             <KeywordWrapper>
               {keywordList.map((keyword, idx) => {
-                return <KeywordLi key={idx}>{keyword}</KeywordLi>;
+                return <KeywordLi key={idx}>{keyword.keyword}</KeywordLi>;
               })}
             </KeywordWrapper>
           </KeywordSetter>
@@ -222,7 +209,7 @@ export default function NewsPost({ data }: pageProps) {
             title={title}
             content={content}
             state={state}
-            keywords={keywordList}
+            keywords={keywordList.map((k) => k.keyword)}
           />
         </NewsPreviewWrapper>
       </TextEditWrapper>
@@ -236,23 +223,20 @@ export default function NewsPost({ data }: pageProps) {
             <Input
               type="text"
               className="form-control"
-              value={opinions.left}
+              value={opinionLeft}
               onChange={(e) => {
-                const curOpinions = clone(opinions);
-                curOpinions.left = e.currentTarget.value;
-                setOpinions(curOpinions);
+                const v = e.currentTarget.value;
+                setOpinionLeft(v);
               }}
             ></Input>
-
             <OpinionRight>오른쪽</OpinionRight>
             <Input
               type="text"
               className="form-control"
-              value={opinions.right}
+              value={opinionRight}
               onChange={(e) => {
-                const curOpinions = clone(opinions);
-                curOpinions.right = e.currentTarget.value;
-                setOpinions(curOpinions);
+                const v = e.currentTarget.value;
+                setOpinionRight(v);
               }}
             ></Input>
           </InputBody>
@@ -267,7 +251,6 @@ export default function NewsPost({ data }: pageProps) {
             }}
           />
         </SubmitWrapper>
-
         <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
         <CommentModal editComment={editComment} />
       </ContentWrapper>

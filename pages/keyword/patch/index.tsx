@@ -4,8 +4,8 @@ import ExplainPreview from '@components/keyword/explainPreview';
 import NewsSelect from '@components/keyword/newsSelect';
 import SearchBox from '@components/keyword/search';
 import { SearchState } from '@components/keyword/searchState';
-import { category as Category, Keyword } from '@interface/keywords';
-import { News } from '@interface/news';
+import { Keyword, KeywordCategory, KeywordTitle } from '@interface/keywords';
+import { NewsTitle } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
@@ -17,9 +17,6 @@ import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
 
 import styled from 'styled-components';
-
-interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
-interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
 
 interface pageProps {
   data: {
@@ -44,10 +41,10 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 export default function KeywordPatch({ data }: pageProps) {
   const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
 
-  const [id, setId] = useState<string>('');
+  const [id, setId] = useState<number | null>(null);
   const [keyword, setKeyword] = useState<string>('');
-  const [category, setCategory] = useState<Keyword['category']>(Category.human);
-  const [newsList, setNewsList] = useState<Array<string>>([]);
+  const [category, setCategory] = useState<Keyword['category']>(KeywordCategory.Human);
+  const [newsList, setNewsList] = useState<Array<NewsTitle>>([]);
   const [keywordSearchErr, setKeywordSearchErr] = useState<boolean>(false);
 
   const isLoading = useCommonStore((state) => state.isLoading);
@@ -67,9 +64,10 @@ export default function KeywordPatch({ data }: pageProps) {
     const encoded = searchWord.replace(/\//g, '$');
 
     try {
-      const { _id, keyword, category, explain, news }: Keyword =
-        await keywordRepositories.getKeyword(encoded);
-      setId(_id);
+      const { id, keyword, category, explain, news } = await keywordRepositories.getKeyword(
+        encoded,
+      );
+      setId(id);
       setKeyword(keyword);
       setCategory(category);
       initializeQuillContents(explain);
@@ -87,18 +85,19 @@ export default function KeywordPatch({ data }: pageProps) {
   };
 
   const resetInput = () => {
-    setId('');
+    setId(null);
     setKeyword('');
-    setCategory(Category.economics);
+    setCategory(KeywordCategory.Economics);
     resetContents();
     setNewsList([]);
   };
 
   const submit = async () => {
+    if (id === null) return;
     setIsLoading(true);
     try {
       const result: boolean = await keywordRepositories.patchKeyword({
-        _id: id,
+        id: id,
         keyword: keyword,
         category: category,
         explain: content,
@@ -120,7 +119,7 @@ export default function KeywordPatch({ data }: pageProps) {
   return (
     <Wrapper>
       <SearchBox findKeyword={findKeyword} />
-      <ContentWrapper state={keyword === ''}>
+      <ContentWrapper state={id === null}>
         <InputWrapper>
           <InputTitle>키워드</InputTitle>
           <Input
@@ -140,16 +139,16 @@ export default function KeywordPatch({ data }: pageProps) {
             className="form-select"
             value={category}
             onChange={(e) => {
-              setCategory(e.currentTarget.value as Category);
+              setCategory(e.currentTarget.value as KeywordCategory);
             }}
           >
-            <option value={Category.human}>인물</option>
-            <option value={Category.politics}>정치</option>
-            <option value={Category.policy}>정책</option>
-            <option value={Category.economics}>경제</option>
-            <option value={Category.social}>사회</option>
-            <option value={Category.organization}>조직</option>
-            <option value={Category.etc}>기타</option>
+            <option value={KeywordCategory.Human}>인물</option>
+            <option value={KeywordCategory.Politics}>정치</option>
+            <option value={KeywordCategory.Policy}>정책</option>
+            <option value={KeywordCategory.Economics}>경제</option>
+            <option value={KeywordCategory.Social}>사회</option>
+            <option value={KeywordCategory.Organization}>조직</option>
+            <option value={KeywordCategory.Etc}>기타</option>
           </Select>
         </InputWrapper>
         <NewsSetter>
@@ -163,11 +162,11 @@ export default function KeywordPatch({ data }: pageProps) {
             {newsList.map((news) => {
               let curTitle: string | undefined = '';
               for (let newstitle of newsTitleList) {
-                if (newstitle._id === news) {
+                if (newstitle.id === news.id) {
                   curTitle = newstitle.title;
                 }
               }
-              return <NewsLi key={news}>{curTitle}</NewsLi>;
+              return <NewsLi key={news.id}>{curTitle}</NewsLi>;
             })}
           </NewsWrapper>
         </NewsSetter>

@@ -45,10 +45,18 @@ export interface Comment {
   date: Date;
 }
 
+export interface CommentToEdit extends Omit<Comment, 'id'> {
+  id?: number;
+}
+
 export interface Timeline {
   id: number;
   date: string;
   title: string;
+}
+
+export interface TimelineToEdit extends Omit<Timeline, 'id'> {
+  id?: number;
 }
 
 export interface Article {
@@ -72,7 +80,7 @@ export interface News {
   timeline: Array<Timeline>;
   opinionLeft: string;
   opinionRight: string;
-  comments: Array<Comment>;
+  comments: Array<CommentToEdit>;
   votes: {
     left: number;
     right: number;
@@ -119,7 +127,7 @@ export const initNews = () => {
     state: true,
     isPublished: false,
     timeline: [] as Timeline[],
-    comments: [] as Comment[],
+    comments: [] as CommentToEdit[],
     opinionLeft: '',
     opinionRight: '',
     keywords: [] as Array<{ id?: number; keyword: string }>,

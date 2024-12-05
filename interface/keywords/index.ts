@@ -24,20 +24,19 @@ export interface KeywordToView
   extends Pick<Keyword, 'id' | 'keyword' | 'category' | 'recent' | 'keywordImage'> {}
 
 export interface KeywordOnDetail
-  extends Partial<Pick<Keyword, 'id' | 'keyword' | 'explain' | 'category' | 'keywordImage'>> {}
+  extends Pick<Keyword, 'id' | 'keyword' | 'explain' | 'category' | 'keywordImage'> {}
 
-export interface keywordToPatch
-  extends Partial<Pick<Keyword, 'id' | 'keyword' | 'category' | 'explain'>> {
+export interface keywordToPatch extends Pick<Keyword, 'id' | 'keyword' | 'category' | 'explain'> {
   news: {
     id: number;
     title: string;
   }[];
 }
 
-export interface keywordToPost extends Partial<Pick<Keyword, 'keyword' | 'category' | 'explain'>> {
+export interface keywordToPost extends Pick<Keyword, 'keyword' | 'category' | 'explain'> {
   news: {
     id: number;
     title: string;
   }[];
 }
-export interface KeywordTitle extends Partial<Pick<Keyword, 'id' | 'keyword'>> {}
+export interface KeywordTitle extends Pick<Keyword, 'id' | 'keyword'> {}

@@ -5,19 +5,17 @@ import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
 import NewsSelect from '@components/keyword/newsSelect';
-import { News, NewsTitle } from '@interface/news';
+import { NewsTitle } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
 
 import TextEditor from '@components/common/textEditor';
 import ExplainPreview from '@components/keyword/explainPreview';
-import { Keyword, KeywordCategory } from '@interface/keywords';
+import { Keyword, KeywordCategory, KeywordTitle } from '@interface/keywords';
 import { keywordRepositories } from '@repositories/keyword';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { GetServerSideProps } from 'next';
-
-
 
 interface pageProps {
   data: {
@@ -132,12 +130,12 @@ export default function KeywordPost({ data }: pageProps) {
           <NewsWrapper>
             {newsList.map((news) => {
               let curTitle: string | undefined = '';
-              for (let newstitle of newsTitleList) {
-                if (newstitle._id === news) {
-                  curTitle = newstitle.title;
+              for (let newsTitle of newsTitleList) {
+                if (newsTitle.id === news.id) {
+                  curTitle = newsTitle.title;
                 }
               }
-              return <NewsLi key={news}>{curTitle}</NewsLi>;
+              return <NewsLi key={news.id}>{curTitle}</NewsLi>;
             })}
           </NewsWrapper>
         </NewsSetter>

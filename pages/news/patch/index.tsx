@@ -9,7 +9,7 @@ import IdSelector from '@components/news/idSelector';
 import KeywordSelect from '@components/news/keywordSelect';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
-import { Keyword, KeywordTitle } from '@interface/keywords';
+import { KeywordTitle } from '@interface/keywords';
 import { News, NewsTitle, NewsToPatch, commentType } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
@@ -51,20 +51,20 @@ export default function NewsPatch({ data }: pageProps) {
   const router = useRouter();
   const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
 
-  const [id, setId] = useState<string>('');
+  const [id, setId] = useState<number | null>(null);
   const [title, setTitle] = useState<string>('');
   const [timeline, setTimeline] = useState<News['timeline']>([]);
   const [state, setState] = useState<boolean>(true);
   const [isPublished, setIsPublished] = useState<boolean>(true);
-  const [leftOpinion, setLeftOpinion] = useState<string>('');
-  const [RightOpinion, setRightOpinion] = useState<string>('');
+  const [opinionLeft, setOpinionLeft] = useState<string>('');
+  const [opinionRight, setOpinionRight] = useState<string>('');
   const [comments, setComments] = useState<
     Array<{
       type: commentType;
       data: Array<{ title: string; comment: string }>;
     }>
   >([]);
-  const [keywordList, setKeywordList] = useState<Array<{ id: number; keyword: string }>>([]);
+  const [keywordList, setKeywordList] = useState<Array<KeywordTitle>>([]);
 
   const [newsSearchList, setNewsSearchList] = useState<NewsTitle[]>([]);
   const [newsSearchErr, setNewsSearchErr] = useState<boolean>(false);
@@ -104,13 +104,12 @@ export default function NewsPatch({ data }: pageProps) {
     }
   }, []);
 
-  const getNews = useCallback(async (id: string) => {
+  const getNews = useCallback(async (id: number) => {
     setIsLoading(true);
     try {
       const response = await newsRepositories.getNewsDetails(id);
 
       const {
-        id,
         title,
         summary,
         keywords,
@@ -130,8 +129,8 @@ export default function NewsPatch({ data }: pageProps) {
       setKeywordList(keywords);
       setState(state!);
       setIsPublished(isPublished ?? true);
-      setOpinions(opinions!);
-
+      setOpinionLeft(opinionLeft);
+      setOpinionRight(opinionRight);
       /**
        * @FIXME comment process error
        */
@@ -175,9 +174,10 @@ export default function NewsPatch({ data }: pageProps) {
         title,
         state,
         isPublished,
-        opinions,
+        opinionLeft,
+        opinionRight,
         timeline,
-        comments: commentsToSend,
+        comments: comments,
         keywords: keywordList,
       });
       if (!result) {
@@ -224,7 +224,7 @@ export default function NewsPatch({ data }: pageProps) {
         newsSelectorUp={newsSelectorUp}
         setNewsSelectorUp={setNewsSelectorup}
       />
-      <TextEditWrapper state={id === ''}>
+      <TextEditWrapper state={id !== null}>
         <ContentEditWrapper>
           <InputWrapper className="pb-1 pt-1 mb-1">
             <InputTitle>제목</InputTitle>
@@ -285,7 +285,7 @@ export default function NewsPatch({ data }: pageProps) {
             />
             <KeywordWrapper>
               {keywordList.map((keyword, idx) => {
-                return <KeywordLi key={idx}>{keyword}</KeywordLi>;
+                return <KeywordLi key={idx}>{keyword.keyword}</KeywordLi>;
               })}
             </KeywordWrapper>
           </KeywordSetter>
@@ -295,11 +295,11 @@ export default function NewsPatch({ data }: pageProps) {
             title={title}
             content={content}
             state={state}
-            keywords={keywordList}
+            keywords={keywordList.map((k) => k.keyword)}
           />
         </NewsPreviewWrapper>
       </TextEditWrapper>
-      <ContentWrapper className="mb-5" state={id === ''}>
+      <ContentWrapper className="mb-5" state={id !== null}>
         <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
         <CommentInput comments={comments} setComments={setComments} />
         <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
@@ -309,23 +309,20 @@ export default function NewsPatch({ data }: pageProps) {
             <Input
               type="text"
               className="form-control"
-              value={opinions.left}
+              value={opinionLeft}
               onChange={(e) => {
-                const curOpinions = clone(opinions);
-                curOpinions.left = e.currentTarget.value;
-                setOpinions(curOpinions);
+                const v = e.currentTarget.value;
+                setOpinionLeft(v);
               }}
             ></Input>
-
             <OpinionRight>오른쪽</OpinionRight>
             <Input
               type="text"
               className="form-control"
-              value={opinions.right}
+              value={opinionRight}
               onChange={(e) => {
-                const curOpinions = clone(opinions);
-                curOpinions.right = e.currentTarget.value;
-                setOpinions(curOpinions);
+                const v = e.currentTarget.value;
+                setOpinionRight(v);
               }}
             ></Input>
           </InputBody>
@@ -361,7 +358,7 @@ interface ContentWrapperProps {
 
 const TextEditWrapper = styled.div<ContentWrapperProps>`
   width: 100%;
-  display: ${({ state }) => (state ? 'none' : 'flex')};
+  display: ${({ state }) => (state ? 'flex' : 'none')};
 
   flex-direction: row;
 `;
@@ -390,7 +387,7 @@ const StateToggleWrapper = styled.div`
 `;
 
 const ContentWrapper = styled.div<ContentWrapperProps>`
-  display: ${({ state }) => (state ? 'none' : 'block')};
+  display: ${({ state }) => (state ? 'block' : 'none')};
   width: 100%;
 `;
 const InputWrapper = styled.div`

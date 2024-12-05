@@ -1,8 +1,6 @@
 import { create } from 'zustand';
 
-import { Keyword } from '@interface/keywords';
-
-interface KeywordTitle extends Partial<Pick<Keyword, '_id' | 'keyword'>> {}
+import { KeywordTitle } from '@interface/keywords';
 
 interface KeywordState {
   keywordTitleList: Array<KeywordTitle>;

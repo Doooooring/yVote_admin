@@ -2,14 +2,12 @@ import styles from '../styles/Home.module.css';
 
 import { GetServerSideProps } from 'next';
 
-import { News } from '@interface/news';
+import { NewsTitle } from '@interface/news';
 import { useEffect } from 'react';
 
 import { newsRepositories } from '@repositories/news';
 import { useNewsStore } from '@store/news';
 import { useRouter } from 'next/router';
-
-interface NewsTitle extends Partial<Pick<News, '_id' | 'title' | 'order'>> {}
 
 interface pageProps {
   data: {
