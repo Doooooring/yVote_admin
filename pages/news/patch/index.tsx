@@ -10,7 +10,7 @@ import KeywordSelect from '@components/news/keywordSelect';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
 import { KeywordTitle } from '@interface/keywords';
-import { News, NewsTitle, NewsToPatch, commentType } from '@interface/news';
+import { CommentToEdit, News, NewsTitle, NewsToPatch, commentType } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
@@ -131,6 +131,17 @@ export default function NewsPatch({ data }: pageProps) {
       setIsPublished(isPublished ?? true);
       setOpinionLeft(opinionLeft);
       setOpinionRight(opinionRight);
+
+      const commentsToStore = {} as { [key in commentType]: CommentToEdit[] };
+      comments.forEach((comment) => {
+        const { commentType } = comment;
+        if (commentType in commentsToStore) {
+          commentsToStore[commentType] = [];
+        }
+
+        commentsToStore[commentType].push(comment);
+      });
+
       /**
        * @FIXME comment process error
        */
@@ -156,16 +167,12 @@ export default function NewsPatch({ data }: pageProps) {
   const submit = async () => {
     setIsLoading(true);
 
-    const commentsToSend = {} as {
-      [key in commentType]?: Array<{
-        title: string;
-        comment: string;
-      }>;
-    };
-    comments.forEach((item) => {
-      const { type, data } = item;
-      commentsToSend[type] = data;
-    });
+    const commentsToSend = Array<CommentToEdit>
+    
+    Object.keys(comments).forEach((type as commentType) => {
+      
+    })
+
 
     try {
       const result: boolean = await newsRepositories.patchNews({

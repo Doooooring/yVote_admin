@@ -1,17 +1,17 @@
 import { create } from 'zustand';
 
-import { commentType, NewsTitle } from '@interface/news';
+import { CommentToEdit, commentType, NewsTitle } from '@interface/news';
 
 interface NewsState {
   newsTitleList: Array<NewsTitle>;
-  commentSelected: null | { type: commentType; data: Array<{ title: string; comment: string }> };
+  commentSelected: null | { type: commentType; data: Array<CommentToEdit> };
 }
 
 interface NewsAction {
   setCommentSelected: (
     state: {
       type: commentType;
-      data: Array<{ title: string; comment: string }>;
+      data: Array<CommentToEdit>;
     } | null,
   ) => void;
   setNewsTitleList: (newList: Array<NewsTitle>) => void;
@@ -23,7 +23,7 @@ export const useNewsStore = create<NewsState & NewsAction>((set) => ({
   setCommentSelected: (
     state: {
       type: commentType;
-      data: Array<{ title: string; comment: string }>;
+      data: Array<CommentToEdit>;
     } | null,
   ) => {
     set(() => ({
