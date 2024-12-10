@@ -45,8 +45,14 @@ export interface Comment {
   date: Date;
 }
 
-export interface CommentToEdit extends Omit<Comment, 'id'> {
+export interface CommentToEdit extends Omit<Comment, 'id' | 'date'> {
   id?: number;
+  date?: Date;
+}
+
+export interface CommentsArr {
+  type: commentType;
+  data: Array<CommentToEdit>;
 }
 
 export interface Timeline {

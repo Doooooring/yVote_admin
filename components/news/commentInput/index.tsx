@@ -2,20 +2,15 @@ import { Center, Column, Row } from '@components/common/figure';
 import ListEditView from '@components/common/listEditView';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CommentToEdit, commentType } from '@interface/news';
+import { CommentsArr, CommentToEdit, commentType } from '@interface/news';
 import { useNewsStore } from '@store/news';
 import { clone } from '@utils';
 import { useArr } from '@utils/hook/useArr';
 import styled from 'styled-components';
 
-interface Comment {
-  type: commentType;
-  data: Array<CommentToEdit>;
-}
-
 interface CommentInputProps {
-  comments: Comment[];
-  setComments: (v: Comment[]) => void;
+  comments: CommentsArr[];
+  setComments: (v: CommentsArr[]) => void;
 }
 
 const commentTypeKey = Object.keys(commentType) as Array<commentType>;

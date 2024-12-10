@@ -10,7 +10,14 @@ import KeywordSelect from '@components/news/keywordSelect';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
 import { KeywordTitle } from '@interface/keywords';
-import { CommentToEdit, News, NewsTitle, NewsToPatch, commentType } from '@interface/news';
+import {
+  CommentToEdit,
+  CommentsArr,
+  News,
+  NewsTitle,
+  NewsToPatch,
+  commentType,
+} from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
@@ -18,6 +25,7 @@ import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
 import { clone } from '@utils';
 import { useReactQuill } from '@utils/hook/useReactQuill';
+import { convertCommentArrToEdit, convertCommentArrToPatch } from '@utils/news';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -58,12 +66,7 @@ export default function NewsPatch({ data }: pageProps) {
   const [isPublished, setIsPublished] = useState<boolean>(true);
   const [opinionLeft, setOpinionLeft] = useState<string>('');
   const [opinionRight, setOpinionRight] = useState<string>('');
-  const [comments, setComments] = useState<
-    Array<{
-      type: commentType;
-      data: Array<{ title: string; comment: string }>;
-    }>
-  >([]);
+  const [comments, setComments] = useState<Array<CommentsArr>>([]);
   const [keywordList, setKeywordList] = useState<Array<KeywordTitle>>([]);
 
   const [newsSearchList, setNewsSearchList] = useState<NewsTitle[]>([]);
@@ -132,31 +135,8 @@ export default function NewsPatch({ data }: pageProps) {
       setOpinionLeft(opinionLeft);
       setOpinionRight(opinionRight);
 
-      const commentsToStore = {} as { [key in commentType]: CommentToEdit[] };
-      comments.forEach((comment) => {
-        const { commentType } = comment;
-        if (commentType in commentsToStore) {
-          commentsToStore[commentType] = [];
-        }
-
-        commentsToStore[commentType].push(comment);
-      });
-
-      /**
-       * @FIXME comment process error
-       */
-      if (Array.isArray(comments)) {
-        setComments([]);
-      } else {
-        const curCommentKeys = Object.keys(comments ?? {}) as commentType[];
-        const commentsToStore = curCommentKeys.map((comment) => {
-          return {
-            type: comment,
-            data: comments[comment]!,
-          };
-        });
-        setComments(commentsToStore);
-      }
+      const commentsToEdit = convertCommentArrToEdit(comments);
+      setComments(commentsToEdit);
     } catch (e) {
       console.log(e);
     } finally {
@@ -165,18 +145,13 @@ export default function NewsPatch({ data }: pageProps) {
   }, []);
 
   const submit = async () => {
+    if (!id) return;
     setIsLoading(true);
 
-    const commentsToSend = Array<CommentToEdit>
-    
-    Object.keys(comments).forEach((type as commentType) => {
-      
-    })
-
-
+    const commentsToSend = convertCommentArrToPatch(comments);
     try {
       const result: boolean = await newsRepositories.patchNews({
-        _id: id,
+        id: id,
         summary: content,
         title,
         state,
@@ -184,7 +159,7 @@ export default function NewsPatch({ data }: pageProps) {
         opinionLeft,
         opinionRight,
         timeline,
-        comments: comments,
+        comments: commentsToSend,
         keywords: keywordList,
       });
       if (!result) {
@@ -202,10 +177,7 @@ export default function NewsPatch({ data }: pageProps) {
     }
   };
 
-  const editComment = (comment: {
-    type: commentType;
-    data: Array<{ title: string; comment: string }>;
-  }) => {
+  const editComment = (comment: CommentsArr) => {
     let index = null;
     for (let i = 0; i < comments.length; i++) {
       const cur = comments[i];

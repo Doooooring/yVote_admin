@@ -1,4 +1,4 @@
-import { News, NewsTitle, commentType } from '@interface/news';
+import { CommentsArr, News, NewsTitle, commentType } from '@interface/news';
 import { useCommonStore } from '@store/common';
 import { clone } from '@utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -22,6 +22,7 @@ import { KeywordTitle } from '@interface/keywords';
 import { useNewsStore } from '@store/news';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { useRouter } from 'next/router';
+import { convertCommentArrToPatch } from '@utils/news';
 
 interface pageProps {
   data: {
@@ -54,12 +55,7 @@ export default function NewsPost({ data }: pageProps) {
   const [isPublished, setIsPublished] = useState<boolean>(false);
   const [opinionLeft, setOpinionLeft] = useState<string>('');
   const [opinionRight, setOpinionRight] = useState<string>('');
-  const [comments, setComments] = useState<
-    Array<{
-      type: commentType;
-      data: Array<{ title: string; comment: string }>;
-    }>
-  >([]);
+  const [comments, setComments] = useState<Array<CommentsArr>>([]);
   const [keywordList, setKeywordList] = useState<Array<KeywordTitle>>([]);
 
   const isLoading = useCommonStore((state) => state.isLoading);
@@ -78,17 +74,7 @@ export default function NewsPost({ data }: pageProps) {
 
   const submit = async () => {
     setIsLoading(true);
-    const commentsToSend = {} as {
-      [key in commentType]?: Array<{
-        title: string;
-        comment: string;
-      }>;
-    };
-
-    comments.forEach((item) => {
-      const { type, data } = item;
-      commentsToSend[type] = data;
-    });
+    const commentsToSend = convertCommentArrToPatch(comments);
     try {
       const result: boolean = await newsRepositories.postNews({
         summary: content,
@@ -116,10 +102,7 @@ export default function NewsPost({ data }: pageProps) {
     }
   };
 
-  const editComment = (comment: {
-    type: commentType;
-    data: Array<{ title: string; comment: string }>;
-  }) => {
+  const editComment = (comment: CommentsArr) => {
     let index = null;
     for (let i = 0; i < comments.length; i++) {
       const cur = comments[i];

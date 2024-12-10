@@ -1,4 +1,4 @@
-import { commentType } from '@interface/news';
+import { CommentsArr, CommentToEdit, commentType } from '@interface/news';
 import { useNewsStore } from '@store/news';
 import { changeItemsOrder, clone } from '@utils';
 import styled from 'styled-components';
@@ -14,7 +14,7 @@ import { Row, Center, Column } from '@components/common/figure';
 import CommonModal from '@components/common/comonModal';
 
 interface CommentModalProps {
-  editComment: (v: { type: commentType; data: Array<{ title: string; comment: string }> }) => void;
+  editComment: (v: CommentsArr) => void;
 }
 
 export default function CommentModal({ editComment }: CommentModalProps) {
@@ -43,7 +43,7 @@ function ModalBody({ editComment }: CommentModalProps) {
   }, [commentSelected]);
 
   const setCommentArr = useCallback(
-    (arr: { title: string; comment: string }[]) => {
+    (arr: CommentToEdit[]) => {
       if (!commentSelected) return;
       editComment({
         type: commentSelected?.type,
@@ -61,7 +61,7 @@ function ModalBody({ editComment }: CommentModalProps) {
     moveArrLeft: moveCommentUp,
     moveArrRight: moveCommentDown,
   } = useArr(commentArr, setCommentArr, () => {
-    return { title: '', comment: '' };
+    return { order: -1, title: '', comment: '', commentType: commentSelected?.type! };
   });
 
   return (
