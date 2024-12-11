@@ -1,23 +1,39 @@
-import { useCallback, useState } from 'react';
+import { imageRepositories } from '@repositories/img';
+import { ChangeEvent, useCallback, useState } from 'react';
 
 interface ImageUploadProps {
-  setImageUrl: (url: string) => void;
+  isLoading?: boolean;
+  setIsLoading?: (p: boolean) => void;
+  setImageUrl: (url: string | null) => void;
 }
 
-export default function ImageUpload({ setImageUrl }: ImageUploadProps) {
-  const [isLoading, setIsLoading] = useState(false);
-
-  const uploadFile = useCallback(
-    (fl: File) => {
-      setIsLoading(true);
-
-      try {
-      } catch (e) {}
-
-      setIsLoading(false);
+export default function ImageUpload({
+  setImageUrl,
+  setIsLoading: setIsLoadingProto,
+}: ImageUploadProps) {
+  const setIsLoading = useCallback(
+    (b: boolean) => {
+      if (setIsLoadingProto) setIsLoadingProto(b);
     },
-    [setIsLoading],
+    [setIsLoadingProto],
   );
 
-  return <input type="file" className="form-control" onChange={(e) => {}} />;
+  const fileFormOnChange = useCallback(
+    async (e: ChangeEvent<HTMLInputElement>) => {
+      const curFiles = e.currentTarget.files;
+      setIsLoading(true);
+      try {
+        if (curFiles) {
+          const imgUrl = await imageRepositories.postImage(curFiles[0]);
+          setImageUrl(imgUrl);
+        } else {
+          setImageUrl(null);
+        }
+      } catch (e) {}
+      setIsLoading(false);
+    },
+    [setImageUrl],
+  );
+
+  return <input type="file" className="form-control" onChange={fileFormOnChange} />;
 }
