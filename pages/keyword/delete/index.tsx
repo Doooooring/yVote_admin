@@ -31,9 +31,9 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
   };
 };
 
-export default function NewsDelete({ data }: pageProps) {
+export default function KeywordDelete({ data }: pageProps) {
   const [keywordList, setKeywordList] = useState<KeywordTitle[]>([]);
-  const [deleteId, setDeleteId] = useState<number | null>('');
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
@@ -56,6 +56,7 @@ export default function NewsDelete({ data }: pageProps) {
   }, []);
 
   const deleteKeyword = useCallback(async () => {
+    if (!deleteId) return;
     try {
       setIsLoading(true);
       const response = await keywordRepositories.deleteKeyword(deleteId);
