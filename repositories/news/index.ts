@@ -35,9 +35,9 @@ class NewsRepositories {
     return response.data.success;
   }
 
-  async deleteNews(id: string) {
+  async deleteNews(id: number) {
     const response: { data: Response<{ state: boolean }> } = await axios.delete(
-      `${HOST_URL}/news/${id}`,
+      `${HOST_URL}/news/edit/${id}`,
     );
     return response.data.success;
   }

@@ -1,11 +1,11 @@
 import { HOST_URL } from '@asset';
 import { Response } from '@interface/basic';
-import { Keyword, KeywordTitle, keywordToPatch, keywordToPost } from '@interface/keywords';
+import { Keyword, KeywordTitle, KeywordToPatch, KeywordToPost } from '@interface/keywords';
 import axios from 'axios';
 
 class KeywordRepositories {
   async getKeyword(keyname: string) {
-    const response: { data: Response<keywordToPatch> } = await axios.get(
+    const response: { data: Response<KeywordToPatch> } = await axios.get(
       `${HOST_URL}/keyword?key=${keyname}`,
     );
 
@@ -19,23 +19,23 @@ class KeywordRepositories {
     return response.data.result;
   }
 
-  async postKeyword(keyword: keywordToPost) {
+  async postKeyword(keyword: KeywordToPost) {
     const response: { data: Response<boolean> } = await axios.post(`${HOST_URL}/keyword/edit`, {
       keyword: keyword,
     });
     return true;
   }
 
-  async patchKeyword(keyword: keywordToPatch) {
+  async patchKeyword(keyword: KeywordToPatch) {
     const response: { data: Response<{ state: boolean }> } = await axios.patch(
       `${HOST_URL}/keyword/edit/${keyword.id}`,
       { keyword: keyword },
     );
     return true;
   }
-  async deleteKeyword(id: string) {
+  async deleteKeyword(id: number) {
     const response: { data: Response<{ state: boolean }> } = await axios.delete(
-      `${HOST_URL}/keyword/${id}`,
+      `${HOST_URL}/keyword/edit/${id}`,
     );
     return true;
   }

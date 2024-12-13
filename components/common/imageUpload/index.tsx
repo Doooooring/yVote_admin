@@ -10,6 +10,7 @@ interface ImageUploadProps {
 export default function ImageUpload({
   setImageUrl,
   setIsLoading: setIsLoadingProto,
+  ...pros
 }: ImageUploadProps) {
   const setIsLoading = useCallback(
     (b: boolean) => {

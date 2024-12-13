@@ -2,13 +2,14 @@ import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
 import SearchBox from '@components/keyword/search';
-import { NewsTitle, newsRepositories } from '@repositories/news';
+import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { GetServerSideProps } from 'next';
 import { useCallback, useState } from 'react';
+import { NewsTitle } from '@interface/news';
 
 export interface NewsToDelete {
-  _id: string;
+  id: string;
 }
 
 interface pageProps {
@@ -31,10 +32,11 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 
 export default function NewsDelete({ data }: pageProps) {
   const [newsList, setNewsList] = useState<NewsTitle[]>([]);
-  const [deleteId, setDeleteId] = useState<string>('');
+  const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
+
   const findNews = useCallback(async (searchWord: string) => {
     try {
       setIsLoading(true);
@@ -43,30 +45,31 @@ export default function NewsDelete({ data }: pageProps) {
         Error;
       } else {
         setNewsList(response);
-        setIsLoading(false);
       }
       return true;
     } catch {
-      setIsLoading(false);
-      console.log('is here');
       return false;
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
-  const deleteNews = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      console.log(deleteId);
-      const response = await newsRepositories.deleteNews(deleteId);
-      if (!response) Error;
-      setNewsList([]);
-      setDeleteId('');
+  const deleteNews = useCallback(
+    async (id: number) => {
+      try {
+        setIsLoading(true);
+        console.log(deleteId);
+        const response = await newsRepositories.deleteNews(id);
+        if (!response) Error;
+        setNewsList([]);
+        setDeleteId(null);
+      } catch (e) {
+        alert('잘 안감');
+      }
       setIsLoading(false);
-    } catch (e) {
-      alert('잘 안감');
-      setIsLoading(false);
-    }
-  }, [deleteId]);
+    },
+    [deleteId],
+  );
 
   return (
     <Wrapper>
@@ -87,9 +90,9 @@ export default function NewsDelete({ data }: pageProps) {
             return (
               <NewsLi
                 key={idx}
-                state={deleteId === news._id}
+                state={deleteId === news.id}
                 onClick={async () => {
-                  setDeleteId(news._id!);
+                  setDeleteId(news.id);
                 }}
               >
                 {news.title}
@@ -101,8 +104,8 @@ export default function NewsDelete({ data }: pageProps) {
           <SubmitButton
             title="SUBMIT"
             click={async () => {
-              if (isLoading) return;
-              await deleteNews();
+              if (isLoading || !deleteId) return;
+              await deleteNews(deleteId);
             }}
           />
         </SubmitWrapper>

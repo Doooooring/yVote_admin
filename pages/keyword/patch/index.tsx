@@ -1,4 +1,5 @@
 import { SubmitButton } from '@components/common/button';
+import ImageUpload from '@components/common/imageUpload';
 import TextEditor from '@components/common/textEditor';
 import ExplainPreview from '@components/keyword/explainPreview';
 import NewsSelect from '@components/keyword/newsSelect';
@@ -44,6 +45,7 @@ export default function KeywordPatch({ data }: pageProps) {
   const [id, setId] = useState<number | null>(null);
   const [keyword, setKeyword] = useState<string>('');
   const [category, setCategory] = useState<Keyword['category']>(KeywordCategory.Human);
+  const [keywordImg, setKeywordImg] = useState<string | null>(null);
   const [newsList, setNewsList] = useState<Array<NewsTitle>>([]);
   const [keywordSearchErr, setKeywordSearchErr] = useState<boolean>(false);
 
@@ -64,12 +66,12 @@ export default function KeywordPatch({ data }: pageProps) {
     const encoded = searchWord.replace(/\//g, '$');
 
     try {
-      const { id, keyword, category, explain, news } = await keywordRepositories.getKeyword(
-        encoded,
-      );
+      const { id, keyword, category, keywordImage, explain, news } =
+        await keywordRepositories.getKeyword(encoded);
       setId(id);
       setKeyword(keyword);
       setCategory(category);
+      setKeywordImg(keywordImage);
       initializeQuillContents(explain);
       setNewsList(news);
       setKeywordSearchErr(false);
@@ -87,6 +89,7 @@ export default function KeywordPatch({ data }: pageProps) {
   const resetInput = () => {
     setId(null);
     setKeyword('');
+    setKeywordImg(null);
     setCategory(KeywordCategory.Economics);
     resetContents();
     setNewsList([]);
@@ -100,6 +103,7 @@ export default function KeywordPatch({ data }: pageProps) {
         id: id,
         keyword: keyword,
         category: category,
+        keywordImage: keywordImg,
         explain: content,
         news: newsList,
       });
@@ -130,6 +134,9 @@ export default function KeywordPatch({ data }: pageProps) {
               setKeyword(e.currentTarget.value);
             }}
           ></Input>
+        </InputWrapper>
+        <InputWrapper>
+          <ImageUpload setImageUrl={setKeywordImg} />
         </InputWrapper>
         <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
         <ExplainPreview keyword={keyword} explain={content} />

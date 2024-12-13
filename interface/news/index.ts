@@ -80,7 +80,7 @@ export interface News {
   title: string;
   summary: string;
   keywords: Array<Keyword>;
-  newsImage: string;
+  newsImage: string | null;
   isPublished: boolean;
   state: boolean;
   timeline: Array<Timeline>;
@@ -110,6 +110,7 @@ export interface NewsToPost
     | 'title'
     | 'summary'
     | 'state'
+    | 'newsImage'
     | 'isPublished'
     | 'timeline'
     | 'comments'
@@ -131,6 +132,7 @@ export const initNews = () => {
     title: '',
     summary: '',
     state: true,
+    newsImage: null,
     isPublished: false,
     timeline: [] as Timeline[],
     comments: [] as CommentToEdit[],

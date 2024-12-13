@@ -2,11 +2,12 @@ import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
 import SearchBox from '@components/keyword/search';
-import { KeywordTitle, keywordRepositories } from '@repositories/keyword';
-import { NewsTitle } from '@repositories/news';
+import { keywordRepositories } from '@repositories/keyword';
 import { useCommonStore } from '@store/common';
 import { GetServerSideProps } from 'next';
 import { useCallback, useState } from 'react';
+import { NewsTitle } from '@interface/news';
+import { KeywordTitle } from '@interface/keywords';
 
 export interface NewsToDelete {
   _id: string;
@@ -14,12 +15,12 @@ export interface NewsToDelete {
 
 interface pageProps {
   data: {
-    keywordTitles: Array<NewsTitle>;
+    keywordTitles: Array<KeywordTitle>;
   };
 }
 
 export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
-  const keywordTitles: Array<NewsTitle> = await keywordRepositories.getKeywordTitles('');
+  const keywordTitles: Array<KeywordTitle> = await keywordRepositories.getKeywordTitles('');
 
   return {
     props: {
@@ -32,7 +33,7 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 
 export default function NewsDelete({ data }: pageProps) {
   const [keywordList, setKeywordList] = useState<KeywordTitle[]>([]);
-  const [deleteId, setDeleteId] = useState<string>('');
+  const [deleteId, setDeleteId] = useState<number | null>('');
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
@@ -60,7 +61,7 @@ export default function NewsDelete({ data }: pageProps) {
       const response = await keywordRepositories.deleteKeyword(deleteId);
       if (!response) Error;
       setKeywordList([]);
-      setDeleteId('');
+      setDeleteId(null);
       setIsLoading(false);
     } catch (e) {
       alert('잘 안감');
@@ -82,9 +83,9 @@ export default function NewsDelete({ data }: pageProps) {
             return (
               <NewsLi
                 key={idx}
-                state={deleteId === keyword._id}
+                state={deleteId === keyword.id}
                 onClick={async () => {
-                  setDeleteId(keyword._id!);
+                  setDeleteId(keyword.id!);
                 }}
               >
                 {keyword.keyword}

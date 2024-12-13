@@ -43,6 +43,7 @@ export default function KeywordPost({ data }: pageProps) {
 
   const [keyword, setKeyword] = useState<string>('');
   const [explain, setExplain] = useState<string>('');
+  const [keywordImg, setKeywordImg] = useState<string | null>(null);
   const [category, setCategory] = useState<Keyword['category']>(KeywordCategory.Human);
   const [newsList, setNewsList] = useState<Array<{ id: number; title: string }>>([]);
 
@@ -62,6 +63,7 @@ export default function KeywordPost({ data }: pageProps) {
       const result: boolean = await keywordRepositories.postKeyword({
         keyword: keyword,
         category: category,
+        keywordImage: keywordImg,
         explain: content,
         news: newsList,
       });
@@ -83,6 +85,7 @@ export default function KeywordPost({ data }: pageProps) {
     setExplain('');
     resetContents();
     setCategory(KeywordCategory.Human);
+    setKeywordImg(null);
     setNewsList([]);
   }, [setKeyword, setExplain, resetContents, setCategory, setNewsList]);
 

@@ -16,7 +16,7 @@ export interface Keyword {
   explain: string;
   category: KeywordCategory;
   recent: boolean;
-  keywordImage: string;
+  keywordImage: string | null;
   news: Array<News>;
 }
 
@@ -26,17 +26,14 @@ export interface KeywordToView
 export interface KeywordOnDetail
   extends Pick<Keyword, 'id' | 'keyword' | 'explain' | 'category' | 'keywordImage'> {}
 
-export interface keywordToPatch extends Pick<Keyword, 'id' | 'keyword' | 'category' | 'explain'> {
+export interface KeywordToPatch
+  extends Pick<Keyword, 'id' | 'keyword' | 'category' | 'keywordImage' | 'explain'> {
   news: {
     id: number;
     title: string;
   }[];
 }
 
-export interface keywordToPost extends Pick<Keyword, 'keyword' | 'category' | 'explain'> {
-  news: {
-    id: number;
-    title: string;
-  }[];
-}
+export interface KeywordToPost extends Omit<KeywordToPatch, 'id'> {}
+
 export interface KeywordTitle extends Pick<Keyword, 'id' | 'keyword'> {}

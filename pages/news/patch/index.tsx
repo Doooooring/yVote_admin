@@ -1,4 +1,5 @@
 import { SubmitButton } from '@components/common/button';
+import ImageUpload from '@components/common/imageUpload';
 import TextEditor from '@components/common/textEditor';
 import ToggleButton from '@components/common/toggleButton';
 import SearchBox from '@components/keyword/search';
@@ -66,6 +67,7 @@ export default function NewsPatch({ data }: pageProps) {
   const [isPublished, setIsPublished] = useState<boolean>(true);
   const [opinionLeft, setOpinionLeft] = useState<string>('');
   const [opinionRight, setOpinionRight] = useState<string>('');
+  const [newsImg, setNewsImg] = useState<string | null>(null);
   const [comments, setComments] = useState<Array<CommentsArr>>([]);
   const [keywordList, setKeywordList] = useState<Array<KeywordTitle>>([]);
 
@@ -158,6 +160,7 @@ export default function NewsPatch({ data }: pageProps) {
         isPublished,
         opinionLeft,
         opinionRight,
+        newsImage: newsImg,
         timeline,
         comments: commentsToSend,
         keywords: keywordList,
@@ -215,6 +218,9 @@ export default function NewsPatch({ data }: pageProps) {
                 setTitle(e.currentTarget.value);
               }}
             ></Input>
+          </InputWrapper>
+          <InputWrapper className="pb-1 pt-1 mb-1">
+            <ImageUpload setImageUrl={setNewsImg} />
           </InputWrapper>
           <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
           <StateToggleWrapper>

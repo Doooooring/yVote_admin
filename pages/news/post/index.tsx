@@ -23,6 +23,7 @@ import { useNewsStore } from '@store/news';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { useRouter } from 'next/router';
 import { convertCommentArrToPatch } from '@utils/news';
+import ImageUpload from '@components/common/imageUpload';
 
 interface pageProps {
   data: {
@@ -55,6 +56,7 @@ export default function NewsPost({ data }: pageProps) {
   const [isPublished, setIsPublished] = useState<boolean>(false);
   const [opinionLeft, setOpinionLeft] = useState<string>('');
   const [opinionRight, setOpinionRight] = useState<string>('');
+  const [newsImg, setNewsImg] = useState<string | null>(null);
   const [comments, setComments] = useState<Array<CommentsArr>>([]);
   const [keywordList, setKeywordList] = useState<Array<KeywordTitle>>([]);
 
@@ -83,6 +85,7 @@ export default function NewsPost({ data }: pageProps) {
         isPublished,
         opinionLeft,
         opinionRight,
+        newsImage: newsImg,
         timeline,
         comments: commentsToSend,
         keywords: keywordList,
@@ -133,6 +136,9 @@ export default function NewsPost({ data }: pageProps) {
                 setTitle(e.currentTarget.value);
               }}
             ></Input>
+          </InputWrapper>
+          <InputWrapper className="pb-1 pt-1 mb-1">
+            <ImageUpload setImageUrl={setNewsImg} />
           </InputWrapper>
           <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
           <StateToggleWrapper>
