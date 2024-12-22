@@ -1,6 +1,6 @@
-import { CommentsArr, News, NewsTitle, commentType } from '@interface/news';
+import { CommentsArr, NewsTitle, TimelineToEdit, commentType } from '@interface/news';
 import { useCommonStore } from '@store/common';
-import { clone } from '@utils';
+import { complexClone } from '@utils';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
@@ -13,6 +13,7 @@ import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useKeywordStore } from '@store/keyword';
 
+import ImageUpload from '@components/common/imageUpload';
 import TextEditor from '@components/common/textEditor';
 import ToggleButton from '@components/common/toggleButton';
 import CommentInput from '@components/news/commentInput';
@@ -21,9 +22,8 @@ import TimelineInput from '@components/news/timelineInput';
 import { KeywordTitle } from '@interface/keywords';
 import { useNewsStore } from '@store/news';
 import { useReactQuill } from '@utils/hook/useReactQuill';
-import { useRouter } from 'next/router';
 import { convertCommentArrToPatch } from '@utils/news';
-import ImageUpload from '@components/common/imageUpload';
+import { useRouter } from 'next/router';
 
 interface pageProps {
   data: {
@@ -51,7 +51,7 @@ export default function NewsPost({ data }: pageProps) {
   const { ref, content, handleContents, resetContents } = useReactQuill();
 
   const [title, setTitle] = useState<string>('');
-  const [timeline, setTimeline] = useState<News['timeline']>([]);
+  const [timeline, setTimeline] = useState<TimelineToEdit[]>([]);
   const [state, setState] = useState<boolean>(true);
   const [isPublished, setIsPublished] = useState<boolean>(false);
   const [opinionLeft, setOpinionLeft] = useState<string>('');
@@ -116,7 +116,7 @@ export default function NewsPost({ data }: pageProps) {
     }
 
     if (index === null) return;
-    const newComments = clone(comments);
+    const newComments = complexClone(comments);
     newComments[index] = comment;
     setComments(newComments);
     setCommentSelected(comment);

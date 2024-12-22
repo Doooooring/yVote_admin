@@ -1,6 +1,6 @@
 import { HOST_URL } from '@asset';
 import { Response } from '@interface/basic';
-import { News, NewsTitle, NewsToPatch, NewsToPost } from '@interface/news';
+import { NewsTitle, NewsToPatch, NewsToPost } from '@interface/news';
 import axios from 'axios';
 
 class NewsRepositories {
@@ -8,6 +8,7 @@ class NewsRepositories {
     const response: {
       data: Response<Array<NewsTitle>>;
     } = await axios.get(`${HOST_URL}/news/titles?search=${search}`);
+    console.log(response.data);
     return response.data.result;
   }
 

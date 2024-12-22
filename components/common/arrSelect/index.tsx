@@ -11,7 +11,7 @@ import Loader from '@components/common/loader';
 import { TfiLoop } from 'react-icons/tfi';
 import { isArrIncludeSrc } from './arrSelect.tools';
 interface ArrSelectProps<T> {
-  key: keyof T;
+  keyToView: keyof T;
   curArrSrc: Array<T>;
   totalArrSrc: Array<T>;
   setCurArrSrc: (curList: Array<T>) => void;
@@ -19,7 +19,7 @@ interface ArrSelectProps<T> {
 }
 
 export default function ArrSelect<T>({
-  key,
+  keyToView,
   curArrSrc,
   totalArrSrc,
   compare,
@@ -98,6 +98,13 @@ export default function ArrSelect<T>({
     setRestSelected([]);
   }
 
+  const log = (t: any) => {
+    console.log('=============');
+    console.log(t);
+  };
+  console.log(arrRest);
+  console.log(arrContain);
+
   return (
     <Modal>
       <Wrapper>
@@ -108,14 +115,15 @@ export default function ArrSelect<T>({
               {arrRest
                 .sort((a, b) => compare(a, b))
                 .map((s, idx) => {
-                  const value = s[key] as string;
+                  const value = s[keyToView] as string;
+
                   return (
                     <SourceLi
                       key={value}
                       onClick={() => {
                         clickRest(s);
                       }}
-                      state={restSelected.includes(s)}
+                      state={isArrIncludeSrc(restSelected, s, compare)}
                     >
                       {value}
                     </SourceLi>
@@ -136,7 +144,7 @@ export default function ArrSelect<T>({
               {arrContain
                 .sort((a, b) => compare(a, b))
                 .map((s) => {
-                  const value = s[key] as string;
+                  const value = s[keyToView] as string;
                   return (
                     <SourceLi
                       key={value}

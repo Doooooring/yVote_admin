@@ -5,6 +5,15 @@ export const htmlFromString = (s: string) => {
   return doc.body;
 };
 
+export const getDotDateForm = (date: Date) => {
+  if (typeof date === 'string') date = new Date(date);
+  return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+};
+
+export const getStandardDateForm = (date: Date) => {
+  return date.toISOString().split('T')[0];
+};
+
 export const sortKorCallback = (a: string, b: string) => {
   return a > b ? 1 : a < b ? -1 : 0;
 };

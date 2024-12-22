@@ -1,17 +1,17 @@
-import { CommentsArr, CommentToEdit, commentType } from '@interface/news';
+import { CommentsArr, CommentToEdit } from '@interface/news';
 import { useNewsStore } from '@store/news';
-import { changeItemsOrder, clone } from '@utils';
+import { complexClone } from '@utils';
 import styled from 'styled-components';
 
+import ListEditView from '@components/common/listEditView';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useArr } from '@utils/hook/useArr';
-import { comment } from '@uiw/react-md-editor';
 import { useCallback, useMemo } from 'react';
-import ListEditView from '@components/common/listEditView';
 
-import { Row, Center, Column } from '@components/common/figure';
 import CommonModal from '@components/common/comonModal';
+import { Center, Column, Row } from '@components/common/figure';
+import { getStandardDateForm } from '@utils/tools';
 
 interface CommentModalProps {
   editComment: (v: CommentsArr) => void;
@@ -129,11 +129,33 @@ function ModalBody({ editComment }: CommentModalProps) {
                   className="form-control"
                   value={commentArr[curFocus].title}
                   onChange={(e) => {
-                    const curCommentArr = clone(commentArr);
+                    const curCommentArr = complexClone(commentArr);
                     curCommentArr[curFocus!].title = e.currentTarget.value;
                     setCommentArr(curCommentArr);
                   }}
                 ></TitleInput>
+              </InputWrapper>
+              <InputWrapper>
+                <SubInputTitle>날짜</SubInputTitle>
+                <DateInput
+                  type="date"
+                  className="form-control"
+                  value={
+                    commentArr[curFocus!].date
+                      ? getStandardDateForm(commentArr[curFocus!].date!)
+                      : ''
+                  }
+                  onChange={(e) => {
+                    const curCommentArr = complexClone(commentArr);
+                    curCommentArr[curFocus!].date = new Date(e.currentTarget.value);
+                    setCommentArr(curCommentArr);
+                  }}
+                  onFocus={(e) => {
+                    if (e.currentTarget.showPicker) {
+                      e.currentTarget.showPicker();
+                    }
+                  }}
+                />
               </InputWrapper>
               <InputWrapper>
                 <SubInputTitle>내용</SubInputTitle>
@@ -142,7 +164,7 @@ function ModalBody({ editComment }: CommentModalProps) {
                   className="form-control"
                   value={commentArr[curFocus!].comment}
                   onChange={(e) => {
-                    const curCommentArr = clone(commentArr);
+                    const curCommentArr = complexClone(commentArr);
                     curCommentArr[curFocus!].comment = e.currentTarget.value;
                     setCommentArr(curCommentArr);
                   }}

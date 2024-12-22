@@ -7,14 +7,15 @@ interface NewsSelectProps {
   setCurNewsList: (arr: Array<NewsTitle>) => void;
 }
 
-export default function NewsSelect({curNewsList, setCurNewsList} : NewsSelectProps) {
-  
-  const newsTitleList = useNewsStore((store) => store.newsTitleList);
+export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectProps) {
+  console.log('is news select');
+  console.log(curNewsList);
 
+  const newsTitleList = useNewsStore((store) => store.newsTitleList);
 
   return (
     <ArrSelect
-      key={'title'}
+      keyToView={'title'}
       curArrSrc={curNewsList}
       totalArrSrc={newsTitleList}
       setCurArrSrc={setCurNewsList}

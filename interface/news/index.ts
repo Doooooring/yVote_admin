@@ -57,12 +57,13 @@ export interface CommentsArr {
 
 export interface Timeline {
   id: number;
-  date: string;
+  date: Date;
   title: string;
 }
 
-export interface TimelineToEdit extends Omit<Timeline, 'id'> {
+export interface TimelineToEdit extends Omit<Timeline, 'id' | 'date'> {
   id?: number;
+  date?: Date;
 }
 
 export interface Article {
@@ -112,7 +113,6 @@ export interface NewsToPost
     | 'state'
     | 'newsImage'
     | 'isPublished'
-    | 'timeline'
     | 'comments'
     | 'opinionLeft'
     | 'opinionRight'
@@ -121,6 +121,7 @@ export interface NewsToPost
     id: number;
     keyword: string;
   }[];
+  timeline: TimelineToEdit[];
 }
 
 export interface NewsToPatch extends NewsToPost {

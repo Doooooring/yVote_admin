@@ -2,9 +2,9 @@ import { Center, Column, Row } from '@components/common/figure';
 import ListEditView from '@components/common/listEditView';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CommentsArr, CommentToEdit, commentType } from '@interface/news';
+import { CommentsArr, commentType } from '@interface/news';
 import { useNewsStore } from '@store/news';
-import { clone } from '@utils';
+import { complexClone } from '@utils';
 import { useArr } from '@utils/hook/useArr';
 import styled from 'styled-components';
 
@@ -15,12 +15,7 @@ interface CommentInputProps {
 
 const commentTypeKey = Object.keys(commentType) as Array<commentType>;
 
-const getCommentRest = (
-  comments: Array<{
-    type: commentType;
-    data: Array<{ title: string; comment: string }>;
-  }>,
-) => {
+const getCommentRest = (comments: CommentsArr[]) => {
   const curComments = comments;
   let restComment: commentType[] = [];
   commentTypeKey.forEach((commentType) => {
@@ -111,7 +106,7 @@ export default function CommentInput({ comments, setComments }: CommentInputProp
               className="form-select"
               value={comments[curFocus].type}
               onChange={(e) => {
-                const curComments = clone(comments);
+                const curComments = complexClone(comments);
                 curComments[curFocus].type = e.currentTarget.value as commentType;
                 setComments(curComments);
               }}

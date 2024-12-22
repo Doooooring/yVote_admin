@@ -1,18 +1,18 @@
-import { changeItemsOrder, clone } from '@utils';
+import { changeItemsOrder, complexClone } from '@utils';
 import { useState } from 'react';
 
 export const useArr = <T,>(arr: T[], setArr: (arr: T[]) => void, getInitialValue: () => T) => {
   const [curFocus, setCurFocus] = useState<number | null>(null);
 
   const addArr = (idx: number) => {
-    const curArr = clone(arr);
+    const curArr = complexClone(arr);
     const newData = getInitialValue();
     curArr.splice(idx + 1, 0, newData);
     setArr(curArr);
   };
 
   const deleteArr = (idx: number) => {
-    const curArr = clone(arr);
+    const curArr = complexClone(arr);
     curArr.splice(idx, 1);
     setArr(curArr);
     setCurFocus(null);

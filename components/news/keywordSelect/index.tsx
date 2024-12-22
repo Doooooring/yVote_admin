@@ -19,7 +19,7 @@ export default function KeywordSelect({ curKeywordList, setCurKeywordList }: Key
 
   return (
     <ArrSelect
-      key={'keyword'}
+      keyToView={'keyword'}
       curArrSrc={curKeywordList}
       totalArrSrc={keywordTitleList}
       setCurArrSrc={setCurKeywordList}

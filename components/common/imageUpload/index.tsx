@@ -1,5 +1,5 @@
 import { imageRepositories } from '@repositories/img';
-import { ChangeEvent, useCallback, useState } from 'react';
+import { ChangeEvent, useCallback } from 'react';
 
 interface ImageUploadProps {
   isLoading?: boolean;
@@ -25,12 +25,15 @@ export default function ImageUpload({
       setIsLoading(true);
       try {
         if (curFiles) {
+          console.log('is here : ', curFiles);
           const imgUrl = await imageRepositories.postImage(curFiles[0]);
           setImageUrl(imgUrl);
         } else {
           setImageUrl(null);
         }
-      } catch (e) {}
+      } catch (e) {
+        console.log(e);
+      }
       setIsLoading(false);
     },
     [setImageUrl],

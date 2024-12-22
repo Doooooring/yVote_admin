@@ -1,5 +1,5 @@
 import { Timeline } from '@interface/news';
-import { changeItemsOrder, clone } from '@utils';
+import { changeItemsOrder, complexClone } from '@utils';
 import { useState } from 'react';
 
 export const useTimelineArr = (
@@ -9,14 +9,14 @@ export const useTimelineArr = (
   const [curFocus, setCurFocus] = useState<number | null>(null);
 
   const addTimeline = (idx: number) => {
-    const curTimeline = clone(timeline);
+    const curTimeline = complexClone(timeline);
     const newData = { date: '', title: '' };
     curTimeline.splice(idx + 1, 0, newData);
     setTimeline(curTimeline);
   };
 
   const deleteTimeline = (idx: number) => {
-    const curTimeline = clone(timeline);
+    const curTimeline = complexClone(timeline);
     curTimeline.splice(idx, 1);
     setTimeline(curTimeline);
     setCurFocus(null);

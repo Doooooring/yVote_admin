@@ -11,20 +11,13 @@ import KeywordSelect from '@components/news/keywordSelect';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
 import { KeywordTitle } from '@interface/keywords';
-import {
-  CommentToEdit,
-  CommentsArr,
-  News,
-  NewsTitle,
-  NewsToPatch,
-  commentType,
-} from '@interface/news';
+import { CommentsArr, NewsTitle, NewsToPatch, TimelineToEdit } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
-import { clone } from '@utils';
+import { complexClone } from '@utils';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { convertCommentArrToEdit, convertCommentArrToPatch } from '@utils/news';
 
@@ -62,7 +55,7 @@ export default function NewsPatch({ data }: pageProps) {
 
   const [id, setId] = useState<number | null>(null);
   const [title, setTitle] = useState<string>('');
-  const [timeline, setTimeline] = useState<News['timeline']>([]);
+  const [timeline, setTimeline] = useState<TimelineToEdit[]>([]);
   const [state, setState] = useState<boolean>(true);
   const [isPublished, setIsPublished] = useState<boolean>(true);
   const [opinionLeft, setOpinionLeft] = useState<string>('');
@@ -191,7 +184,7 @@ export default function NewsPatch({ data }: pageProps) {
     }
 
     if (index === null) return;
-    const newComments = clone(comments);
+    const newComments = complexClone(comments);
     newComments[index] = comment;
     setComments(newComments);
     setCommentSelected(comment);

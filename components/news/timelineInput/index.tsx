@@ -1,17 +1,16 @@
-import { News, commentType } from '@interface/news';
-import styled from 'styled-components';
-import { useTimelineArr } from './timelineInput.hook';
 import { Center, Column, Row } from '@components/common/figure';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { clone } from '@utils';
-import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
-import { useState } from 'react';
-import { useArr } from '@utils/hook/useArr';
 import ListEditView from '@components/common/listEditView';
+import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { TimelineToEdit } from '@interface/news';
+import { complexClone } from '@utils';
+import { useArr } from '@utils/hook/useArr';
+import { getDotDateForm, getStandardDateForm } from '@utils/tools';
+import styled from 'styled-components';
 
 interface TimelineInputProps {
-  timeline: News['timeline'];
-  handleTimeline: (timeline: News['timeline']) => void;
+  timeline: TimelineToEdit[];
+  handleTimeline: (timeline: TimelineToEdit[]) => void;
 }
 
 export default function TimelineInput({ timeline, handleTimeline }: TimelineInputProps) {
@@ -23,9 +22,8 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
     moveArrLeft: moveTimelineLeft,
     moveArrRight: moveTimelineRight,
   } = useArr(timeline, handleTimeline, () => {
-    return { date: '', title: '' };
+    return { title: '' };
   });
-
   return (
     <ListEditView
       title="타임라인"
@@ -41,8 +39,11 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
                 className="p-3"
               >
                 <p className="date">
-                  {item.date}
-                  {item.date === '' ? <span className="example">2024.01.01</span> : <></>}
+                  {item.date ? (
+                    getDotDateForm(item.date)
+                  ) : (
+                    <span className="example">2024.01.01</span>
+                  )}
                 </p>
                 <p className="title">
                   {item.title}{' '}
@@ -89,15 +90,22 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
             <InputWrapper>
               <SubInputTitle>날짜</SubInputTitle>
               <DateInput
-                type="text"
+                type="date"
                 className="form-control"
-                value={timeline[curFocus!].date}
+                value={
+                  timeline[curFocus!].date ? getStandardDateForm(timeline[curFocus!].date!) : ''
+                }
                 onChange={(e) => {
-                  const curTimeline = clone(timeline);
-                  curTimeline[curFocus!].date = e.currentTarget.value;
+                  const curTimeline = complexClone(timeline);
+                  curTimeline[curFocus!].date = new Date(e.currentTarget.value);
                   handleTimeline(curTimeline);
                 }}
-              ></DateInput>
+                onFocus={(e) => {
+                  if (e.currentTarget.showPicker) {
+                    e.currentTarget.showPicker();
+                  }
+                }}
+              />
             </InputWrapper>
             <InputWrapper>
               <SubInputTitle>제목</SubInputTitle>
@@ -106,7 +114,7 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
                 className="form-control"
                 value={timeline[curFocus!].title}
                 onChange={(e) => {
-                  const curTimeline = clone(timeline);
+                  const curTimeline = complexClone(timeline);
                   curTimeline[curFocus!].title = e.currentTarget.value;
                   handleTimeline(curTimeline);
                 }}
@@ -207,7 +215,7 @@ const SubInputTitle = styled.div`
 `;
 
 const DateInput = styled.input`
-  width: 110px;
+  width: 150px;
 `;
 
 const TitleInput = styled.input`

@@ -39,6 +39,7 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
     },
   };
 };
+
 export default function KeywordPatch({ data }: pageProps) {
   const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
 
