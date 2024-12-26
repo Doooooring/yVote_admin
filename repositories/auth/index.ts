@@ -8,7 +8,7 @@ class AuthRepositories {
       const response: Response<boolean> = await axios.get(
         `${HOST_URL}/auth/admin/validate-session`,
       );
-      return response.result;
+      return response.data.result;
     } catch (e) {
       return false;
     }
@@ -19,7 +19,11 @@ class AuthRepositories {
       const response = await axios.post(`${HOST_URL}/auth/admin/login`, {
         code,
       });
-    } catch (e) {}
+      return response.data.result;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
   }
 }
 
