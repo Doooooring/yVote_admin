@@ -61,8 +61,7 @@ export default function Header() {
             link={'/keyword/patch'}
             comment="키워드 수정하기"
             state={curTab === 'keyword/patch'}
-          />{' '}
-          <Blank />
+          />
           <Blank />
           <NavBox link={'/news/delete'} comment="뉴스 지우기" state={curTab === 'news/delete'} />
           <Blank />

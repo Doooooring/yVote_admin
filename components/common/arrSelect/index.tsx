@@ -98,13 +98,6 @@ export default function ArrSelect<T>({
     setRestSelected([]);
   }
 
-  const log = (t: any) => {
-    console.log('=============');
-    console.log(t);
-  };
-  console.log(arrRest);
-  console.log(arrContain);
-
   return (
     <Modal>
       <Wrapper>

@@ -8,9 +8,6 @@ interface NewsSelectProps {
 }
 
 export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectProps) {
-  console.log('is news select');
-  console.log(curNewsList);
-
   const newsTitleList = useNewsStore((store) => store.newsTitleList);
 
   return (

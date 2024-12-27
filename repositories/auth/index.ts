@@ -5,11 +5,17 @@ import axios from 'axios';
 class AuthRepositories {
   async checkAuthSession() {
     try {
-      const response: Response<boolean> = await axios.get(
-        `${HOST_URL}/auth/admin/validate-session`,
-      );
-      return response.data.result;
+      const response = await fetch(`${HOST_URL}/auth/admin/validate-session`, {
+        method: 'GET',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed with status ${response.status}`);
+      }
+      const data = await response.json();
+      return data.result;
     } catch (e) {
+      console.log(e);
       return false;
     }
   }
@@ -17,9 +23,9 @@ class AuthRepositories {
   async login(code: string) {
     try {
       const response = await axios.post(`${HOST_URL}/auth/admin/login`, {
-        code,
+        token: code,
       });
-      return response.data.result;
+      return response.data.success;
     } catch (e) {
       console.log(e);
       return false;
