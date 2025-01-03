@@ -1,5 +1,6 @@
 import { SubmitButton } from '@components/common/button';
 import ImageUpload from '@components/common/imageUpload';
+import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
 import ExplainPreview from '@components/keyword/explainPreview';
 import NewsSelect from '@components/keyword/newsSelect';
@@ -122,74 +123,76 @@ export default function KeywordPatch({ data }: pageProps) {
   };
 
   return (
-    <Wrapper>
-      <SearchBox findKeyword={findKeyword} />
-      <ContentWrapper state={id === null}>
-        <InputWrapper>
-          <InputTitle>키워드</InputTitle>
-          <Input
-            type="text"
-            className="form-control"
-            value={keyword}
-            onChange={(e) => {
-              setKeyword(e.currentTarget.value);
-            }}
-          ></Input>
-        </InputWrapper>
-        <InputWrapper>
-          <ImageUpload setImageUrl={setKeywordImg} />
-        </InputWrapper>
-        <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
-        <ExplainPreview keyword={keyword} explain={content} />
-        <InputWrapper>
-          <InputTitle>카테고리</InputTitle>
-          <Select
-            className="form-select"
-            value={category}
-            onChange={(e) => {
-              setCategory(e.currentTarget.value as KeywordCategory);
-            }}
-          >
-            <option value={KeywordCategory.Human}>인물</option>
-            <option value={KeywordCategory.Politics}>정치</option>
-            <option value={KeywordCategory.Policy}>정책</option>
-            <option value={KeywordCategory.Economics}>경제</option>
-            <option value={KeywordCategory.Social}>사회</option>
-            <option value={KeywordCategory.Organization}>조직</option>
-            <option value={KeywordCategory.Etc}>기타</option>
-          </Select>
-        </InputWrapper>
-        <NewsSetter>
-          <SubmitButton
-            title={'뉴스 선택하기'}
-            click={() => {
-              setIsSelectorModalUp(true);
-            }}
-          />
-          <NewsWrapper>
-            {newsList.map((news) => {
-              let curTitle: string | undefined = '';
-              for (let newstitle of newsTitleList) {
-                if (newstitle.id === news.id) {
-                  curTitle = newstitle.title;
+    <ProtectedLayout>
+      <Wrapper>
+        <SearchBox findKeyword={findKeyword} />
+        <ContentWrapper state={id === null}>
+          <InputWrapper>
+            <InputTitle>키워드</InputTitle>
+            <Input
+              type="text"
+              className="form-control"
+              value={keyword}
+              onChange={(e) => {
+                setKeyword(e.currentTarget.value);
+              }}
+            ></Input>
+          </InputWrapper>
+          <InputWrapper>
+            <ImageUpload setImageUrl={setKeywordImg} />
+          </InputWrapper>
+          <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
+          <ExplainPreview keyword={keyword} explain={content} />
+          <InputWrapper>
+            <InputTitle>카테고리</InputTitle>
+            <Select
+              className="form-select"
+              value={category}
+              onChange={(e) => {
+                setCategory(e.currentTarget.value as KeywordCategory);
+              }}
+            >
+              <option value={KeywordCategory.Human}>인물</option>
+              <option value={KeywordCategory.Politics}>정치</option>
+              <option value={KeywordCategory.Policy}>정책</option>
+              <option value={KeywordCategory.Economics}>경제</option>
+              <option value={KeywordCategory.Social}>사회</option>
+              <option value={KeywordCategory.Organization}>조직</option>
+              <option value={KeywordCategory.Etc}>기타</option>
+            </Select>
+          </InputWrapper>
+          <NewsSetter>
+            <SubmitButton
+              title={'뉴스 선택하기'}
+              click={() => {
+                setIsSelectorModalUp(true);
+              }}
+            />
+            <NewsWrapper>
+              {(newsList ?? []).map((news) => {
+                let curTitle: string | undefined = '';
+                for (let newstitle of newsTitleList) {
+                  if (newstitle.id === news.id) {
+                    curTitle = newstitle.title;
+                  }
                 }
-              }
-              return <NewsLi key={news.id}>{curTitle}</NewsLi>;
-            })}
-          </NewsWrapper>
-        </NewsSetter>
-        <SubmitWrapper>
-          <SubmitButton
-            title="SUBMIT"
-            click={() => {
-              submit();
-            }}
-          />
-        </SubmitWrapper>
-        <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList}></NewsSelect>
-      </ContentWrapper>
-      <SearchState searchErr={keywordSearchErr} loading={isLoading} />
-    </Wrapper>
+                return <NewsLi key={news.id}>{curTitle}</NewsLi>;
+              })}
+            </NewsWrapper>
+          </NewsSetter>
+          <SubmitWrapper>
+            <SubmitButton
+              title="SUBMIT"
+              click={() => {
+                submit();
+              }}
+            />
+          </SubmitWrapper>
+          <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList}></NewsSelect>
+        </ContentWrapper>
+        <SearchState searchErr={keywordSearchErr} loading={isLoading} />
+      </Wrapper>
+    </ProtectedLayout>
   );
 }
 

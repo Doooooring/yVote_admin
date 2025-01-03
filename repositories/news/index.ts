@@ -20,9 +20,15 @@ class NewsRepositories {
   }
 
   async postNews(news: NewsToPost) {
-    const response: { data: Response<boolean> } = await axios.post(`${HOST_URL}/news/edit`, {
-      news: news,
-    });
+    const response: { data: Response<boolean> } = await axios.post(
+      `${HOST_URL}/news/edit`,
+      {
+        news: news,
+      },
+      {
+        withCredentials: true,
+      },
+    );
     return response.data.success;
   }
 
@@ -32,6 +38,9 @@ class NewsRepositories {
       {
         news: news,
       },
+      {
+        withCredentials: true,
+      },
     );
     return response.data.success;
   }
@@ -39,6 +48,9 @@ class NewsRepositories {
   async deleteNews(id: number) {
     const response: { data: Response<{ state: boolean }> } = await axios.delete(
       `${HOST_URL}/news/edit/${id}`,
+      {
+        withCredentials: true,
+      },
     );
     return response.data.success;
   }

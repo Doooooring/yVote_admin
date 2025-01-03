@@ -6,7 +6,7 @@ import axios from 'axios';
 class KeywordRepositories {
   async getKeyword(keyname: string) {
     const response: { data: Response<KeywordToPatch> } = await axios.get(
-      `${HOST_URL}/keyword?key=${keyname}`,
+      `${HOST_URL}/keyword?key=${keyname}&isWithNews=${true}`,
     );
 
     return response.data.result;
@@ -20,9 +20,15 @@ class KeywordRepositories {
   }
 
   async postKeyword(keyword: KeywordToPost) {
-    const response: { data: Response<boolean> } = await axios.post(`${HOST_URL}/keyword/edit`, {
-      keyword: keyword,
-    });
+    const response: { data: Response<boolean> } = await axios.post(
+      `${HOST_URL}/keyword/edit`,
+      {
+        keyword: keyword,
+      },
+      {
+        withCredentials: true,
+      },
+    );
     return true;
   }
 
@@ -30,12 +36,18 @@ class KeywordRepositories {
     const response: { data: Response<{ state: boolean }> } = await axios.patch(
       `${HOST_URL}/keyword/edit/${keyword.id}`,
       { keyword: keyword },
+      {
+        withCredentials: true,
+      },
     );
     return true;
   }
   async deleteKeyword(id: number) {
     const response: { data: Response<{ state: boolean }> } = await axios.delete(
       `${HOST_URL}/keyword/edit/${id}`,
+      {
+        withCredentials: true,
+      },
     );
     return true;
   }

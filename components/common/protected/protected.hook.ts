@@ -11,7 +11,9 @@ export const useProtected = () => {
     if (!response) {
       navigation.push('/login');
     }
+    setIsValid(true);
   }, [isValid]);
 
   checkValidate();
+  return isValid;
 };

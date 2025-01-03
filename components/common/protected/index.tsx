@@ -6,7 +6,7 @@ interface ProtectedProps {
 }
 
 export default function Protected({ children }: ProtectedProps) {
-  useProtected();
+  const isValid = useProtected();
 
-  return <>{children}</>;
+  return isValid ? <>{children}</> : <></>;
 }

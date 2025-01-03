@@ -8,6 +8,7 @@ import { GetServerSideProps } from 'next';
 import { useCallback, useState } from 'react';
 import { NewsTitle } from '@interface/news';
 import { KeywordTitle } from '@interface/keywords';
+import ProtectedLayout from '@components/common/protectedLayout';
 
 export interface NewsToDelete {
   _id: string;
@@ -71,40 +72,42 @@ export default function KeywordDelete({ data }: pageProps) {
   }, [deleteId]);
 
   return (
-    <Wrapper>
-      {/* <div className="delete-all">
+    <ProtectedLayout>
+      <Wrapper>
+        {/* <div className="delete-all">
         <div className="btn btn-primary" onClick={() => keywordRepositories.deleteKeywordAll()}>
           전체 삭제
         </div>
       </div> */}
-      <SearchBox findKeyword={findKeyword} />
-      <SelectWrapper>
-        <NewsUl>
-          {keywordList.map((keyword, idx) => {
-            return (
-              <NewsLi
-                key={idx}
-                state={deleteId === keyword.id}
-                onClick={async () => {
-                  setDeleteId(keyword.id!);
-                }}
-              >
-                {keyword.keyword}
-              </NewsLi>
-            );
-          })}
-        </NewsUl>
-        <SubmitWrapper>
-          <SubmitButton
-            title="SUBMIT"
-            click={async () => {
-              if (isLoading) return;
-              await deleteKeyword();
-            }}
-          />
-        </SubmitWrapper>
-      </SelectWrapper>
-    </Wrapper>
+        <SearchBox findKeyword={findKeyword} />
+        <SelectWrapper>
+          <NewsUl>
+            {keywordList.map((keyword, idx) => {
+              return (
+                <NewsLi
+                  key={idx}
+                  state={deleteId === keyword.id}
+                  onClick={async () => {
+                    setDeleteId(keyword.id!);
+                  }}
+                >
+                  {keyword.keyword}
+                </NewsLi>
+              );
+            })}
+          </NewsUl>
+          <SubmitWrapper>
+            <SubmitButton
+              title="SUBMIT"
+              click={async () => {
+                if (isLoading) return;
+                await deleteKeyword();
+              }}
+            />
+          </SubmitWrapper>
+        </SelectWrapper>
+      </Wrapper>
+    </ProtectedLayout>
   );
 }
 

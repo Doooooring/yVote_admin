@@ -1,5 +1,8 @@
 import { SubmitButton } from '@components/common/button';
+import Header from '@components/common/header';
 import ImageUpload from '@components/common/imageUpload';
+import Protected from '@components/common/protected';
+import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
 import ToggleButton from '@components/common/toggleButton';
 import SearchBox from '@components/keyword/search';
@@ -191,134 +194,136 @@ export default function NewsPatch({ data }: pageProps) {
   };
 
   return (
-    <Wrapper>
-      <SearchBox findKeyword={findNews} />
-      <IdSelector
-        newsSearchList={newsSearchList}
-        getNews={getNews}
-        newsSelectorUp={newsSelectorUp}
-        setNewsSelectorUp={setNewsSelectorup}
-      />
-      <TextEditWrapper state={id !== null}>
-        <ContentEditWrapper>
-          <InputWrapper className="pb-1 pt-1 mb-1">
-            <InputTitle>제목</InputTitle>
-            <Input
-              type="text"
-              className="form-control"
-              value={title}
-              onChange={(e) => {
-                setTitle(e.currentTarget.value);
-              }}
-            ></Input>
-          </InputWrapper>
-          <InputWrapper className="pb-1 pt-1 mb-1">
-            <ImageUpload setImageUrl={setNewsImg} />
-          </InputWrapper>
-          <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
-          <StateToggleWrapper>
+    <ProtectedLayout>
+      <Wrapper>
+        <SearchBox findKeyword={findNews} />
+        <IdSelector
+          newsSearchList={newsSearchList}
+          getNews={getNews}
+          newsSelectorUp={newsSelectorUp}
+          setNewsSelectorUp={setNewsSelectorup}
+        />
+        <TextEditWrapper state={id !== null}>
+          <ContentEditWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
-              <ToggleTitle>최신 아티클</ToggleTitle>
-              <ToggleButton
-                state={state}
-                setState={setState}
-                style={{
-                  width: '50px',
-                  height: '25px',
-                  backgroundColor: '#77C998',
-                  padding: '0.3rem',
+              <InputTitle>제목</InputTitle>
+              <Input
+                type="text"
+                className="form-control"
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.currentTarget.value);
                 }}
-                circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
-                activeColor="#4F69E7"
-                unactiveColor="#A8A8A8"
-                activeCircleColor="#EDF0F1"
-                unactiveCircleColor="#EDF0F1"
-              />
+              ></Input>
             </InputWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
-              <ToggleTitle>퍼블리시 상태</ToggleTitle>
-              <ToggleButton
-                state={isPublished}
-                setState={setIsPublished}
-                style={{
-                  width: '50px',
-                  height: '25px',
-                  backgroundColor: '#77C998',
-                  padding: '0.3rem',
-                }}
-                circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
-                activeColor="#4F69E7"
-                unactiveColor="#A8A8A8"
-                activeCircleColor="#EDF0F1"
-                unactiveCircleColor="#EDF0F1"
-              />
+              <ImageUpload setImageUrl={setNewsImg} />
             </InputWrapper>
-          </StateToggleWrapper>
-          <KeywordSetter>
+            <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
+            <StateToggleWrapper>
+              <InputWrapper className="pb-1 pt-1 mb-1">
+                <ToggleTitle>최신 아티클</ToggleTitle>
+                <ToggleButton
+                  state={state}
+                  setState={setState}
+                  style={{
+                    width: '50px',
+                    height: '25px',
+                    backgroundColor: '#77C998',
+                    padding: '0.3rem',
+                  }}
+                  circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
+                  activeColor="#4F69E7"
+                  unactiveColor="#A8A8A8"
+                  activeCircleColor="#EDF0F1"
+                  unactiveCircleColor="#EDF0F1"
+                />
+              </InputWrapper>
+              <InputWrapper className="pb-1 pt-1 mb-1">
+                <ToggleTitle>퍼블리시 상태</ToggleTitle>
+                <ToggleButton
+                  state={isPublished}
+                  setState={setIsPublished}
+                  style={{
+                    width: '50px',
+                    height: '25px',
+                    backgroundColor: '#77C998',
+                    padding: '0.3rem',
+                  }}
+                  circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
+                  activeColor="#4F69E7"
+                  unactiveColor="#A8A8A8"
+                  activeCircleColor="#EDF0F1"
+                  unactiveCircleColor="#EDF0F1"
+                />
+              </InputWrapper>
+            </StateToggleWrapper>
+            <KeywordSetter>
+              <SubmitButton
+                title={'키워드 선택하기'}
+                click={() => {
+                  setIsSelectorModalUp(true);
+                }}
+              />
+              <KeywordWrapper>
+                {keywordList.map((keyword, idx) => {
+                  return <KeywordLi key={idx}>{keyword.keyword}</KeywordLi>;
+                })}
+              </KeywordWrapper>
+            </KeywordSetter>
+          </ContentEditWrapper>
+          <NewsPreviewWrapper>
+            <NewsContentPreview
+              title={title}
+              content={content}
+              state={state}
+              keywords={keywordList.map((k) => k.keyword)}
+            />
+          </NewsPreviewWrapper>
+        </TextEditWrapper>
+        <ContentWrapper className="mb-5" state={id !== null}>
+          <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
+          <CommentInput comments={comments} setComments={setComments} />
+          <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
+            <InputTitle>의견</InputTitle>
+            <InputBody className="d-flex flex-row align-items-center w-100">
+              <OpinionLeft>왼쪽</OpinionLeft>
+              <Input
+                type="text"
+                className="form-control"
+                value={opinionLeft}
+                onChange={(e) => {
+                  const v = e.currentTarget.value;
+                  setOpinionLeft(v);
+                }}
+              ></Input>
+              <OpinionRight>오른쪽</OpinionRight>
+              <Input
+                type="text"
+                className="form-control"
+                value={opinionRight}
+                onChange={(e) => {
+                  const v = e.currentTarget.value;
+                  setOpinionRight(v);
+                }}
+              ></Input>
+            </InputBody>
+          </OpinionWrapper>
+          <SubmitWrapper>
             <SubmitButton
-              title={'키워드 선택하기'}
+              title="SUBMIT"
               click={() => {
-                setIsSelectorModalUp(true);
+                if (isLoading) return;
+                submit();
               }}
             />
-            <KeywordWrapper>
-              {keywordList.map((keyword, idx) => {
-                return <KeywordLi key={idx}>{keyword.keyword}</KeywordLi>;
-              })}
-            </KeywordWrapper>
-          </KeywordSetter>
-        </ContentEditWrapper>
-        <NewsPreviewWrapper>
-          <NewsContentPreview
-            title={title}
-            content={content}
-            state={state}
-            keywords={keywordList.map((k) => k.keyword)}
-          />
-        </NewsPreviewWrapper>
-      </TextEditWrapper>
-      <ContentWrapper className="mb-5" state={id !== null}>
-        <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
-        <CommentInput comments={comments} setComments={setComments} />
-        <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
-          <InputTitle>의견</InputTitle>
-          <InputBody className="d-flex flex-row align-items-center w-100">
-            <OpinionLeft>왼쪽</OpinionLeft>
-            <Input
-              type="text"
-              className="form-control"
-              value={opinionLeft}
-              onChange={(e) => {
-                const v = e.currentTarget.value;
-                setOpinionLeft(v);
-              }}
-            ></Input>
-            <OpinionRight>오른쪽</OpinionRight>
-            <Input
-              type="text"
-              className="form-control"
-              value={opinionRight}
-              onChange={(e) => {
-                const v = e.currentTarget.value;
-                setOpinionRight(v);
-              }}
-            ></Input>
-          </InputBody>
-        </OpinionWrapper>
-        <SubmitWrapper>
-          <SubmitButton
-            title="SUBMIT"
-            click={() => {
-              if (isLoading) return;
-              submit();
-            }}
-          />
-        </SubmitWrapper>
-        <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
-        <CommentModal editComment={editComment} />
-      </ContentWrapper>
-      <SearchState searchErr={newsSearchErr} loading={isLoading} />
-    </Wrapper>
+          </SubmitWrapper>
+          <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
+          <CommentModal editComment={editComment} />
+        </ContentWrapper>
+        <SearchState searchErr={newsSearchErr} loading={isLoading} />
+      </Wrapper>
+    </ProtectedLayout>
   );
 }
 const Wrapper = styled.div`

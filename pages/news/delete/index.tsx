@@ -7,6 +7,7 @@ import { useCommonStore } from '@store/common';
 import { GetServerSideProps } from 'next';
 import { useCallback, useState } from 'react';
 import { NewsTitle } from '@interface/news';
+import ProtectedLayout from '@components/common/protectedLayout';
 
 export interface NewsToDelete {
   id: string;
@@ -72,8 +73,9 @@ export default function NewsDelete({ data }: pageProps) {
   );
 
   return (
-    <Wrapper>
-      {/* <div className="delete-all">
+    <ProtectedLayout>
+      <Wrapper>
+        {/* <div className="delete-all">
         <div
           className="btn btn-primary"
           onClick={() => {
@@ -83,34 +85,35 @@ export default function NewsDelete({ data }: pageProps) {
           전체 삭제
         </div>
       </div> */}
-      <SearchBox findKeyword={findNews} />
-      <SelectWrapper>
-        <NewsUl>
-          {newsList.map((news, idx) => {
-            return (
-              <NewsLi
-                key={idx}
-                state={deleteId === news.id}
-                onClick={async () => {
-                  setDeleteId(news.id);
-                }}
-              >
-                {news.title}
-              </NewsLi>
-            );
-          })}
-        </NewsUl>
-        <SubmitWrapper>
-          <SubmitButton
-            title="SUBMIT"
-            click={async () => {
-              if (isLoading || !deleteId) return;
-              await deleteNews(deleteId);
-            }}
-          />
-        </SubmitWrapper>
-      </SelectWrapper>
-    </Wrapper>
+        <SearchBox findKeyword={findNews} />
+        <SelectWrapper>
+          <NewsUl>
+            {newsList.map((news, idx) => {
+              return (
+                <NewsLi
+                  key={idx}
+                  state={deleteId === news.id}
+                  onClick={async () => {
+                    setDeleteId(news.id);
+                  }}
+                >
+                  {news.title}
+                </NewsLi>
+              );
+            })}
+          </NewsUl>
+          <SubmitWrapper>
+            <SubmitButton
+              title="SUBMIT"
+              click={async () => {
+                if (isLoading || !deleteId) return;
+                await deleteNews(deleteId);
+              }}
+            />
+          </SubmitWrapper>
+        </SelectWrapper>
+      </Wrapper>
+    </ProtectedLayout>
   );
 }
 

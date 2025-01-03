@@ -4,6 +4,7 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 interface pageProps {
   data: {};
@@ -25,10 +26,12 @@ export default function Login({ data }: pageProps) {
     async (token: string) => {
       try {
         const response = await authRepositories.login(token);
-        if (response.data) {
+        if (response) {
           navigation.push('/news/post');
+          return;
+        } else {
+          throw Error('error');
         }
-        throw Error('error');
       } catch (e) {
         console.log(e);
         alert('다시');
@@ -40,20 +43,24 @@ export default function Login({ data }: pageProps) {
   return (
     <Wrapper>
       <LoginWrapper>
-        <input
-          type="text"
-          className="form-control"
-          onChange={(e) => {
-            setToken(e.target.value);
-          }}
-        />
-        <button
-          onClick={() => {
-            login(token);
-          }}
-        >
-          로그인
-        </button>
+        <div className="h-100 d-flex flex-column justify-content-center align-items-center ">
+          <input
+            type="text"
+            className="form-control mb-4"
+            placeholder="코드를 입력해주세요."
+            onChange={(e) => {
+              setToken(e.target.value);
+            }}
+          />
+          <button
+            className="w-40 btn btn-primary px-5"
+            onClick={() => {
+              login(token);
+            }}
+          >
+            로그인
+          </button>
+        </div>
       </LoginWrapper>
     </Wrapper>
   );
