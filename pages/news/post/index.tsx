@@ -54,6 +54,8 @@ export default function NewsPost({ data }: pageProps) {
   const { ref, content, handleContents, resetContents } = useReactQuill();
 
   const [title, setTitle] = useState<string>('');
+  const [subTitle, setSubTitle] = useState<string>('');
+  const [slug, setSlug] = useState<string>('');
   const [timeline, setTimeline] = useState<TimelineToEdit[]>([]);
   const [state, setState] = useState<boolean>(true);
   const [isPublished, setIsPublished] = useState<boolean>(false);
@@ -84,6 +86,8 @@ export default function NewsPost({ data }: pageProps) {
       const result: boolean = await newsRepositories.postNews({
         summary: content,
         title,
+        subTitle,
+        slug,
         state,
         isPublished,
         opinionLeft,
@@ -139,6 +143,26 @@ export default function NewsPost({ data }: pageProps) {
                   value={title}
                   onChange={(e) => {
                     setTitle(e.currentTarget.value);
+                  }}
+                ></Input>
+              </InputWrapper>
+              <InputWrapper className="pb-1 pt-1 mb-1">
+                <InputTitle>부제목</InputTitle>
+                <Input
+                  type="text"
+                  className="form-control"
+                  value={subTitle}
+                  onChange={(e) => {
+                    setSubTitle(e.currentTarget.value);
+                  }}
+                ></Input>
+                <InputTitle>슬러그 (Url 뒤에 붙을거임)</InputTitle>
+                <Input
+                  type="text"
+                  className="form-control"
+                  value={slug}
+                  onChange={(e) => {
+                    setSlug(e.currentTarget.value);
                   }}
                 ></Input>
               </InputWrapper>
@@ -318,6 +342,7 @@ const InputTitle = styled.div`
   font-size: 16px;
   font-weight: bold;
   padding: 0 1rem;
+  min-width: 80px;
 `;
 
 const ToggleTitle = styled.div`

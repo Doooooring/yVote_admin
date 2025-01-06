@@ -79,6 +79,8 @@ export interface News {
   id: number;
   order: number;
   title: string;
+  subTitle: string;
+  slug: string;
   summary: string;
   keywords: Array<Keyword>;
   newsImage: string | null;
@@ -109,6 +111,8 @@ export interface NewsToPost
   extends Pick<
     News,
     | 'title'
+    | 'subTitle'
+    | 'slug'
     | 'summary'
     | 'state'
     | 'newsImage'
@@ -131,6 +135,8 @@ export interface NewsToPatch extends NewsToPost {
 export const initNews = () => {
   const news = {
     title: '',
+    subTitle: '',
+    slug: '',
     summary: '',
     state: true,
     newsImage: null,
