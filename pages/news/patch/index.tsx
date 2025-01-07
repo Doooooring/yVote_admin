@@ -58,6 +58,8 @@ export default function NewsPatch({ data }: pageProps) {
 
   const [id, setId] = useState<number | null>(null);
   const [title, setTitle] = useState<string>('');
+  const [subTitle, setSubTitle] = useState<string>('');
+  const [slug, setSlug] = useState<string>('');
   const [timeline, setTimeline] = useState<TimelineToEdit[]>([]);
   const [state, setState] = useState<boolean>(true);
   const [isPublished, setIsPublished] = useState<boolean>(true);
@@ -112,8 +114,11 @@ export default function NewsPatch({ data }: pageProps) {
 
       const {
         title,
+        subTitle,
+        slug,
         summary,
         keywords,
+        newsImage,
         state,
         isPublished,
         timeline,
@@ -124,6 +129,9 @@ export default function NewsPatch({ data }: pageProps) {
 
       setId(id);
       setTitle(title!);
+      setSubTitle(subTitle);
+      setSlug(slug);
+      setNewsImg(newsImage);
       //setSummary(summary!);
       initializeQuillContents(summary!);
       setTimeline(timeline);
@@ -152,6 +160,8 @@ export default function NewsPatch({ data }: pageProps) {
         id: id,
         summary: content,
         title,
+        subTitle,
+        slug,
         state,
         isPublished,
         opinionLeft,
@@ -206,13 +216,33 @@ export default function NewsPatch({ data }: pageProps) {
         <TextEditWrapper state={id !== null}>
           <ContentEditWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
-              <InputTitle>제목</InputTitle>
+              <InputTitle>제목{'  '}</InputTitle>
               <Input
                 type="text"
                 className="form-control"
                 value={title}
                 onChange={(e) => {
                   setTitle(e.currentTarget.value);
+                }}
+              ></Input>
+            </InputWrapper>
+            <InputWrapper className="pb-1 pt-1 mb-1">
+              <InputTitle>부제목</InputTitle>
+              <Input
+                type="text"
+                className="form-control"
+                value={subTitle}
+                onChange={(e) => {
+                  setSubTitle(e.currentTarget.value);
+                }}
+              ></Input>
+              <InputTitle>슬러그 (Url 뒤에 붙을거임)</InputTitle>
+              <Input
+                type="text"
+                className="form-control"
+                value={slug}
+                onChange={(e) => {
+                  setSlug(e.currentTarget.value);
                 }}
               ></Input>
             </InputWrapper>
@@ -386,6 +416,7 @@ const InputTitle = styled.div`
   font-size: 16px;
   font-weight: bold;
   padding: 0 1rem;
+  min-width: 80px;
 `;
 
 const ToggleTitle = styled.div`
@@ -408,146 +439,13 @@ const OpinionRight = styled(OpinionTitle)`
   color: red;
 `;
 
-const SubInputTitle = styled.div`
-  width: 50px;
-  font-size: 18px;
-`;
-
 const Input = styled.input``;
-
-const SubInput = styled.input`
-  width: 200px;
-`;
-
-const TimelineInputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const NewsInputWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const LayerTitleWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-`;
-
-const LayerWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 20px;
-  overflow: scroll;
-
-  div.blank-layer {
-    display: flex;
-    flex: 0 0 auto;
-    flex-direction: column;
-    height: 220px;
-    width: 280px;
-  }
-`;
-
-const NewsInputLayer = styled.div`
-  display: flex;
-  flex-direction: column;
-  div.input_layer_header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    div.left-right-buttons {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      div.order-button {
-        width: 20px;
-        height: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-      }
-    }
-  }
-  div.button_wrapper {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-`;
-const CommentWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const JournalsWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const JournalLayer = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 280px;
-  height: 220px;
-  div.input_layer_header {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    div.left-right-buttons {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      div.order-button {
-        width: 20px;
-        height: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-      }
-    }
-  }
-  div.button_wrapper {
-    display: flex;
-    flex-direction: row;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-`;
-
-const Plus = styled.div`
-  cursor: pointer;
-`;
 
 const OpinionWrapper = styled.div``;
 
 const InputBody = styled.div`
   gap: 20px;
 `;
-const CommentSelect = styled.select`
-  width: 200px;
-`;
-
-const PressSelect = styled.select`
-  width: 200px;
-`;
-
-const Select = styled.select``;
-
-const div = styled.div`
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-  margin-bottom: 10px;
-`;
-
-const Button = styled.button``;
 
 const KeywordSetter = styled.div`
   padding-top: 10px;
