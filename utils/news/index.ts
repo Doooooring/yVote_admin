@@ -8,12 +8,14 @@ export const convertCommentArrToEdit: (comments: Array<CommentToEdit>) => Array<
 
   comments.forEach((comment) => {
     const { commentType } = comment;
-    if (commentType in commentDict) {
+    if (!(commentType in commentDict)) {
       commentDict[commentType] = [] as CommentToEdit[];
     }
 
     commentDict[commentType].push(comment);
   });
+  console.log('==============');
+  console.log(comments);
 
   return (Object.keys(commentDict) as commentType[]).map((type) => {
     return {

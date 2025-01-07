@@ -11,6 +11,7 @@ export const getDotDateForm = (date: Date) => {
 };
 
 export const getStandardDateForm = (date: Date) => {
+  if (typeof date === 'string') date = new Date(date);
   return date.toISOString().split('T')[0];
 };
 

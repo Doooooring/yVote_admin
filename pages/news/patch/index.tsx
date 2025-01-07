@@ -114,8 +114,11 @@ export default function NewsPatch({ data }: pageProps) {
 
       const {
         title,
+        subTitle,
+        slug,
         summary,
         keywords,
+        newsImage,
         state,
         isPublished,
         timeline,
@@ -126,6 +129,9 @@ export default function NewsPatch({ data }: pageProps) {
 
       setId(id);
       setTitle(title!);
+      setSubTitle(subTitle);
+      setSlug(slug);
+      setNewsImg(newsImage);
       //setSummary(summary!);
       initializeQuillContents(summary!);
       setTimeline(timeline);
@@ -217,6 +223,26 @@ export default function NewsPatch({ data }: pageProps) {
                 value={title}
                 onChange={(e) => {
                   setTitle(e.currentTarget.value);
+                }}
+              ></Input>
+            </InputWrapper>
+            <InputWrapper className="pb-1 pt-1 mb-1">
+              <InputTitle>부제목</InputTitle>
+              <Input
+                type="text"
+                className="form-control"
+                value={subTitle}
+                onChange={(e) => {
+                  setSubTitle(e.currentTarget.value);
+                }}
+              ></Input>
+              <InputTitle>슬러그 (Url 뒤에 붙을거임)</InputTitle>
+              <Input
+                type="text"
+                className="form-control"
+                value={slug}
+                onChange={(e) => {
+                  setSlug(e.currentTarget.value);
                 }}
               ></Input>
             </InputWrapper>
