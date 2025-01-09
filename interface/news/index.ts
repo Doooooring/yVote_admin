@@ -43,6 +43,7 @@ export interface Comment {
   title: string;
   comment: string;
   date: Date;
+  url?: string;
 }
 
 export interface CommentToEdit extends Omit<Comment, 'id' | 'date'> {

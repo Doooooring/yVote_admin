@@ -66,7 +66,6 @@ export default function KeywordPost({ data }: pageProps) {
         category: category,
         keywordImage: keywordImg,
         explain: content,
-        news: newsList,
       });
       if (result) {
         alert('잘감');
@@ -125,7 +124,7 @@ export default function KeywordPost({ data }: pageProps) {
               <option value={KeywordCategory.Etc}>기타</option>
             </Select>
           </InputWrapper>
-          <NewsSetter>
+          {/* <NewsSetter>
             <SubmitButton
               title={'뉴스 선택하기'}
               click={() => {
@@ -143,7 +142,7 @@ export default function KeywordPost({ data }: pageProps) {
                 return <NewsLi key={news.id}>{curTitle}</NewsLi>;
               })}
             </NewsWrapper>
-          </NewsSetter>
+          </NewsSetter> */}
           <SubmitWrapper>
             <SubmitButton
               title="SUBMIT"
