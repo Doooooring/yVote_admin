@@ -150,7 +150,7 @@ function ModalBody({ editComment }: CommentModalProps) {
                     curCommentArr[curFocus!].date = new Date(e.currentTarget.value);
                     setCommentArr(curCommentArr);
                   }}
-                  onFocus={(e) => {
+                  onClick={(e) => {
                     if (e.currentTarget.showPicker) {
                       e.currentTarget.showPicker();
                     }
@@ -166,6 +166,19 @@ function ModalBody({ editComment }: CommentModalProps) {
                   onChange={(e) => {
                     const curCommentArr = complexClone(commentArr);
                     curCommentArr[curFocus!].comment = e.currentTarget.value;
+                    setCommentArr(curCommentArr);
+                  }}
+                ></TitleInput>
+              </InputWrapper>
+              <InputWrapper>
+                <SubInputTitle>출처</SubInputTitle>
+                <TitleInput
+                  type="text"
+                  className="form-control"
+                  value={commentArr[curFocus!].url}
+                  onChange={(e) => {
+                    const curCommentArr = complexClone(commentArr);
+                    curCommentArr[curFocus!].url = e.currentTarget.value;
                     setCommentArr(curCommentArr);
                   }}
                 ></TitleInput>
@@ -280,7 +293,7 @@ const SubInputTitle = styled.div`
 `;
 
 const DateInput = styled.input`
-  width: 110px;
+  width: 220px;
 `;
 
 const TitleInput = styled.input`

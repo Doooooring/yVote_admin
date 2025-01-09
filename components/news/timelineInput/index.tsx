@@ -100,7 +100,7 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
                   curTimeline[curFocus!].date = new Date(e.currentTarget.value);
                   handleTimeline(curTimeline);
                 }}
-                onFocus={(e) => {
+                onClick={(e) => {
                   if (e.currentTarget.showPicker) {
                     e.currentTarget.showPicker();
                   }
