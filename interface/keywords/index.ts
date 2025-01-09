@@ -27,12 +27,7 @@ export interface KeywordOnDetail
   extends Pick<Keyword, 'id' | 'keyword' | 'explain' | 'category' | 'keywordImage'> {}
 
 export interface KeywordToPatch
-  extends Pick<Keyword, 'id' | 'keyword' | 'category' | 'keywordImage' | 'explain'> {
-  news: {
-    id: number;
-    title: string;
-  }[];
-}
+  extends Pick<Keyword, 'id' | 'keyword' | 'category' | 'keywordImage' | 'explain'> {}
 
 export interface KeywordToPost extends Omit<KeywordToPatch, 'id'> {}
 

@@ -4,19 +4,19 @@ import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
-import NewsSelect from '@components/keyword/newsSelect';
 import { NewsTitle } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
 
+import ImageUpload from '@components/common/imageUpload';
+import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
 import ExplainPreview from '@components/keyword/explainPreview';
 import { Keyword, KeywordCategory, KeywordTitle } from '@interface/keywords';
 import { keywordRepositories } from '@repositories/keyword';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { GetServerSideProps } from 'next';
-import ProtectedLayout from '@components/common/protectedLayout';
 
 interface pageProps {
   data: {
@@ -66,7 +66,6 @@ export default function KeywordPost({ data }: pageProps) {
         category: category,
         keywordImage: keywordImg,
         explain: content,
-        news: newsList,
       });
       if (result) {
         alert('잘감');
@@ -83,6 +82,7 @@ export default function KeywordPost({ data }: pageProps) {
 
   const resetInput = useCallback(() => {
     setKeyword('');
+    setKeywordImg('');
     setExplain('');
     resetContents();
     setCategory(KeywordCategory.Human);
@@ -105,6 +105,9 @@ export default function KeywordPost({ data }: pageProps) {
               }}
             ></Input>
           </InputWrapper>
+          <InputWrapper>
+            <ImageUpload setImageUrl={setKeywordImg} />
+          </InputWrapper>
           <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
           <ExplainPreview keyword={keyword} explain={content} />
           <InputWrapper>
@@ -125,7 +128,7 @@ export default function KeywordPost({ data }: pageProps) {
               <option value={KeywordCategory.Etc}>기타</option>
             </Select>
           </InputWrapper>
-          <NewsSetter>
+          {/* <NewsSetter>
             <SubmitButton
               title={'뉴스 선택하기'}
               click={() => {
@@ -143,7 +146,7 @@ export default function KeywordPost({ data }: pageProps) {
                 return <NewsLi key={news.id}>{curTitle}</NewsLi>;
               })}
             </NewsWrapper>
-          </NewsSetter>
+          </NewsSetter> */}
           <SubmitWrapper>
             <SubmitButton
               title="SUBMIT"
@@ -153,7 +156,7 @@ export default function KeywordPost({ data }: pageProps) {
               }}
             />
           </SubmitWrapper>
-          <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList} />
+          {/* <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList} /> */}
         </ContentWrapper>
       </Wrapper>
     </ProtectedLayout>

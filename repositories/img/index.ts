@@ -6,11 +6,8 @@ class ImageRepositories {
   async postImage(img: File, title?: string) {
     const formData = new FormData();
     formData.append('img', img);
-    const response: { data: Response<string> } = await axios.post(`${HOST_URL}/img`, formData, {
-      headers: {
-        // 'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response: { data: Response<string> } = await axios.post(`${HOST_URL}/img`, formData, {});
+    if (!response.data.success) throw Error('IMAGEFORMATERROR');
     return response.data.result;
   }
 }

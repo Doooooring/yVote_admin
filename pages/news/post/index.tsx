@@ -14,6 +14,7 @@ import { newsRepositories } from '@repositories/news';
 import { useKeywordStore } from '@store/keyword';
 
 import ImageUpload from '@components/common/imageUpload';
+import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
 import ToggleButton from '@components/common/toggleButton';
 import CommentInput from '@components/news/commentInput';
@@ -24,9 +25,6 @@ import { useNewsStore } from '@store/news';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { convertCommentArrToPatch } from '@utils/news';
 import { useRouter } from 'next/router';
-import Header from '@components/common/header';
-import Protected from '@components/common/protected';
-import ProtectedLayout from '@components/common/protectedLayout';
 
 interface pageProps {
   data: {

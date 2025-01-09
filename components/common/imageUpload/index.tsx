@@ -34,6 +34,7 @@ export default function ImageUpload({
         }
       } catch (e) {
         console.log(e);
+        alert('이미지 형식이 맞지 않습니다.');
       }
       setIsLoading(false);
     },

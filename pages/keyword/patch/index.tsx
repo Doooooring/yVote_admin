@@ -3,7 +3,6 @@ import ImageUpload from '@components/common/imageUpload';
 import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
 import ExplainPreview from '@components/keyword/explainPreview';
-import NewsSelect from '@components/keyword/newsSelect';
 import SearchBox from '@components/keyword/search';
 import { SearchState } from '@components/keyword/searchState';
 import { Keyword, KeywordCategory, KeywordTitle } from '@interface/keywords';
@@ -68,14 +67,14 @@ export default function KeywordPatch({ data }: pageProps) {
     const encoded = searchWord.replace(/\//g, '$');
 
     try {
-      const { id, keyword, category, keywordImage, explain, news } =
-        await keywordRepositories.getKeyword(encoded);
+      const { id, keyword, category, keywordImage, explain } = await keywordRepositories.getKeyword(
+        encoded,
+      );
       setId(id);
       setKeyword(keyword);
       setCategory(category);
       setKeywordImg(keywordImage);
       initializeQuillContents(explain);
-      setNewsList(news);
       setKeywordSearchErr(false);
     } catch {
       setKeyword('');
@@ -107,7 +106,6 @@ export default function KeywordPatch({ data }: pageProps) {
         category: category,
         keywordImage: keywordImg,
         explain: content,
-        news: newsList,
       });
       if (result) {
         resetInput();
@@ -161,7 +159,7 @@ export default function KeywordPatch({ data }: pageProps) {
               <option value={KeywordCategory.Etc}>기타</option>
             </Select>
           </InputWrapper>
-          <NewsSetter>
+          {/* <NewsSetter>
             <SubmitButton
               title={'뉴스 선택하기'}
               click={() => {
@@ -179,7 +177,7 @@ export default function KeywordPatch({ data }: pageProps) {
                 return <NewsLi key={news.id}>{curTitle}</NewsLi>;
               })}
             </NewsWrapper>
-          </NewsSetter>
+          </NewsSetter> */}
           <SubmitWrapper>
             <SubmitButton
               title="SUBMIT"
@@ -188,7 +186,7 @@ export default function KeywordPatch({ data }: pageProps) {
               }}
             />
           </SubmitWrapper>
-          <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList}></NewsSelect>
+          {/* <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList}></NewsSelect> */}
         </ContentWrapper>
         <SearchState searchErr={keywordSearchErr} loading={isLoading} />
       </Wrapper>
