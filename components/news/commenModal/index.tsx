@@ -162,6 +162,11 @@ function ModalBody({ editComment }: CommentModalProps) {
                     }
                   }}
                 />
+                <span style={{ paddingLeft: '0.5rem' }}>
+                  {commentArr[curFocus!].date
+                    ? getStandardDateForm(commentArr[curFocus!].date!)
+                    : ''}
+                </span>
               </InputWrapper>
               <InputWrapper>
                 <SubInputTitle>내용</SubInputTitle>
