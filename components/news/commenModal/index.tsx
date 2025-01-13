@@ -139,6 +139,8 @@ function ModalBody({ editComment }: CommentModalProps) {
                 <SubInputTitle>날짜</SubInputTitle>
                 <DateInput
                   type="date"
+                  min="1000-01-01"
+                  max="9999-12-31"
                   className="form-control"
                   value={
                     commentArr[curFocus!].date
@@ -146,6 +148,10 @@ function ModalBody({ editComment }: CommentModalProps) {
                       : ''
                   }
                   onChange={(e) => {
+                    const nextValue = e.target.value;
+                    const dateObj = new Date(nextValue);
+                    const isValid = !isNaN(dateObj.valueOf());
+                    if (!isValid) return;
                     const curCommentArr = complexClone(commentArr);
                     curCommentArr[curFocus!].date = new Date(e.currentTarget.value);
                     setCommentArr(curCommentArr);

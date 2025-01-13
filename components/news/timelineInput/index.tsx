@@ -91,11 +91,17 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
               <SubInputTitle>날짜</SubInputTitle>
               <DateInput
                 type="date"
+                min="1000-01-01"
+                max="9999-12-31"
                 className="form-control"
                 value={
                   timeline[curFocus!].date ? getStandardDateForm(timeline[curFocus!].date!) : ''
                 }
                 onChange={(e) => {
+                  const nextValue = e.target.value;
+                  const dateObj = new Date(nextValue);
+                  const isValid = !isNaN(dateObj.valueOf());
+                  if (!isValid) return;
                   const curTimeline = complexClone(timeline);
                   curTimeline[curFocus!].date = new Date(e.currentTarget.value);
                   handleTimeline(curTimeline);
