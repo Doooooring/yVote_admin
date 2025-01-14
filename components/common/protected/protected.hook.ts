@@ -1,12 +1,12 @@
 import { authRepositories } from '@repositories/auth';
 import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export const useProtected = () => {
   const navigation = useRouter();
   const [isValid, setIsValid] = useState<boolean>(false);
   const checkValidate = useCallback(async () => {
-    if (isValid) return true;
+    if (isValid || typeof window == undefined) return;
     const response = await authRepositories.checkAuthSession();
     if (!response) {
       navigation.push('/login');
@@ -14,6 +14,9 @@ export const useProtected = () => {
     setIsValid(true);
   }, [isValid]);
 
-  checkValidate();
+  useEffect(() => {
+    checkValidate();
+  }, [checkValidate]);
+
   return isValid;
 };
