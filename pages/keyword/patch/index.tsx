@@ -3,7 +3,6 @@ import ImageUpload from '@components/common/imageUpload';
 import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
 import ExplainPreview from '@components/keyword/explainPreview';
-import NewsSelect from '@components/keyword/newsSelect';
 import SearchBox from '@components/keyword/search';
 import { SearchState } from '@components/keyword/searchState';
 import { Keyword, KeywordCategory, KeywordTitle } from '@interface/keywords';
@@ -188,7 +187,7 @@ export default function KeywordPatch({ data }: pageProps) {
               }}
             />
           </SubmitWrapper>
-          <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList}></NewsSelect>
+          {/* <NewsSelect curNewsList={newsList} setCurNewsList={setNewsList}></NewsSelect> */}
         </ContentWrapper>
         <SearchState searchErr={keywordSearchErr} loading={isLoading} />
       </Wrapper>

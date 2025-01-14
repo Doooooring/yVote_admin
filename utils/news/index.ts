@@ -1,5 +1,4 @@
 import { CommentsArr, CommentToEdit, commentType } from '@interface/news';
-import { comment } from '@uiw/react-md-editor';
 
 export const convertCommentArrToEdit: (comments: Array<CommentToEdit>) => Array<CommentsArr> = (
   comments: Array<CommentToEdit>,

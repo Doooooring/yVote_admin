@@ -1,7 +1,5 @@
 import { SubmitButton } from '@components/common/button';
-import Header from '@components/common/header';
 import ImageUpload from '@components/common/imageUpload';
-import Protected from '@components/common/protected';
 import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
 import ToggleButton from '@components/common/toggleButton';
