@@ -10,6 +10,7 @@ export const useProtected = () => {
     const response = await authRepositories.checkAuthSession();
     if (!response) {
       navigation.push('/login');
+      return;
     }
     setIsValid(true);
   }, [isValid]);

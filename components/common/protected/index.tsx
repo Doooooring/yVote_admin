@@ -8,5 +8,7 @@ interface ProtectedProps {
 export default function Protected({ children }: ProtectedProps) {
   const isValid = useProtected();
 
+  console.log('isValid : ', isValid);
+
   return isValid ? <>{children}</> : <></>;
 }
