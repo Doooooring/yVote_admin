@@ -1,6 +1,6 @@
 import { HOST_URL } from '@asset';
 import { Response } from '@interface/basic';
-import { NewsTitle, NewsToPatch, NewsToPost } from '@interface/news';
+import { NewsOrg, NewsTitle, NewsToPatch, NewsToPost } from '@interface/news';
 import axios from 'axios';
 
 class NewsRepositories {
@@ -13,13 +13,13 @@ class NewsRepositories {
 
   async getNewsDetails(id: number) {
     const response: {
-      data: Response<NewsToPatch>;
+      data: Response<NewsOrg>;
     } = await axios.get(`${HOST_URL}/news/edit/${id}`);
     return response.data.result;
   }
 
   async postNews(news: NewsToPost) {
-    const response: { data: Response<boolean> } = await axios.post(
+    const response: { data: Response<number> } = await axios.post(
       `${HOST_URL}/news/edit`,
       {
         news: news,

@@ -108,7 +108,6 @@ export interface NewsToPost
     | 'state'
     | 'newsImage'
     | 'isPublished'
-    | 'comments'
     | 'opinionLeft'
     | 'opinionRight'
   > {
@@ -119,8 +118,12 @@ export interface NewsToPost
   timeline: TimelineToEdit[];
 }
 
-export interface NewsToPatch extends NewsToPost {
+export interface NewsToPatch extends Partial<NewsToPost> {
   id: number;
+}
+
+export interface NewsOrg extends NewsToPatch {
+  comments: Array<commentType>;
 }
 
 export const initNews = () => {
@@ -133,9 +136,10 @@ export const initNews = () => {
     newsImage: null,
     isPublished: false,
     timeline: [] as Timeline[],
-    comments: [] as CommentToEdit[],
+    comments: [] as Array<commentType>,
     opinionLeft: '',
     opinionRight: '',
     keywords: [] as Array<{ id?: number; keyword: string }>,
   } as NewsToPost;
+  return news;
 };

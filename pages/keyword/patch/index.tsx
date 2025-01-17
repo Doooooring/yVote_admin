@@ -1,4 +1,4 @@
-import { SubmitButton } from '@components/common/button';
+import { PrimaryButton } from '@components/common/button';
 import ImageUpload from '@components/common/imageUpload';
 import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
@@ -161,7 +161,7 @@ export default function KeywordPatch({ data }: pageProps) {
             </Select>
           </InputWrapper>
           {/* <NewsSetter>
-            <SubmitButton
+            <PrimaryButton
               title={'뉴스 선택하기'}
               click={() => {
                 setIsSelectorModalUp(true);
@@ -180,7 +180,7 @@ export default function KeywordPatch({ data }: pageProps) {
             </NewsWrapper>
           </NewsSetter> */}
           <SubmitWrapper>
-            <SubmitButton
+            <PrimaryButton
               title="SUBMIT"
               click={() => {
                 submit();

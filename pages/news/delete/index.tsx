@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { SubmitButton } from '@components/common/button';
+import { PrimaryButton } from '@components/common/button';
 import ProtectedLayout from '@components/common/protectedLayout';
 import SearchBox from '@components/keyword/search';
 import { NewsTitle } from '@interface/news';
@@ -102,7 +102,7 @@ export default function NewsDelete({ data }: pageProps) {
             })}
           </NewsUl>
           <SubmitWrapper>
-            <SubmitButton
+            <PrimaryButton
               title="SUBMIT"
               click={async () => {
                 if (isLoading || !deleteId) return;

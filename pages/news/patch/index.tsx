@@ -1,4 +1,4 @@
-import { SubmitButton } from '@components/common/button';
+import { PrimaryButton } from '@components/common/button';
 import ImageUpload from '@components/common/imageUpload';
 import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
@@ -12,7 +12,15 @@ import KeywordSelect from '@components/news/keywordSelect';
 import NewsContentPreview from '@components/news/newsContentPreview';
 import TimelineInput from '@components/news/timelineInput';
 import { KeywordTitle } from '@interface/keywords';
-import { CommentsArr, NewsTitle, NewsToPatch, TimelineToEdit } from '@interface/news';
+import {
+  CommentsArr,
+  initNews,
+  NewsOrg,
+  NewsTitle,
+  NewsToPatch,
+  NewsToPost,
+  TimelineToEdit,
+} from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
@@ -53,6 +61,8 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 export default function NewsPatch({ data }: pageProps) {
   const router = useRouter();
   const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
+
+  const [news, setNews] = useState<NewsToPatch | null>(null);
 
   const [id, setId] = useState<number | null>(null);
   const [title, setTitle] = useState<string>('');
@@ -120,27 +130,26 @@ export default function NewsPatch({ data }: pageProps) {
         state,
         isPublished,
         timeline,
+        comments,
         opinionLeft,
         opinionRight,
-        comments,
-      }: NewsToPatch = response;
+      }: NewsOrg = response;
 
       setId(id);
       setTitle(title!);
-      setSubTitle(subTitle);
-      setSlug(slug);
-      setNewsImg(newsImage);
-      //setSummary(summary!);
+      setSubTitle(subTitle ?? '');
+      setSlug(slug ?? '');
+      setNewsImg(newsImage ?? '');
       initializeQuillContents(summary!);
-      setTimeline(timeline);
-      setKeywordList(keywords);
+      setTimeline(timeline ?? []);
+      setKeywordList(keywords ?? []);
       setState(state!);
       setIsPublished(isPublished ?? true);
-      setOpinionLeft(opinionLeft);
-      setOpinionRight(opinionRight);
+      setOpinionLeft(opinionLeft ?? '');
+      setOpinionRight(opinionRight ?? '');
 
-      const commentsToEdit = convertCommentArrToEdit(comments);
-      setComments(commentsToEdit);
+      // const commentsToEdit = convertCommentArrToEdit(comments);
+      // setComments(commentsToEdit);
     } catch (e) {
       console.log(e);
     } finally {
@@ -148,11 +157,24 @@ export default function NewsPatch({ data }: pageProps) {
     }
   }, []);
 
+  const generateNewNews = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const newsDefault = initNews();
+      newsDefault.isPublished = false;
+      const id = await newsRepositories.postNews({ isPublished: false } as NewsToPost);
+    } catch (e) {
+      alert('다시 시도해보세요.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setId]);
+
   const submit = async () => {
     if (!id) return;
     setIsLoading(true);
 
-    const commentsToSend = convertCommentArrToPatch(comments);
+    // const commentsToSend = convertCommentArrToPatch(comments);
     try {
       const result: boolean = await newsRepositories.patchNews({
         id: id,
@@ -166,7 +188,7 @@ export default function NewsPatch({ data }: pageProps) {
         opinionRight,
         newsImage: newsImg,
         timeline,
-        comments: commentsToSend,
+        // comments: commentsToSend,
         keywords: keywordList,
       });
       if (!result) {
@@ -204,6 +226,10 @@ export default function NewsPatch({ data }: pageProps) {
   return (
     <ProtectedLayout>
       <Wrapper>
+        <InputWrapper className="pb-1 pt-1 mb-1">
+          <InputTitle>새로 만들기</InputTitle>
+          <PrimaryButton title="+" click={generateNewNews} />
+        </InputWrapper>
         <SearchBox findKeyword={findNews} />
         <IdSelector
           newsSearchList={newsSearchList}
@@ -211,144 +237,7 @@ export default function NewsPatch({ data }: pageProps) {
           newsSelectorUp={newsSelectorUp}
           setNewsSelectorUp={setNewsSelectorup}
         />
-        <TextEditWrapper state={id !== null}>
-          <ContentEditWrapper>
-            <InputWrapper className="pb-1 pt-1 mb-1">
-              <InputTitle>제목{'  '}</InputTitle>
-              <Input
-                type="text"
-                className="form-control"
-                value={title}
-                onChange={(e) => {
-                  setTitle(e.currentTarget.value);
-                }}
-              ></Input>
-            </InputWrapper>
-            <InputWrapper className="pb-1 pt-1 mb-1">
-              <InputTitle>부제목</InputTitle>
-              <Input
-                type="text"
-                className="form-control"
-                value={subTitle}
-                onChange={(e) => {
-                  setSubTitle(e.currentTarget.value);
-                }}
-              ></Input>
-              <InputTitle>슬러그 (Url 뒤에 붙을거임)</InputTitle>
-              <Input
-                type="text"
-                className="form-control"
-                value={slug}
-                onChange={(e) => {
-                  setSlug(e.currentTarget.value);
-                }}
-              ></Input>
-            </InputWrapper>
-            <InputWrapper className="pb-1 pt-1 mb-1">
-              <ImageUpload setImageUrl={setNewsImg} />
-            </InputWrapper>
-            <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
-            <StateToggleWrapper>
-              <InputWrapper className="pb-1 pt-1 mb-1">
-                <ToggleTitle>최신 아티클</ToggleTitle>
-                <ToggleButton
-                  state={state}
-                  setState={setState}
-                  style={{
-                    width: '50px',
-                    height: '25px',
-                    backgroundColor: '#77C998',
-                    padding: '0.3rem',
-                  }}
-                  circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
-                  activeColor="#4F69E7"
-                  unactiveColor="#A8A8A8"
-                  activeCircleColor="#EDF0F1"
-                  unactiveCircleColor="#EDF0F1"
-                />
-              </InputWrapper>
-              <InputWrapper className="pb-1 pt-1 mb-1">
-                <ToggleTitle>퍼블리시 상태</ToggleTitle>
-                <ToggleButton
-                  state={isPublished}
-                  setState={setIsPublished}
-                  style={{
-                    width: '50px',
-                    height: '25px',
-                    backgroundColor: '#77C998',
-                    padding: '0.3rem',
-                  }}
-                  circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
-                  activeColor="#4F69E7"
-                  unactiveColor="#A8A8A8"
-                  activeCircleColor="#EDF0F1"
-                  unactiveCircleColor="#EDF0F1"
-                />
-              </InputWrapper>
-            </StateToggleWrapper>
-            <KeywordSetter>
-              <SubmitButton
-                title={'키워드 선택하기'}
-                click={() => {
-                  setIsSelectorModalUp(true);
-                }}
-              />
-              <KeywordWrapper>
-                {keywordList.map((keyword, idx) => {
-                  return <KeywordLi key={idx}>{keyword.keyword}</KeywordLi>;
-                })}
-              </KeywordWrapper>
-            </KeywordSetter>
-          </ContentEditWrapper>
-          <NewsPreviewWrapper>
-            <NewsContentPreview
-              title={title}
-              content={content}
-              state={state}
-              keywords={keywordList.map((k) => k.keyword)}
-            />
-          </NewsPreviewWrapper>
-        </TextEditWrapper>
-        <ContentWrapper className="mb-5" state={id !== null}>
-          <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
-          <CommentInput comments={comments} setComments={setComments} />
-          <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
-            <InputTitle>의견</InputTitle>
-            <InputBody className="d-flex flex-row align-items-center w-100">
-              <OpinionLeft>왼쪽</OpinionLeft>
-              <Input
-                type="text"
-                className="form-control"
-                value={opinionLeft}
-                onChange={(e) => {
-                  const v = e.currentTarget.value;
-                  setOpinionLeft(v);
-                }}
-              ></Input>
-              <OpinionRight>오른쪽</OpinionRight>
-              <Input
-                type="text"
-                className="form-control"
-                value={opinionRight}
-                onChange={(e) => {
-                  const v = e.currentTarget.value;
-                  setOpinionRight(v);
-                }}
-              ></Input>
-            </InputBody>
-          </OpinionWrapper>
-          <SubmitWrapper>
-            <SubmitButton
-              title="SUBMIT"
-              click={() => {
-                if (isLoading) return;
-                submit();
-              }}
-            />
-          </SubmitWrapper>
-          <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
-          <CommentModal editComment={editComment} />
-        </ContentWrapper>
+
         <SearchState searchErr={newsSearchErr} loading={isLoading} />
       </Wrapper>
     </ProtectedLayout>

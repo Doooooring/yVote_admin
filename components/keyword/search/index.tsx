@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { SubmitButton } from '@components/common/button';
+import { PrimaryButton } from '@components/common/button';
 import { useState } from 'react';
 
 interface SearchBoxProps {
@@ -21,7 +21,7 @@ export default function SearchBox({ findKeyword }: SearchBoxProps) {
             setSearchWord(e.currentTarget.value);
           }}
         ></Input>
-        <SubmitButton
+        <PrimaryButton
           title="검색"
           click={async () => {
             const response = await findKeyword(searchWord);

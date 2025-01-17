@@ -3,7 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { SubmitButton } from '@components/common/button';
+import { PrimaryButton } from '@components/common/button';
 import { NewsTitle } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
@@ -129,7 +129,7 @@ export default function KeywordPost({ data }: pageProps) {
             </Select>
           </InputWrapper>
           {/* <NewsSetter>
-            <SubmitButton
+            <PrimaryButton
               title={'뉴스 선택하기'}
               click={() => {
                 setIsSelectorModalUp(true);
@@ -148,7 +148,7 @@ export default function KeywordPost({ data }: pageProps) {
             </NewsWrapper>
           </NewsSetter> */}
           <SubmitWrapper>
-            <SubmitButton
+            <PrimaryButton
               title="SUBMIT"
               click={() => {
                 if (isLoading) return;

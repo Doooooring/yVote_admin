@@ -6,7 +6,7 @@ import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
-import { SubmitButton } from '@components/common/button';
+import { PrimaryButton } from '@components/common/button';
 import CommentModal from '@components/news/commenModal';
 import KeywordSelect from '@components/news/keywordSelect';
 import { keywordRepositories } from '@repositories/keyword';
@@ -207,7 +207,7 @@ export default function NewsPost({ data }: pageProps) {
                 </InputWrapper>
               </StateToggleWrapper>
               <KeywordSetter>
-                <SubmitButton
+                <PrimaryButton
                   title={'키워드 선택하기'}
                   click={() => {
                     setIsSelectorModalUp(true);
@@ -259,7 +259,7 @@ export default function NewsPost({ data }: pageProps) {
             </OpinionWrapper>
 
             <SubmitWrapper>
-              <SubmitButton
+              <PrimaryButton
                 title="SUBMIT"
                 click={() => {
                   if (isLoading) return;

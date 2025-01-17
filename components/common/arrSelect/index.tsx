@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { useCommonStore } from '@store/common';
 
-import { SubmitButton } from '@components/common/button';
+import { PrimaryButton } from '@components/common/button';
 import Loader from '@components/common/loader';
 import { TfiLoop } from 'react-icons/tfi';
 import { isArrIncludeSrc } from './arrSelect.tools';
@@ -155,13 +155,13 @@ export default function ArrSelect<T>({
           </SourceGrid>
         </SourceWrapper>
         <SubmitWrapper>
-          <SubmitButton
+          <PrimaryButton
             title={'선택 완료'}
             click={() => {
               setIsSelectorModalUp(false);
               setCurArrSrc(arrContain);
             }}
-          ></SubmitButton>
+          ></PrimaryButton>
         </SubmitWrapper>
       </Wrapper>
     </Modal>

@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import { SubmitButton } from '@components/common/button';
+import { PrimaryButton } from '@components/common/button';
 import SearchBox from '@components/keyword/search';
 import { keywordRepositories } from '@repositories/keyword';
 import { useCommonStore } from '@store/common';
@@ -97,7 +97,7 @@ export default function KeywordDelete({ data }: pageProps) {
             })}
           </NewsUl>
           <SubmitWrapper>
-            <SubmitButton
+            <PrimaryButton
               title="SUBMIT"
               click={async () => {
                 if (isLoading) return;

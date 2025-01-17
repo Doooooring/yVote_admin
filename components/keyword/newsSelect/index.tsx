@@ -35,7 +35,7 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
 // import { News } from '@interface/news';
 // import { useCommonStore } from '@store/common';
 
-// import { SubmitButton } from '@components/common/button';
+// import { PrimaryButton } from '@components/common/button';
 // import Loader from '@components/common/loader';
 // import { TfiLoop } from 'react-icons/tfi';
 
@@ -175,13 +175,13 @@ export default function NewsSelect({ curNewsList, setCurNewsList }: NewsSelectPr
 //           <Loader />
 //         </NewsGrid>
 //         <SubmitWrapper>
-//           <SubmitButton
+//           <PrimaryButton
 //             title={'선택 완료'}
 //             click={() => {
 //               setIsSelectorModalUp(false);
 //               setCurNewsList(newsContain.map((news) => news._id!));
 //             }}
-//           ></SubmitButton>
+//           ></PrimaryButton>
 //         </SubmitWrapper>
 //       </Wrapper>
 //     </Modal>

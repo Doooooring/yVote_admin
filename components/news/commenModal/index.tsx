@@ -186,7 +186,7 @@ function ModalBody({ editComment }: CommentModalProps) {
                 <TitleInput
                   type="text"
                   className="form-control"
-                  value={commentArr[curFocus!].url}
+                  value={commentArr[curFocus!].url ?? ''}
                   onChange={(e) => {
                     const curCommentArr = complexClone(commentArr);
                     curCommentArr[curFocus!].url = e.currentTarget.value;
