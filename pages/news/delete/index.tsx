@@ -1,13 +1,13 @@
 import styled from 'styled-components';
 
 import { SubmitButton } from '@components/common/button';
+import ProtectedLayout from '@components/common/protectedLayout';
 import SearchBox from '@components/keyword/search';
+import { NewsTitle } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { GetServerSideProps } from 'next';
 import { useCallback, useState } from 'react';
-import { NewsTitle } from '@interface/news';
-import ProtectedLayout from '@components/common/protectedLayout';
 
 export interface NewsToDelete {
   id: string;
@@ -59,7 +59,6 @@ export default function NewsDelete({ data }: pageProps) {
     async (id: number) => {
       try {
         setIsLoading(true);
-        console.log(deleteId);
         const response = await newsRepositories.deleteNews(id);
         if (!response) Error;
         setNewsList([]);

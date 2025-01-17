@@ -25,9 +25,7 @@ export default function ImageUpload({
       setIsLoading(true);
       try {
         if (curFiles) {
-          console.log('is here : ', curFiles);
           const imgUrl = await imageRepositories.postImage(curFiles[0]);
-          console.log('img url : ', imgUrl);
           setImageUrl(imgUrl);
         } else {
           setImageUrl(null);
