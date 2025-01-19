@@ -1,34 +1,15 @@
 import { PrimaryButton } from '@components/common/button';
-import ImageUpload from '@components/common/imageUpload';
 import ProtectedLayout from '@components/common/protectedLayout';
-import TextEditor from '@components/common/textEditor';
-import ToggleButton from '@components/common/toggleButton';
 import SearchBox from '@components/keyword/search';
 import { SearchState } from '@components/keyword/searchState';
-import CommentModal from '@components/news/commenModal';
-import CommentInput from '@components/news/commentInput';
+import EditNews from '@components/news/editNews';
 import IdSelector from '@components/news/idSelector';
-import KeywordSelect from '@components/news/keywordSelect';
-import NewsContentPreview from '@components/news/newsContentPreview';
-import TimelineInput from '@components/news/timelineInput';
 import { KeywordTitle } from '@interface/keywords';
-import {
-  CommentsArr,
-  initNews,
-  NewsOrg,
-  NewsTitle,
-  NewsToPatch,
-  NewsToPost,
-  TimelineToEdit,
-} from '@interface/news';
+import { initNews, NewsOrg, NewsTitle, NewsToPatch } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
-import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
-import { complexClone } from '@utils';
-import { useReactQuill } from '@utils/hook/useReactQuill';
-import { convertCommentArrToEdit, convertCommentArrToPatch } from '@utils/news';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -60,30 +41,13 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 
 export default function NewsPatch({ data }: pageProps) {
   const router = useRouter();
-  const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
 
-  const [news, setNews] = useState<NewsToPatch | null>(null);
-
-  const [id, setId] = useState<number | null>(null);
-  const [title, setTitle] = useState<string>('');
-  const [subTitle, setSubTitle] = useState<string>('');
-  const [slug, setSlug] = useState<string>('');
-  const [timeline, setTimeline] = useState<TimelineToEdit[]>([]);
-  const [state, setState] = useState<boolean>(true);
-  const [isPublished, setIsPublished] = useState<boolean>(true);
-  const [opinionLeft, setOpinionLeft] = useState<string>('');
-  const [opinionRight, setOpinionRight] = useState<string>('');
-  const [newsImg, setNewsImg] = useState<string | null>(null);
-  const [comments, setComments] = useState<Array<CommentsArr>>([]);
-  const [keywordList, setKeywordList] = useState<Array<KeywordTitle>>([]);
+  const [news, setNews] = useState<NewsOrg | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [newsSearchList, setNewsSearchList] = useState<NewsTitle[]>([]);
   const [newsSearchErr, setNewsSearchErr] = useState<boolean>(false);
   const [newsSelectorUp, setNewsSelectorup] = useState<boolean>(false);
-
-  const isLoading = useCommonStore((state) => state.isLoading);
-  const setIsLoading = useCommonStore((state) => state.setIsLoading);
-  const setIsSelectorModalUp = useCommonStore((state) => state.setIsSelectorModalUp);
 
   const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
 
@@ -95,61 +59,28 @@ export default function NewsPatch({ data }: pageProps) {
   }, []);
 
   const findNews = useCallback(async (searchWord: string) => {
+    setIsLoading(true);
+
     try {
-      setIsLoading(true);
       const response = await newsRepositories.getNewsTitles(searchWord);
-      if (response.length == 0) {
-        Error;
-      } else {
-        setNewsSearchList(response);
-        setNewsSelectorup(true);
-        setIsLoading(false);
-      }
+
+      setNewsSearchList(response);
+      setNewsSelectorup(true);
+
       return true;
     } catch {
-      setTitle('');
       setNewsSearchErr(true);
-      setIsLoading(false);
-
       return false;
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
   const getNews = useCallback(async (id: number) => {
     setIsLoading(true);
     try {
-      const response = await newsRepositories.getNewsDetails(id);
-
-      const {
-        title,
-        subTitle,
-        slug,
-        summary,
-        keywords,
-        newsImage,
-        state,
-        isPublished,
-        timeline,
-        comments,
-        opinionLeft,
-        opinionRight,
-      }: NewsOrg = response;
-
-      setId(id);
-      setTitle(title!);
-      setSubTitle(subTitle ?? '');
-      setSlug(slug ?? '');
-      setNewsImg(newsImage ?? '');
-      initializeQuillContents(summary!);
-      setTimeline(timeline ?? []);
-      setKeywordList(keywords ?? []);
-      setState(state!);
-      setIsPublished(isPublished ?? true);
-      setOpinionLeft(opinionLeft ?? '');
-      setOpinionRight(opinionRight ?? '');
-
-      // const commentsToEdit = convertCommentArrToEdit(comments);
-      // setComments(commentsToEdit);
+      const newsOrg = await newsRepositories.getNewsDetails(id);
+      setNews(newsOrg);
     } catch (e) {
       console.log(e);
     } finally {
@@ -162,35 +93,21 @@ export default function NewsPatch({ data }: pageProps) {
     try {
       const newsDefault = initNews();
       newsDefault.isPublished = false;
-      const id = await newsRepositories.postNews({ isPublished: false } as NewsToPost);
+      const id = await newsRepositories.postNews(newsDefault);
+
+      setNews({ id: id, ...newsDefault });
     } catch (e) {
       alert('다시 시도해보세요.');
     } finally {
       setIsLoading(false);
     }
-  }, [setId]);
+  }, []);
 
-  const submit = async () => {
-    if (!id) return;
+  const submit = async (news: NewsToPatch) => {
+    if (!news) return;
     setIsLoading(true);
-
-    // const commentsToSend = convertCommentArrToPatch(comments);
     try {
-      const result: boolean = await newsRepositories.patchNews({
-        id: id,
-        summary: content,
-        title,
-        subTitle,
-        slug,
-        state,
-        isPublished,
-        opinionLeft,
-        opinionRight,
-        newsImage: newsImg,
-        timeline,
-        // comments: commentsToSend,
-        keywords: keywordList,
-      });
+      const result: boolean = await newsRepositories.patchNews(news);
       if (!result) {
         Error();
         return;
@@ -204,23 +121,6 @@ export default function NewsPatch({ data }: pageProps) {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const editComment = (comment: CommentsArr) => {
-    let index = null;
-    for (let i = 0; i < comments.length; i++) {
-      const cur = comments[i];
-      if (cur.type === comment.type) {
-        index = i;
-        break;
-      }
-    }
-
-    if (index === null) return;
-    const newComments = complexClone(comments);
-    newComments[index] = comment;
-    setComments(newComments);
-    setCommentSelected(comment);
   };
 
   return (
@@ -237,7 +137,7 @@ export default function NewsPatch({ data }: pageProps) {
           newsSelectorUp={newsSelectorUp}
           setNewsSelectorUp={setNewsSelectorup}
         />
-
+        {news ? <EditNews newsOrg={news} submit={submit} /> : <></>}
         <SearchState searchErr={newsSearchErr} loading={isLoading} />
       </Wrapper>
     </ProtectedLayout>

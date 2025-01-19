@@ -99,23 +99,25 @@ export interface Preview
 export interface NewsTitle extends Pick<News, 'id' | 'title'> {}
 
 export interface NewsToPost
-  extends Pick<
-    News,
-    | 'title'
-    | 'subTitle'
-    | 'slug'
-    | 'summary'
-    | 'state'
-    | 'newsImage'
-    | 'isPublished'
-    | 'opinionLeft'
-    | 'opinionRight'
+  extends Partial<
+    Pick<
+      News,
+      | 'title'
+      | 'subTitle'
+      | 'slug'
+      | 'summary'
+      | 'state'
+      | 'newsImage'
+      | 'isPublished'
+      | 'opinionLeft'
+      | 'opinionRight'
+    >
   > {
-  keywords: {
+  keywords?: {
     id: number;
     keyword: string;
   }[];
-  timeline: TimelineToEdit[];
+  timeline?: TimelineToEdit[];
 }
 
 export interface NewsToPatch extends Partial<NewsToPost> {
@@ -140,6 +142,6 @@ export const initNews = () => {
     opinionLeft: '',
     opinionRight: '',
     keywords: [] as Array<{ id?: number; keyword: string }>,
-  } as NewsToPost;
+  } as Omit<NewsOrg, 'id'>;
   return news;
 };

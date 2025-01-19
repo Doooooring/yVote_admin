@@ -1,27 +1,40 @@
-import { NewsOrg } from '@interface/news';
+import { PrimaryButton } from '@components/common/button';
+import ImageUpload from '@components/common/imageUpload';
+import TextEditor from '@components/common/textEditor';
+import ToggleButton from '@components/common/toggleButton';
+import { NewsOrg, NewsToPatch } from '@interface/news';
 import useObject from '@utils/hook/useObject';
-import { useState } from 'react';
+import { useReactQuill } from '@utils/hook/useReactQuill';
+import { useEffect } from 'react';
 import styled from 'styled-components';
+import CommentModal from '../commenModal';
+import KeywordSelect from '../keywordSelect';
 
 interface EditNewsProps {
   newsOrg: NewsOrg;
+  submit: (news: NewsToPatch) => void;
 }
 
 export default function EditNews({ newsOrg }: EditNewsProps) {
+  const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
   const [news, setNewsVal] = useObject<NewsOrg>(newsOrg);
+
+  useEffect(() => {
+    initializeQuillContents(news.summary ?? '');
+  }, [newsOrg]);
 
   return (
     <>
-      <TextEditWrapper state={id !== null}>
+      <TextEditWrapper state={news !== null}>
         <ContentEditWrapper>
           <InputWrapper className="pb-1 pt-1 mb-1">
             <InputTitle>제목{'  '}</InputTitle>
             <Input
               type="text"
               className="form-control"
-              value={title}
+              value={news.title ?? ''}
               onChange={(e) => {
-                setTitle(e.currentTarget.value);
+                setNewsVal('title', e.currentTarget.value);
               }}
             ></Input>
           </InputWrapper>
@@ -30,31 +43,35 @@ export default function EditNews({ newsOrg }: EditNewsProps) {
             <Input
               type="text"
               className="form-control"
-              value={subTitle}
+              value={news.subTitle ?? ''}
               onChange={(e) => {
-                setSubTitle(e.currentTarget.value);
+                setNewsVal('subTitle', e.currentTarget.value);
               }}
             ></Input>
             <InputTitle>슬러그 (Url 뒤에 붙을거임)</InputTitle>
             <Input
               type="text"
               className="form-control"
-              value={slug}
+              value={news.slug ?? ''}
               onChange={(e) => {
-                setSlug(e.currentTarget.value);
+                setNewsVal('slug', e.currentTarget.value);
               }}
             ></Input>
           </InputWrapper>
           <InputWrapper className="pb-1 pt-1 mb-1">
-            <ImageUpload setImageUrl={setNewsImg} />
+            <ImageUpload
+              setImageUrl={(s: string | null) => {
+                setNewsVal('newsImage', s);
+              }}
+            />
           </InputWrapper>
           <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
           <StateToggleWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>최신 아티클</ToggleTitle>
               <ToggleButton
-                state={state}
-                setState={setState}
+                state={news.state}
+                setState={setNewsVal()}
                 style={{
                   width: '50px',
                   height: '25px',

@@ -23,7 +23,6 @@ import TimelineInput from '@components/news/timelineInput';
 import { KeywordTitle } from '@interface/keywords';
 import { useNewsStore } from '@store/news';
 import { useReactQuill } from '@utils/hook/useReactQuill';
-import { convertCommentArrToPatch } from '@utils/news';
 import { useRouter } from 'next/router';
 
 interface pageProps {
@@ -79,7 +78,6 @@ export default function NewsPost({ data }: pageProps) {
 
   const submit = async () => {
     setIsLoading(true);
-    const commentsToSend = convertCommentArrToPatch(comments);
     try {
       const result: boolean = await newsRepositories.postNews({
         summary: content,
@@ -92,7 +90,6 @@ export default function NewsPost({ data }: pageProps) {
         opinionRight,
         newsImage: newsImg,
         timeline,
-        comments: commentsToSend,
         keywords: keywordList,
       });
       if (result) {

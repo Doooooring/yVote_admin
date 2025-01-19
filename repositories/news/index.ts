@@ -28,7 +28,7 @@ class NewsRepositories {
         withCredentials: true,
       },
     );
-    return response.data.success;
+    return response.data.result;
   }
 
   async patchNews(news: NewsToPatch) {

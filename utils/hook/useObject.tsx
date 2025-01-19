@@ -13,5 +13,5 @@ export default function useObject<T>(obj: T) {
     [setV, obj],
   );
 
-  return [v, setObject];
+  return [v, setObject] as [T, <K extends keyof T>(key: K, value: T[K]) => void];
 }
