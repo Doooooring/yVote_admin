@@ -1,6 +1,6 @@
 import { HOST_URL } from '@asset';
 import { Response } from '@interface/basic';
-import { NewsOrg, NewsTitle, NewsToPatch, NewsToPost } from '@interface/news';
+import { Comment, commentType, NewsOrg, NewsTitle, NewsToPatch, NewsToPost } from '@interface/news';
 import axios from 'axios';
 
 class NewsRepositories {
@@ -15,6 +15,13 @@ class NewsRepositories {
     const response: {
       data: Response<NewsOrg>;
     } = await axios.get(`${HOST_URL}/news/edit/${id}`);
+    return response.data.result;
+  }
+
+  async getNewsComment(id: number, type: commentType, page: number, limit: number = 20) {
+    const response: { data: Response<Comment[]> } = await axios.get(
+      `${HOST_URL}/news/${id}/comment?type=${type}&offset=${page}&limit=${limit}`,
+    );
     return response.data.result;
   }
 

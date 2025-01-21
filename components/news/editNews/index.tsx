@@ -2,26 +2,35 @@ import { PrimaryButton } from '@components/common/button';
 import ImageUpload from '@components/common/imageUpload';
 import TextEditor from '@components/common/textEditor';
 import ToggleButton from '@components/common/toggleButton';
-import { NewsOrg, NewsToPatch } from '@interface/news';
+import { KeywordTitle } from '@interface/keywords';
+import { commentType, NewsToEdit, NewsToPatch, TimelineToEdit } from '@interface/news';
+import { useCommonStore } from '@store/common';
+import { useKeywordStore } from '@store/keyword';
+import { useNewsStore } from '@store/news';
 import useObject from '@utils/hook/useObject';
 import { useReactQuill } from '@utils/hook/useReactQuill';
 import { useEffect } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
+import CommentInput from '../commentInput';
 import KeywordSelect from '../keywordSelect';
-import { useCommonStore } from '@store/common';
+import NewsContentPreview from '../newsContentPreview';
+import TimelineInput from '../timelineInput';
 
 interface EditNewsProps {
-  newsOrg: NewsOrg;
+  newsOrg: NewsToEdit;
   submit: (news: NewsToPatch) => void;
 }
 
-export default function EditNews({ newsOrg }: EditNewsProps) {
+export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
-  const [news, setNewsVal] = useObject<NewsOrg>(newsOrg);
+  const [news, setNewsVal] = useObject<NewsToEdit>(newsOrg);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsSelectorModalUp = useCommonStore((state) => state.setIsSelectorModalUp);
+
+  const [commentSelected] = useNewsStore((state) => [state.commentSelected]);
+  const keywordTitleList = useKeywordStore((state) => state.keywordTitleList);
 
   useEffect(() => {
     initializeQuillContents(news.summary ?? '');
@@ -120,7 +129,7 @@ export default function EditNews({ newsOrg }: EditNewsProps) {
               }}
             />
             <KeywordWrapper>
-              {keywordList.map((keyword, idx) => {
+              {news.keywords.map((keyword, idx) => {
                 return <KeywordLi key={idx}>{keyword.keyword}</KeywordLi>;
               })}
             </KeywordWrapper>
@@ -128,58 +137,78 @@ export default function EditNews({ newsOrg }: EditNewsProps) {
         </ContentEditWrapper>
         <NewsPreviewWrapper>
           <NewsContentPreview
-            title={title}
+            title={news.title}
             content={content}
-            state={state}
+            state={news.state}
             keywords={(news.keywords ?? []).map((k) => k.keyword)}
           />
         </NewsPreviewWrapper>
       </TextEditWrapper>
-      <ContentWrapper className="mb-5" state={id !== null}>
-        <TimelineInput timeline={timeline} handleTimeline={setTimeline} />
-        <CommentInput comments={comments} setComments={setComments} />
-        {/* <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
-    <InputTitle>의견</InputTitle>
-    <InputBody className="d-flex flex-row align-items-center w-100">
-      <OpinionLeft>왼쪽</OpinionLeft>
-      <Input
-        type="text"
-        className="form-control"
-        value={opinionLeft}
-        onChange={(e) => {
-          const v = e.currentTarget.value;
-          setOpinionLeft(v);
-        }}
-      ></Input>
-      <OpinionRight>오른쪽</OpinionRight>
-      <Input
-        type="text"
-        className="form-control"
-        value={opinionRight}
-        onChange={(e) => {
-          const v = e.currentTarget.value;
-          setOpinionRight(v);
-        }}
-      ></Input>
-    </InputBody>
-  </OpinionWrapper> */}
+      <ContentWrapper className="mb-5" state={news.id !== null}>
+        <TimelineInput
+          timeline={news.timeline}
+          handleTimeline={(timeline: TimelineToEdit[]) => {
+            setNewsVal('timeline', timeline);
+          }}
+        />
+        <CommentInput
+          comments={news.comments}
+          setComments={(comments: commentType[]) => {
+            setNewsVal('comments', comments);
+          }}
+        />
+        <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
+          <InputTitle>의견</InputTitle>
+          <InputBody className="d-flex flex-row align-items-center w-100">
+            <OpinionLeft>왼쪽</OpinionLeft>
+            <Input
+              type="text"
+              className="form-control"
+              value={news.opinionLeft}
+              onChange={(e) => {
+                const v = e.currentTarget.value;
+                setNewsVal('opinionLeft', v);
+              }}
+            ></Input>
+            <OpinionRight>오른쪽</OpinionRight>
+            <Input
+              type="text"
+              className="form-control"
+              value={news.opinionRight}
+              onChange={(e) => {
+                const v = e.currentTarget.value;
+                setNewsVal('opinionRight', v);
+              }}
+            ></Input>
+          </InputBody>
+        </OpinionWrapper>
         <SubmitWrapper>
           <PrimaryButton
             title="SUBMIT"
             click={() => {
               if (isLoading) return;
-              submit();
+              const { comments, ...rest } = news;
+              submit(rest);
             }}
           />
         </SubmitWrapper>
-        <KeywordSelect curKeywordList={keywordList} setCurKeywordList={setKeywordList} />
-        <CommentModal editComment={editComment} />
+        <KeywordSelect
+          curKeywordList={news.keywords}
+          setCurKeywordList={(keywordList: KeywordTitle[]) => {
+            setNewsVal('keywords', keywordList);
+          }}
+        />
+        {commentSelected ? <CommentModal newsId={news.id} /> : <></>}
       </ContentWrapper>
     </>
   );
 }
 
-const TextEditWrapper = styled.div<ContentWrapperProps>`
+interface TextEditWrapperProps {
+  state: boolean;
+}
+
+const TextEditWrapper = styled.div<TextEditWrapperProps>`
   width: 100%;
   display: ${({ state }) => (state ? 'flex' : 'none')};
 
@@ -208,6 +237,10 @@ const StateToggleWrapper = styled.div`
   flex-direction: row;
   padding: 0.5rem 0;
 `;
+
+interface ContentWrapperProps {
+  state: boolean;
+}
 
 const ContentWrapper = styled.div<ContentWrapperProps>`
   display: ${({ state }) => (state ? 'block' : 'none')};

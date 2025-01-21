@@ -121,6 +121,10 @@ export interface NewsOrg
   comments: Array<commentType>;
 }
 
+export interface NewsToEdit extends NewsOrg {
+  id: number;
+}
+
 export interface NewsToPost extends Partial<NewsOrg> {}
 
 export interface NewsToPatch extends Partial<NewsOrg> {

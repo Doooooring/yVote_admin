@@ -2,31 +2,37 @@ import { Center, Column, Row } from '@components/common/figure';
 import ListEditView from '@components/common/listEditView';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { CommentsArr, commentType } from '@interface/news';
+import { commentType } from '@interface/news';
 import { useNewsStore } from '@store/news';
 import { complexClone } from '@utils';
 import { useArr } from '@utils/hook/useArr';
 import styled from 'styled-components';
 
 interface CommentInputProps {
-  comments: CommentsArr[];
-  setComments: (v: CommentsArr[]) => void;
+  comments: commentType[];
+  setComments: (v: commentType[]) => void;
 }
 
 const commentTypeKey = Object.keys(commentType) as Array<commentType>;
 
-const getCommentRest = (comments: CommentsArr[]) => {
-  const curComments = comments;
-  let restComment: commentType[] = [];
-  commentTypeKey.forEach((commentType) => {
-    const result = curComments.filter((comment) => {
-      return comment.type === commentType;
-    });
-    if (result.length === 0) {
-      restComment.push(commentType);
-    }
+// const getCommentRest = (comments: CommentsArr[]) => {
+//   const curComments = comments;
+//   let restComment: commentType[] = [];
+//   commentTypeKey.forEach((commentType) => {
+//     const result = curComments.filter((comment) => {
+//       return comment.type === commentType;
+//     });
+//     if (result.length === 0) {
+//       restComment.push(commentType);
+//     }
+//   });
+//   return restComment;
+// };
+
+const getCommentRest = (comments: commentType[]) => {
+  return commentTypeKey.filter((type) => {
+    return !comments.includes(type);
   });
-  return restComment;
 };
 
 export default function CommentInput({ comments, setComments }: CommentInputProps) {
@@ -39,8 +45,7 @@ export default function CommentInput({ comments, setComments }: CommentInputProp
     moveArrRight: moveCommentRight,
   } = useArr(comments, setComments, () => {
     const curType = getCommentRest(comments)[0];
-    const newComment = { type: curType, data: [] };
-    return newComment;
+    return curType;
   });
 
   const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
@@ -60,7 +65,7 @@ export default function CommentInput({ comments, setComments }: CommentInputProp
                 className="p-3"
               >
                 <p className="title_d">평론 타입</p>
-                <p className="title">{comment.type} </p>
+                <p className="title">{comment} </p>
               </CommentListLayer>
             );
           })}
@@ -104,14 +109,14 @@ export default function CommentInput({ comments, setComments }: CommentInputProp
             </InputLayerHeader>
             <CommentSelect
               className="form-select"
-              value={comments[curFocus].type}
+              value={comments[curFocus]}
               onChange={(e) => {
                 const curComments = complexClone(comments);
-                curComments[curFocus].type = e.currentTarget.value as commentType;
+                curComments[curFocus] = e.currentTarget.value as commentType;
                 setComments(curComments);
               }}
             >
-              {[comments[curFocus].type, ...getCommentRest(comments)].map((comment, idx) => {
+              {[comments[curFocus], ...getCommentRest(comments)].map((comment, idx) => {
                 return (
                   <option key={comment + JSON.stringify(idx)} value={comment}>
                     {comment}

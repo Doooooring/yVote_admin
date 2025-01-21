@@ -26,10 +26,8 @@ export default function Header() {
       console.log("it's error");
       return;
     }
-    if (navigation.pathname.includes('news/post')) {
-      setCurTab('news/post');
-    } else if (navigation.pathname.includes('news/patch')) {
-      setCurTab('news/patch');
+    if (navigation.pathname.includes('news/edit')) {
+      setCurTab('news/edit');
     } else if (navigation.pathname.includes('keyword/post')) {
       setCurTab('keyword/post');
     } else if (navigation.pathname.includes('keyword/patch')) {
@@ -47,9 +45,7 @@ export default function Header() {
     <Wrapper>
       <HeaderBody>
         <NavigationBox>
-          <NavBox link={'/news/post'} comment="뉴스 새로넣기" state={curTab === 'news/post'} />
-          <Blank />
-          <NavBox link={'/news/patch'} comment="뉴스 수정하기" state={curTab === 'news/patch'} />
+          <NavBox link={'/news/edit'} comment="뉴스 수정하기" state={curTab === 'news/patch'} />
           <Blank />
           <NavBox
             link={'/keyword/post'}

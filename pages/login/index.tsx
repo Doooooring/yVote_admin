@@ -1,10 +1,10 @@
 import { Center, CommonLayoutBox } from '@components/common/figure';
 import { authRepositories } from '@repositories/auth';
+import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 interface pageProps {
   data: {};
@@ -27,7 +27,7 @@ export default function Login({ data }: pageProps) {
       try {
         const response = await authRepositories.login(token);
         if (response) {
-          navigation.push('/news/post');
+          navigation.push('/news/edit');
           return;
         } else {
           throw Error('error');

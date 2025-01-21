@@ -32,7 +32,7 @@ const Home = ({ data }: pageProps) => {
   const setNewsTitleList = useNewsStore((state) => state.setNewsTitleList);
   const router = useRouter();
   useEffect(() => {
-    router.push('/news/post');
+    router.push('/news/edit');
     setNewsTitleList(data.newsTitles);
   }, []);
 

@@ -75,7 +75,6 @@ export default function KeywordPatch({ data }: pageProps) {
       setCategory(category);
       setKeywordImg(keywordImage);
       initializeQuillContents(explain);
-      // setNewsList(news);
       setKeywordSearchErr(false);
     } catch {
       setKeyword('');

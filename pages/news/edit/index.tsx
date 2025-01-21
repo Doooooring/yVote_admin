@@ -5,7 +5,7 @@ import { SearchState } from '@components/keyword/searchState';
 import EditNews from '@components/news/editNews';
 import IdSelector from '@components/news/idSelector';
 import { KeywordTitle } from '@interface/keywords';
-import { initNews, NewsOrg, NewsTitle, NewsToPatch } from '@interface/news';
+import { initNews, NewsTitle, NewsToEdit, NewsToPatch, setDefaultNews } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
@@ -43,7 +43,7 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 export default function NewsPatch({ data }: pageProps) {
   const router = useRouter();
 
-  const [news, setNews] = useState<NewsOrg | null>(null);
+  const [news, setNews] = useState<NewsToEdit | null>(null);
 
   const [newsSearchList, setNewsSearchList] = useState<NewsTitle[]>([]);
   const [newsSearchErr, setNewsSearchErr] = useState<boolean>(false);
@@ -53,9 +53,7 @@ export default function NewsPatch({ data }: pageProps) {
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
 
   const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
-
   const setKeywordTitleList = useKeywordStore((state) => state.setKeywordTitleList);
-  const keywordTitleList = useKeywordStore((state) => state.keywordTitleList);
 
   useEffect(() => {
     setKeywordTitleList(data.keywordTitles);
@@ -83,7 +81,7 @@ export default function NewsPatch({ data }: pageProps) {
     setIsLoading(true);
     try {
       const newsOrg = await newsRepositories.getNewsDetails(id);
-      setNews(newsOrg);
+      setNews(setDefaultNews(newsOrg) as NewsToEdit);
     } catch (e) {
       console.log(e);
     } finally {
@@ -146,6 +144,7 @@ export default function NewsPatch({ data }: pageProps) {
     </ProtectedLayout>
   );
 }
+
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
