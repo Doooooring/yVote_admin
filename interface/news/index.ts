@@ -7,6 +7,7 @@
 //   동아 = '동아',
 // }
 
+import { complexClone } from '@utils';
 import { Keyword } from '../keywords';
 
 export enum commentType {
@@ -98,50 +99,55 @@ export interface Preview
 
 export interface NewsTitle extends Pick<News, 'id' | 'title'> {}
 
-export interface NewsToPost
-  extends Partial<
-    Pick<
-      News,
-      | 'title'
-      | 'subTitle'
-      | 'slug'
-      | 'summary'
-      | 'state'
-      | 'newsImage'
-      | 'isPublished'
-      | 'opinionLeft'
-      | 'opinionRight'
-    >
+export interface NewsOrg
+  extends Pick<
+    News,
+    | 'title'
+    | 'subTitle'
+    | 'slug'
+    | 'summary'
+    | 'state'
+    | 'newsImage'
+    | 'isPublished'
+    | 'opinionLeft'
+    | 'opinionRight'
   > {
-  keywords?: {
+  id?: number;
+  keywords: {
     id: number;
     keyword: string;
   }[];
-  timeline?: TimelineToEdit[];
-}
-
-export interface NewsToPatch extends Partial<NewsToPost> {
-  id: number;
-}
-
-export interface NewsOrg extends NewsToPatch {
+  timeline: TimelineToEdit[];
   comments: Array<commentType>;
 }
 
+export interface NewsToPost extends Partial<NewsOrg> {}
+
+export interface NewsToPatch extends Partial<NewsOrg> {
+  id: number;
+}
+
+export const defaultNews = {
+  title: '',
+  subTitle: '',
+  slug: '',
+  summary: '',
+  state: true,
+  newsImage: '',
+  isPublished: false,
+  timeline: [] as TimelineToEdit[],
+  comments: [] as Array<commentType>,
+  opinionLeft: '',
+  opinionRight: '',
+  keywords: [] as Array<{ id: number; keyword: string }>,
+} as NewsOrg;
+
 export const initNews = () => {
-  const news = {
-    title: '',
-    subTitle: '',
-    slug: '',
-    summary: '',
-    state: true,
-    newsImage: null,
-    isPublished: false,
-    timeline: [] as Timeline[],
-    comments: [] as Array<commentType>,
-    opinionLeft: '',
-    opinionRight: '',
-    keywords: [] as Array<{ id?: number; keyword: string }>,
-  } as Omit<NewsOrg, 'id'>;
+  const news = complexClone(defaultNews) as Omit<NewsOrg, 'id'>;
   return news;
+};
+
+export const setDefaultNews = (news: NewsOrg) => {
+  const newsOrg = complexClone(defaultNews);
+  return { ...newsOrg, ...news } as NewsOrg;
 };

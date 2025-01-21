@@ -8,6 +8,7 @@ import { KeywordTitle } from '@interface/keywords';
 import { initNews, NewsOrg, NewsTitle, NewsToPatch } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
+import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
 
@@ -43,11 +44,13 @@ export default function NewsPatch({ data }: pageProps) {
   const router = useRouter();
 
   const [news, setNews] = useState<NewsOrg | null>(null);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [newsSearchList, setNewsSearchList] = useState<NewsTitle[]>([]);
   const [newsSearchErr, setNewsSearchErr] = useState<boolean>(false);
   const [newsSelectorUp, setNewsSelectorup] = useState<boolean>(false);
+
+  const isLoading = useCommonStore((state) => state.isLoading);
+  const setIsLoading = useCommonStore((state) => state.setIsLoading);
 
   const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
 

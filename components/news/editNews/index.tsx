@@ -9,6 +9,7 @@ import { useEffect } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
 import KeywordSelect from '../keywordSelect';
+import { useCommonStore } from '@store/common';
 
 interface EditNewsProps {
   newsOrg: NewsOrg;
@@ -18,6 +19,9 @@ interface EditNewsProps {
 export default function EditNews({ newsOrg }: EditNewsProps) {
   const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
   const [news, setNewsVal] = useObject<NewsOrg>(newsOrg);
+
+  const isLoading = useCommonStore((state) => state.isLoading);
+  const setIsSelectorModalUp = useCommonStore((state) => state.setIsSelectorModalUp);
 
   useEffect(() => {
     initializeQuillContents(news.summary ?? '');
@@ -70,8 +74,10 @@ export default function EditNews({ newsOrg }: EditNewsProps) {
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>최신 아티클</ToggleTitle>
               <ToggleButton
-                state={news.state}
-                setState={setNewsVal()}
+                state={news.state ?? false}
+                setState={(state: boolean) => {
+                  setNewsVal('state', state);
+                }}
                 style={{
                   width: '50px',
                   height: '25px',
@@ -88,8 +94,10 @@ export default function EditNews({ newsOrg }: EditNewsProps) {
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>퍼블리시 상태</ToggleTitle>
               <ToggleButton
-                state={isPublished}
-                setState={setIsPublished}
+                state={news.isPublished ?? false}
+                setState={(state: boolean) => {
+                  setNewsVal('isPublished', state);
+                }}
                 style={{
                   width: '50px',
                   height: '25px',
@@ -123,7 +131,7 @@ export default function EditNews({ newsOrg }: EditNewsProps) {
             title={title}
             content={content}
             state={state}
-            keywords={keywordList.map((k) => k.keyword)}
+            keywords={(news.keywords ?? []).map((k) => k.keyword)}
           />
         </NewsPreviewWrapper>
       </TextEditWrapper>
