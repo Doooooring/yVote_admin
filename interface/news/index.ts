@@ -152,6 +152,6 @@ export const initNews = () => {
 };
 
 export const setDefaultNews = (news: NewsOrg) => {
-  const newsOrg = complexClone(defaultNews);
+  const newsOrg = complexClone({ ...defaultNews });
   return { ...newsOrg, ...news } as NewsOrg;
 };

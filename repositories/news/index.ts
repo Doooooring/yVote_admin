@@ -1,6 +1,14 @@
 import { HOST_URL } from '@asset';
 import { Response } from '@interface/basic';
-import { Comment, commentType, NewsOrg, NewsTitle, NewsToPatch, NewsToPost } from '@interface/news';
+import {
+  Comment,
+  CommentToEdit,
+  commentType,
+  NewsOrg,
+  NewsTitle,
+  NewsToPatch,
+  NewsToPost,
+} from '@interface/news';
 import axios from 'axios';
 
 class NewsRepositories {
@@ -23,6 +31,19 @@ class NewsRepositories {
       `${HOST_URL}/news/${id}/comment?type=${type}&offset=${page}&limit=${limit}`,
     );
     return response.data.result;
+  }
+
+  async patchCommentsByNewsId(id: number, comments: CommentToEdit[]) {
+    const response: { data: Response<boolean> } = await axios.patch(
+      `${HOST_URL}/news/edit/${id}/comments`,
+      {
+        comments: comments,
+      },
+      {
+        withCredentials: true,
+      },
+    );
+    return response.data.success;
   }
 
   async postNews(news: NewsToPost) {

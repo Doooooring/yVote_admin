@@ -21,19 +21,16 @@ import styled from 'styled-components';
 
 interface pageProps {
   data: {
-    newsTitles: Array<NewsTitle>;
     keywordTitles: Array<KeywordTitle>;
   };
 }
 
 export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
-  const newsTitles: Array<NewsTitle> = await newsRepositories.getNewsTitles('');
   const keywordTitles: Array<KeywordTitle> = await keywordRepositories.getKeywordTitles('');
 
   return {
     props: {
       data: {
-        newsTitles,
         keywordTitles,
       },
     },
