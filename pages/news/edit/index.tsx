@@ -124,18 +124,23 @@ export default function NewsPatch({ data }: pageProps) {
   return (
     <ProtectedLayout>
       <Wrapper>
-        <InputWrapper className="pb-1 pt-1 mb-1">
-          <InputTitle>새로 만들기</InputTitle>
-          <PrimaryButton title="+" click={generateNewNews} />
-        </InputWrapper>
-        <SearchBox findKeyword={findNews} />
         <IdSelector
           newsSearchList={newsSearchList}
           getNews={getNews}
           newsSelectorUp={newsSelectorUp}
           setNewsSelectorUp={setNewsSelectorup}
         />
-        {news ? <EditNews newsOrg={news} submit={submit} /> : <></>}
+        {news ? (
+          <EditNews newsOrg={news} submit={submit} />
+        ) : (
+          <>
+            <InputWrapper className="pb-1 pt-1 mb-1">
+              <InputTitle>새로 만들기</InputTitle>
+              <PrimaryButton title="+" click={generateNewNews} />
+            </InputWrapper>
+            <SearchBox findKeyword={findNews} />
+          </>
+        )}
         <SearchState searchErr={newsSearchErr} loading={isLoading} />
       </Wrapper>
     </ProtectedLayout>
