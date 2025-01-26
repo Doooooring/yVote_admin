@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
+import { useCommonStore } from '@store/common';
 import { useRouteState } from '@utils/hook/useRouteState';
 import { ReactNode } from 'react';
 import LoadingIndicator from './loading';
-import { useCommonStore } from '@store/common';
 
 const Layout = ({ children }: { children: ReactNode }) => {
   const routeState = useRouteState();
