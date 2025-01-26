@@ -33,7 +33,6 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const keywordTitleList = useKeywordStore((state) => state.keywordTitleList);
 
   useEffect(() => {
-    console.log('ishere');
     if (ref.current) {
       initializeQuillContents(newsOrg.summary);
     }
@@ -44,7 +43,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
     news.summary = content;
     const { comments, ...rest } = news;
     submit(rest);
-  }, [content, submit]);
+  }, [news, content, submit]);
 
   return (
     <>
