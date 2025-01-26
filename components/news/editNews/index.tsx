@@ -9,7 +9,7 @@ import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
 import useObject from '@utils/hook/useObject';
 import { useReactQuill } from '@utils/hook/useReactQuill';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
 import CommentInput from '../commentInput';
@@ -33,12 +33,22 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const keywordTitleList = useKeywordStore((state) => state.keywordTitleList);
 
   useEffect(() => {
-    initializeQuillContents(news.summary ?? '');
-  }, [newsOrg]);
+    console.log('ishere');
+    if (ref.current) {
+      initializeQuillContents(newsOrg.summary);
+    }
+  }, [window, newsOrg]);
+
+  const submitNews = useCallback(async () => {
+    if (isLoading) return;
+    news.summary = content;
+    const { comments, ...rest } = news;
+    submit(rest);
+  }, [content, submit]);
 
   return (
     <>
-      <TextEditWrapper state={news !== null}>
+      <TextEditWrapper>
         <ContentEditWrapper>
           <InputWrapper className="pb-1 pt-1 mb-1">
             <InputTitle>제목{'  '}</InputTitle>
@@ -78,7 +88,14 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               }}
             />
           </InputWrapper>
-          <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
+          <TextEditor
+            ref={ref}
+            style={{ height: '600px' }}
+            onChange={handleContents}
+            onMount={() => {
+              initializeQuillContents(news.summary ?? '');
+            }}
+          />
           <StateToggleWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>최신 아티클</ToggleTitle>
@@ -186,9 +203,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
           <PrimaryButton
             title="SUBMIT"
             click={() => {
-              if (isLoading) return;
-              const { comments, ...rest } = news;
-              submit(rest);
+              submitNews();
             }}
           />
         </SubmitWrapper>
@@ -204,13 +219,9 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   );
 }
 
-interface TextEditWrapperProps {
-  state: boolean;
-}
-
-const TextEditWrapper = styled.div<TextEditWrapperProps>`
+const TextEditWrapper = styled.div`
   width: 100%;
-  display: ${({ state }) => (state ? 'flex' : 'none')};
+  display: flex;
 
   flex-direction: row;
 `;

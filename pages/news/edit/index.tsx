@@ -1,5 +1,6 @@
 import { PrimaryButton } from '@components/common/button';
 import ProtectedLayout from '@components/common/protectedLayout';
+import TextEditor from '@components/common/textEditor';
 import SearchBox from '@components/keyword/search';
 import { SearchState } from '@components/keyword/searchState';
 import EditNews from '@components/news/editNews';
@@ -16,7 +17,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import ReactQuill from 'react-quill';
 import styled from 'styled-components';
 
 interface pageProps {
@@ -38,6 +40,7 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 };
 
 export default function NewsPatch({ data }: pageProps) {
+  const a = useRef<ReactQuill>(null);
   const router = useRouter();
 
   const [news, setNews] = useState<NewsToEdit | null>(null);
@@ -143,9 +146,16 @@ export default function NewsPatch({ data }: pageProps) {
         )}
         <SearchState searchErr={newsSearchErr} loading={isLoading} />
       </Wrapper>
+      <PreLoaded>
+        <TextEditor ref={a} onChange={() => {}} />
+      </PreLoaded>
     </ProtectedLayout>
   );
 }
+
+const PreLoaded = styled.div`
+  display: none;
+`;
 
 const Wrapper = styled.div`
   display: flex;
