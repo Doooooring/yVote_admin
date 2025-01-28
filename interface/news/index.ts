@@ -74,6 +74,7 @@ export interface News {
   subTitle: string;
   slug: string;
   summary: string;
+  date: Date | null;
   keywords: Array<Keyword>;
   newsImage: string | null;
   isPublished: boolean;
@@ -106,6 +107,7 @@ export interface NewsOrg
     | 'subTitle'
     | 'slug'
     | 'summary'
+    | 'date'
     | 'state'
     | 'newsImage'
     | 'isPublished'
@@ -136,6 +138,7 @@ export const defaultNews = {
   subTitle: '',
   slug: '',
   summary: '',
+  date: null,
   state: true,
   newsImage: '',
   isPublished: false,

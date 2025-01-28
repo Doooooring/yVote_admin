@@ -9,6 +9,7 @@ import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
 import useObject from '@utils/hook/useObject';
 import { useReactQuill } from '@utils/hook/useReactQuill';
+import { getStandardDateForm } from '@utils/tools';
 import { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
@@ -41,6 +42,8 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const submitNews = useCallback(async () => {
     if (isLoading) return;
     news.summary = content;
+    if (!news.date) news.date = new Date();
+
     const { comments, ...rest } = news;
     submit(rest);
   }, [news, content, submit]);
@@ -79,6 +82,28 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                 setNewsVal('slug', e.currentTarget.value);
               }}
             ></Input>
+          </InputWrapper>
+          <InputWrapper className="pb-1 pt-1 mb-1">
+            <InputTitle>날짜</InputTitle>
+            <Input
+              type="date"
+              min="1000-01-01"
+              max="9999-12-31"
+              className="form-control"
+              value={news.date ? getStandardDateForm(news.date!) : ''}
+              onChange={(e) => {
+                const nextValue = e.target.value;
+                const dateObj = new Date(nextValue);
+                const isValid = !isNaN(dateObj.valueOf());
+                if (!isValid) return;
+                setNewsVal('date', dateObj);
+              }}
+              onClick={(e) => {
+                if (e.currentTarget.showPicker) {
+                  e.currentTarget.showPicker();
+                }
+              }}
+            />
           </InputWrapper>
           <InputWrapper className="pb-1 pt-1 mb-1">
             <ImageUpload
