@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import ReactQuill, { Quill } from 'react-quill';
+import ReactQuill from 'react-quill';
 
 export const useReactQuill = () => {
   const ref = useRef<ReactQuill>(null);

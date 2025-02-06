@@ -11,6 +11,7 @@ import { INF } from '@asset';
 import { PrimaryButton } from '@components/common/button';
 import CommonModal from '@components/common/comonModal';
 import { Center, Column, Row } from '@components/common/figure';
+import LoadingCommon from '@components/common/loadingCommon';
 import { CommentToEdit } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
@@ -234,6 +235,9 @@ export default function CommentModal({ newsId }: CommentModalProps) {
             }}
           />
         </SubmitWrapper>
+        <Loading $state={isRequesting}>
+          <LoadingCommon comment="" fontSize="3rem" iconSize={128} />
+        </Loading>
       </ContentWrapper>
     </CommonModal>
   );
@@ -250,6 +254,8 @@ const ContentWrapper = styled.div`
   border: 1px solid #ced4da;
   border-radius: 1rem;
   background-color: white;
+
+  overflow: hidden;
 
   position: absolute;
   top: 50%;
@@ -374,4 +380,20 @@ const OrderButton = styled(Center)`
 
 const SubmitWrapper = styled.div`
   padding: 0.5rem;
+`;
+
+interface LoadingProps {
+  $state: boolean;
+}
+
+const Loading = styled.div<LoadingProps>`
+  display: ${({ $state }) => ($state ? 'block' : 'none')};
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1100;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.2);
 `;

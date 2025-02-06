@@ -21,7 +21,12 @@ export default function LoadingCommon({
 }: LoadingCommonProps) {
   return (
     <Wrapper $isRow={isRow} fontSize={fontSize} fontColor={fontColor}>
-      <FontAwesomeIcon className="spinner" icon={faSpinner as IconProp} width={iconSize} />
+      <FontAwesomeIcon
+        className="spinner"
+        icon={faSpinner as IconProp}
+        width={iconSize}
+        height={iconSize}
+      />
     </Wrapper>
   );
 }

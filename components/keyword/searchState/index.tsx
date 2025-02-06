@@ -1,16 +1,9 @@
 import styled, { keyframes } from 'styled-components';
 
-import { AiOutlineLoading3Quarters } from 'react-icons/ai';
-
 export function SearchState({ searchErr, loading }: { searchErr: boolean; loading: boolean }) {
   return (
     <Indicator>
       <Indicate state={searchErr && !loading}>키워드 검색 에러. 다시 찾아봅시다</Indicate>
-      <Icon>
-        <Indicate state={loading}>
-          <AiOutlineLoading3Quarters />
-        </Indicate>
-      </Icon>
     </Indicator>
   );
 }

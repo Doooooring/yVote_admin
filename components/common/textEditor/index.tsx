@@ -1,25 +1,19 @@
-import styled, { CSSProperties } from 'styled-components';
 import dynamic from 'next/dynamic';
+import { ForwardedRef, forwardRef } from 'react';
+import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import React, { ForwardedRef, forwardRef } from 'react';
-import ReactQuill, { ReactQuillProps } from 'react-quill';
+import styled, { CSSProperties } from 'styled-components';
 
-interface ReactQuillCompProps extends ReactQuillProps {
-  forwardedRef: ForwardedRef<ReactQuill>;
-}
+import type { ComponentType } from 'react';
+import { ReactQuillCompProps } from './reactQuill';
 
-const ReactQuillComp = dynamic(
-  async () => {
-    const { default: RQ } = await import('react-quill');
+export type DynamicComponent<P> = ComponentType<P> & {
+  preload: () => Promise<void>;
+};
 
-    return ({ forwardedRef, ...props }: ReactQuillCompProps) => (
-      <RQ ref={forwardedRef} {...props} />
-    );
-  },
-  {
-    ssr: false,
-  },
-);
+export const ReactQuillComp = dynamic<ReactQuillCompProps>(() => import('./reactQuill'), {
+  ssr: false,
+}) as DynamicComponent<ReactQuillCompProps>;
 
 const toolbarOptions = [
   ['bold', 'italic', 'underline', 'strike'], // toggled buttons
@@ -36,12 +30,11 @@ const toolbarOptions = [
 interface TextEditorProps {
   style?: CSSProperties;
   onChange: (v: string) => void;
+  onMount?: (...args: unknown[]) => void;
 }
 
 const TextEditor = forwardRef(
-  ({ style, onChange }: TextEditorProps, ref: ForwardedRef<ReactQuill>) => {
-    if (!ref) return <></>;
-
+  ({ style, onChange, onMount }: TextEditorProps, ref: ForwardedRef<ReactQuill>) => {
     return (
       <Wrapper style={style}>
         <ReactQuillComp

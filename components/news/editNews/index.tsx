@@ -9,7 +9,8 @@ import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
 import useObject from '@utils/hook/useObject';
 import { useReactQuill } from '@utils/hook/useReactQuill';
-import { useEffect } from 'react';
+import { getStandardDateForm } from '@utils/tools';
+import { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
 import CommentInput from '../commentInput';
@@ -33,12 +34,23 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const keywordTitleList = useKeywordStore((state) => state.keywordTitleList);
 
   useEffect(() => {
-    initializeQuillContents(news.summary ?? '');
-  }, [newsOrg]);
+    if (ref.current) {
+      initializeQuillContents(newsOrg.summary);
+    }
+  }, [window, newsOrg]);
+
+  const submitNews = useCallback(async () => {
+    if (isLoading) return;
+    news.summary = content;
+    if (!news.date) news.date = new Date();
+
+    const { comments, ...rest } = news;
+    submit(rest);
+  }, [news, content, submit]);
 
   return (
     <>
-      <TextEditWrapper state={news !== null}>
+      <TextEditWrapper>
         <ContentEditWrapper>
           <InputWrapper className="pb-1 pt-1 mb-1">
             <InputTitle>제목{'  '}</InputTitle>
@@ -72,13 +84,42 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
             ></Input>
           </InputWrapper>
           <InputWrapper className="pb-1 pt-1 mb-1">
+            <InputTitle>날짜</InputTitle>
+            <Input
+              type="date"
+              min="1000-01-01"
+              max="9999-12-31"
+              className="form-control"
+              value={news.date ? getStandardDateForm(news.date!) : ''}
+              onChange={(e) => {
+                const nextValue = e.target.value;
+                const dateObj = new Date(nextValue);
+                const isValid = !isNaN(dateObj.valueOf());
+                if (!isValid) return;
+                setNewsVal('date', dateObj);
+              }}
+              onClick={(e) => {
+                if (e.currentTarget.showPicker) {
+                  e.currentTarget.showPicker();
+                }
+              }}
+            />
+          </InputWrapper>
+          <InputWrapper className="pb-1 pt-1 mb-1">
             <ImageUpload
               setImageUrl={(s: string | null) => {
                 setNewsVal('newsImage', s);
               }}
             />
           </InputWrapper>
-          <TextEditor ref={ref} style={{ height: '600px' }} onChange={handleContents} />
+          <TextEditor
+            ref={ref}
+            style={{ height: '600px' }}
+            onChange={handleContents}
+            onMount={() => {
+              initializeQuillContents(news.summary ?? '');
+            }}
+          />
           <StateToggleWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>최신 아티클</ToggleTitle>
@@ -186,9 +227,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
           <PrimaryButton
             title="SUBMIT"
             click={() => {
-              if (isLoading) return;
-              const { comments, ...rest } = news;
-              submit(rest);
+              submitNews();
             }}
           />
         </SubmitWrapper>
@@ -204,13 +243,9 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   );
 }
 
-interface TextEditWrapperProps {
-  state: boolean;
-}
-
-const TextEditWrapper = styled.div<TextEditWrapperProps>`
+const TextEditWrapper = styled.div`
   width: 100%;
-  display: ${({ state }) => (state ? 'flex' : 'none')};
+  display: flex;
 
   flex-direction: row;
 `;
