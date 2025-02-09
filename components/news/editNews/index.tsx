@@ -43,9 +43,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
     if (isLoading) return;
     news.summary = content;
     if (!news.date) news.date = new Date();
-
-    const { comments, ...rest } = news;
-    submit(rest);
+    submit(news);
   }, [news, content, submit]);
 
   return (
