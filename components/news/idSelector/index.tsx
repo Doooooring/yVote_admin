@@ -32,7 +32,8 @@ export default function IdSelector({
                   setNewsSelectorUp(false);
                 }}
               >
-                {news.title}
+                <p className="title">{news.title}</p>
+                <p className="subTitle">{news.subTitle}</p>
               </NewsLi>
             );
           })}
@@ -65,6 +66,7 @@ const SelectWrapper = styled.div`
   width: 50%;
   max-height: 400px;
   overflow: scroll;
+  background-color: white;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
   padding: 0.375rem 0.75rem;
@@ -87,4 +89,24 @@ const NewsLi = styled.li`
   }
   padding: 0.375rem 0.75rem;
   margin-bottom: 10px;
+
+  p {
+    display: block;
+    margin: 0;
+  }
+
+  .title {
+    font-size: 14px;
+    color: black;
+  }
+
+  .subTitle {
+    display: -webkit-box;
+    font-size: 12px;
+    color: rgb(100, 100, 100);
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;

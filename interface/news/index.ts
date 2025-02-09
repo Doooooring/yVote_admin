@@ -98,7 +98,7 @@ export interface NewsInView extends Omit<News, 'keywords' | 'comments' | ''> {
 export interface Preview
   extends Pick<News, 'id' | 'order' | 'newsImage' | 'title' | 'summary' | 'keywords' | 'state'> {}
 
-export interface NewsTitle extends Pick<News, 'id' | 'title'> {}
+export interface NewsTitle extends Pick<News, 'id' | 'title' | 'subTitle'> {}
 
 export interface NewsOrg
   extends Pick<
