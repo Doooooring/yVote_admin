@@ -33,9 +33,9 @@ class NewsRepositories {
     return response.data.result;
   }
 
-  async patchCommentsByNewsId(id: number, comments: CommentToEdit[]) {
+  async patchCommentsByNewsId(id: number, commentType: commentType, comments: CommentToEdit[]) {
     const response: { data: Response<boolean> } = await axios.patch(
-      `${HOST_URL}/news/edit/${id}/comments`,
+      `${HOST_URL}/news/edit/${id}/comments/${commentType}`,
       {
         comments: comments,
       },

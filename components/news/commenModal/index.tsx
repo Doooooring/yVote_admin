@@ -12,7 +12,7 @@ import { PrimaryButton } from '@components/common/button';
 import CommonModal from '@components/common/comonModal';
 import { Center, Column, Row } from '@components/common/figure';
 import LoadingCommon from '@components/common/loadingCommon';
-import { CommentToEdit } from '@interface/news';
+import { CommentToEdit, commentType } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useStateDepend } from '@utils/hook/useStateDepend';
@@ -51,21 +51,24 @@ export default function CommentModal({ newsId }: CommentModalProps) {
     return { order: -1, title: '', comment: '', commentType: commentSelected! };
   });
 
-  const saveComments = useCallback(async (id: number, comments: CommentToEdit[]) => {
-    if (isLoading) return;
+  const saveComments = useCallback(
+    async (id: number, commentType: commentType, comments: CommentToEdit[]) => {
+      if (isLoading) return;
 
-    setIsLoading(true);
-    try {
-      const response = await newsRepositories.patchCommentsByNewsId(id, comments);
-      alert('저장되었습니다.');
-      setCommentSelected(null);
-    } catch (e) {
-      console.log(e);
-      alert('뭔가 이상하네');
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+      setIsLoading(true);
+      try {
+        const response = await newsRepositories.patchCommentsByNewsId(id, commentType, comments);
+        alert('저장되었습니다.');
+        setCommentSelected(null);
+      } catch (e) {
+        console.log(e);
+        alert('뭔가 이상하네');
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
     initComments();
@@ -75,11 +78,11 @@ export default function CommentModal({ newsId }: CommentModalProps) {
     const result = window.confirm('저장 후 종료하겠어요?');
     try {
       if (result) {
-        await saveComments(newsId, commentsToEdit);
+        await saveComments(newsId, commentSelected!, commentsToEdit);
       }
       setCommentSelected(null);
     } catch (e) {}
-  }, [newsId, commentsToEdit, saveComments, setCommentSelected]);
+  }, [newsId, commentSelected, commentsToEdit, saveComments, setCommentSelected]);
 
   return (
     <CommonModal
@@ -231,7 +234,7 @@ export default function CommentModal({ newsId }: CommentModalProps) {
           <PrimaryButton
             title="SUBMIT"
             click={() => {
-              saveComments(newsId, commentsToEdit);
+              saveComments(newsId, commentSelected!, commentsToEdit);
             }}
           />
         </SubmitWrapper>
