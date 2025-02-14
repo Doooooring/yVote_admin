@@ -74,17 +74,6 @@ export default function CommentModal({ newsId }: CommentModalProps) {
     initComments();
   }, []);
 
-  const safeClose = useCallback(async () => {
-    const result = window.confirm('종료하시겠습니까?');
-    try {
-      if (result) {
-        await close();
-      }
-    } catch (e) {
-      console.log(e);
-    }
-  }, []);
-
   const close = useCallback(async () => {
     const result = window.confirm('저장 후 종료하겠어요?');
     try {
@@ -95,6 +84,16 @@ export default function CommentModal({ newsId }: CommentModalProps) {
     } catch (e) {}
   }, [newsId, commentSelected, commentsToEdit, saveComments, setCommentSelected]);
 
+  const safeClose = useCallback(async () => {
+    const result = window.confirm('종료하시겠습니까?');
+    try {
+      if (result) {
+        await close();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, [close]);
   return (
     <CommonModal
       state={commentSelected !== null}
