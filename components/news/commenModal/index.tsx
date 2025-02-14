@@ -74,6 +74,17 @@ export default function CommentModal({ newsId }: CommentModalProps) {
     initComments();
   }, []);
 
+  const safeClose = useCallback(async () => {
+    const result = window.confirm('종료하시겠습니까?');
+    try {
+      if (result) {
+        await close();
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }, []);
+
   const close = useCallback(async () => {
     const result = window.confirm('저장 후 종료하겠어요?');
     try {
@@ -88,7 +99,7 @@ export default function CommentModal({ newsId }: CommentModalProps) {
     <CommonModal
       state={commentSelected !== null}
       outClickAction={() => {
-        close();
+        safeClose();
       }}
     >
       <ContentWrapper>
