@@ -16,6 +16,17 @@ class AuthRepositories {
     }
   }
 
+  async getCookieInfo() {
+    try {
+      const response = await axios.get(`${HOST_URL}/auth/admin/cookie-info`, {
+        withCredentials: true,
+      });
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+
   async login(code: string) {
     try {
       const response = await axios.post(
