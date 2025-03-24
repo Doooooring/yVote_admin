@@ -1,5 +1,4 @@
 import { HOST_URL } from '@asset';
-import { Response } from '@interface/basic';
 import axios from 'axios';
 
 class AuthRepositories {
@@ -13,6 +12,19 @@ class AuthRepositories {
     } catch (e) {
       console.log(e);
       return false;
+    }
+  }
+
+  async getCookieInfo() {
+    try {
+      const response = await axios.get(`${HOST_URL}/auth/admin/cookir-info`, {
+        withCredentials: true,
+      });
+
+      return response.data.result;
+    } catch (e) {
+      console.log(e);
+      return null;
     }
   }
 

@@ -49,6 +49,7 @@ export interface CommentsArr {
 
 export interface Timeline {
   id: number;
+  order: number;
   date: Date;
   title: string;
 }
