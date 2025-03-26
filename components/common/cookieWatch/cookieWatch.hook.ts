@@ -1,9 +1,6 @@
-import { useQuery } from "@node_modules/@tanstack/react-query/build/legacy";
+import { useSuspenseQuery } from '@tanstack/react-query';
 
 export function useCookieInfo() {
-
-    const a = useQuery
-
   const { data } = useSuspenseQuery({
     queryKey: ['posts'],
     queryFn: async () => {
@@ -11,7 +8,4 @@ export function useCookieInfo() {
       return res.json();
     },
   });
-
-
-
 }
