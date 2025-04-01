@@ -4,20 +4,20 @@ import IsShow from '../isShow';
 
 interface TimeWatchProps {
   expiredAt: Date;
-  timeViewer: (timeLeft: Date) => ReactNode;
+  timeFormatter: (timeLeft: number) => ReactNode;
 }
 
-export default function TimeWatch({ expiredAt, timeViewer }: TimeWatchProps) {
-  const [curTimeLeft, setCurTimeLeft] = useState<Date | null>(null);
+export default function TimeWatch({ expiredAt, timeFormatter }: TimeWatchProps) {
+  const [curTimeLeft, setCurTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
     const updateCurTime = () => {
       const curTime = new Date();
       const diff: number = expiredAt.getTime() - curTime.getTime();
-      setCurTimeLeft(new Date(diff));
+      setCurTimeLeft(diff);
     };
 
-    const timeout: ReturnType<typeof setInterval> = setInterval(updateCurTime, 50);
+    const timeout: ReturnType<typeof setInterval> = setInterval(updateCurTime, 1000);
 
     return () => {
       clearInterval(timeout);
@@ -26,7 +26,7 @@ export default function TimeWatch({ expiredAt, timeViewer }: TimeWatchProps) {
 
   return (
     <Wrapper>
-      <IsShow state={curTimeLeft != null}>{timeViewer(curTimeLeft!)}</IsShow>
+      <IsShow state={curTimeLeft != null}>{timeFormatter(curTimeLeft!)}</IsShow>
     </Wrapper>
   );
 }

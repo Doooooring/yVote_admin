@@ -25,7 +25,10 @@ class AuthRepositories {
         },
       );
 
-      return response.data.result;
+      const data = response.data.result;
+      if (data) data.expiredAt = new Date(data.expiredAt);
+
+      return data;
     } catch (e) {
       console.log(e);
       return null;
