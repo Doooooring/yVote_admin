@@ -19,6 +19,15 @@ export const getDateDiff = (baseDate: Date, targetDate: Date) => {
   return dateDiff;
 };
 
+export const getDateDiffInMill = (date1: Date, date2: Date) => {
+  return date1.getTime() - date2.getTime();
+};
+
+export const getDateDiffInMillFromToday = (date: Date) => {
+  const today = new Date();
+  return getDateDiffInMill(today, date);
+};
+
 export const getStandardDateForm = (date: Date) => {
   const d = new Date(date);
   return d.toISOString().split('T')[0];
@@ -62,7 +71,7 @@ export const getKoreanTimeDifference = (baseDate: Date, targetDate: Date) => {
   return prefix + ' ' + subfix;
 };
 
-export const getTimeDiffBeforeToday = (date: Date) => {
+export const getKoreanTimeDiffBeforeToday = (date: Date) => {
   return getKoreanTimeDifference(new Date(), date);
 };
 
@@ -90,10 +99,10 @@ export const useKoreanDateFormat = (date: Date) => {
 export const milliSecondsToHHMMSS = (mil: number) => {
   const totalSeconds = Math.floor(mil / 1000);
   const second = totalSeconds % 60;
-  const totalMinutes = Math.floor((totalSeconds - second) / 60);
-  const minutes = totalMinutes % 60;
+  const totalMinute = Math.floor((totalSeconds - second) / 60);
+  const minute = totalMinute % 60;
 
-  const totalHours = Math.floor((totalMinutes - minutes) / 60);
+  const totalHours = Math.floor((totalMinute - minute) / 60);
 
   return { hour: totalHours, minute, second };
 };
