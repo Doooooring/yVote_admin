@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
+import { HeaderHeight } from '../../../styles/layout';
 
 interface NavBoxProps {
   link: string;
@@ -78,7 +79,7 @@ const Wrapper = styled.header`
   align-items: center;
   width: 100%;
   min-width: 800px;
-  height: 80px;
+  height: ${HeaderHeight}
   font-size: 15px;
   text-align: left;
   color: black;

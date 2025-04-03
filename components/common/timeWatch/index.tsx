@@ -13,6 +13,7 @@ export default function TimeWatch({ expiredAt, timeFormatter }: TimeWatchProps) 
   useEffect(() => {
     const updateCurTime = () => {
       const curTime = new Date();
+
       const diff: number = expiredAt.getTime() - curTime.getTime();
       setCurTimeLeft(diff);
     };

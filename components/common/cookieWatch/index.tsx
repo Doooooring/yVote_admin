@@ -5,7 +5,10 @@ import styled from 'styled-components';
 import { authRepositories } from '../../../repositories/auth';
 import TimeWatch from '../timeWatch';
 import { getDateDiffInMillFromToday, milliSecondsToHHMMSS } from '../../../utils/tools/date';
-import { TextButton } from '../button';
+import { CommonIconButton, TextButton } from '../button';
+import { HeaderHeight } from '../../../styles/layout';
+import ClockIcon from '../../../public/assets/img/clock-icon.svg';
+import Image from 'next/image';
 
 function CookieTimeWatch() {
   const { data, refetch } = useSuspenseQuery({
@@ -19,7 +22,7 @@ function CookieTimeWatch() {
 
   const { expiredAt } = data;
   const [token, setToken] = useState('');
-  const [isFetchingLogin, setIsFetchingLogin] = useState(false);
+  const [isFetchingLogin, setIsFetchingLogin] = useState<boolean>(false);
 
   const login = useCallback(
     async (token: string) => {
@@ -42,13 +45,12 @@ function CookieTimeWatch() {
     [refetch],
   );
 
-  return isFetchingLogin ? (
+  return !isFetchingLogin ? (
     <TimeWatch
       expiredAt={expiredAt}
       timeFormatter={(timeLeft: number) => {
         if (timeLeft > 0) {
           const { hour, minute } = milliSecondsToHHMMSS(timeLeft);
-
           return (
             <TimeWatchBody>{`로그인 만료까지 ${hour}시간${minute}분 남았습니다.`}</TimeWatchBody>
           );
@@ -85,18 +87,52 @@ function CookieTimeWatch() {
 }
 
 export default function CookieTimeWatchWrapper() {
+  const [isShowTimeWatch, setIsShowTimeWatch] = useState(false);
+
+  const toggleTimeWatch = () => {
+    setIsShowTimeWatch((prev) => !prev);
+  };
+
   return (
     <Wrapper>
-      <Suspense fallback={<div>정보를 받아오는 중입니다.</div>}>
-        <CookieTimeWatch />
-      </Suspense>
+      <CookieTimeWatchBody $state={isShowTimeWatch}>
+        {isShowTimeWatch ? (
+          <Suspense fallback={<div>정보를 받아오는 중입니다.</div>}>
+            <>
+              <CookieTimeWatch />
+              <CommonIconButton onClick={toggleTimeWatch}>
+                <Image src={ClockIcon} alt="clock" sizes={'24'} />
+              </CommonIconButton>
+            </>
+          </Suspense>
+        ) : (
+          <CommonIconButton onClick={toggleTimeWatch}>
+            <Image src={ClockIcon} alt="clock" sizes={'24'} />
+          </CommonIconButton>
+        )}
+      </CookieTimeWatchBody>
     </Wrapper>
   );
 }
 
 const Wrapper = styled(CommonLayoutBox)`
-  width: 300px;
-  height: 200px;
+  position: fixed;
+  top: calc(${HeaderHeight} + 10px);
+  right: 10px;
+`;
+
+interface TimeWatchBodyProps {
+  $state: boolean;
+}
+
+const CookieTimeWatchBody = styled.div<TimeWatchBodyProps>`
+  width: ${({ $state }) => ($state ? '300px' : '24px')};
+  height: ${({ $state }) => ($state ? '200px' : '24px')};
+  border-radius: ${({ $state }) => ($state ? '12px' : '24px')};
+
+  transition: all 0.5s ease-in-out;
+
+  background-color: white;
 `;
 
 const TimeWatchBody = styled.div``;
