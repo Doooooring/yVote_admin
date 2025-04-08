@@ -22,7 +22,7 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
     moveArrLeft: moveTimelineLeft,
     moveArrRight: moveTimelineRight,
   } = useArr(timeline, handleTimeline, () => {
-    return { title: '' };
+    return { title: '', order: 0 };
   });
   return (
     <ListEditView

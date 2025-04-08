@@ -1,6 +1,6 @@
 import { HOST_URL } from '@asset';
-import { Response } from '@interface/basic';
 import axios from 'axios';
+import { AuthPayload, Response } from '../../interface/basic';
 
 class AuthRepositories {
   async checkAuthSession() {
@@ -13,6 +13,25 @@ class AuthRepositories {
     } catch (e) {
       console.log(e);
       return false;
+    }
+  }
+
+  async getCookieInfo() {
+    try {
+      const response: { data: Response<AuthPayload> } = await axios.get(
+        `${HOST_URL}/auth/admin/cookie-info`,
+        {
+          withCredentials: true,
+        },
+      );
+
+      const data = response.data.result;
+      if (data) data.expiredAt = new Date(data.expiredAt);
+
+      return data;
+    } catch (e) {
+      console.log(e);
+      return null;
     }
   }
 
