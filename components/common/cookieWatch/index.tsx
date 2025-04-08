@@ -1,4 +1,4 @@
-import { CommonLayoutBox } from '@components/common/figure';
+import { Column, CommonLayoutBox } from '@components/common/figure';
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Suspense, useCallback, useState } from 'react';
 import styled from 'styled-components';
@@ -9,6 +9,7 @@ import { CommonIconButton, TextButton } from '../button';
 import { HeaderHeight } from '../../../styles/layout';
 import ClockIcon from '../../../public/assets/img/clock-icon.svg';
 import Image from 'next/image';
+import IsShow from '../isShow';
 
 function CookieTimeWatch() {
   const { data, refetch } = useSuspenseQuery({
@@ -50,9 +51,18 @@ function CookieTimeWatch() {
       expiredAt={expiredAt}
       timeFormatter={(timeLeft: number) => {
         if (timeLeft > 0) {
-          const { hour, minute } = milliSecondsToHHMMSS(timeLeft);
+          const { hour, minute, second } = milliSecondsToHHMMSS(timeLeft);
           return (
-            <TimeWatchBody>{`로그인 만료까지 ${hour}시간${minute}분 남았습니다.`}</TimeWatchBody>
+            <TimeWatchBody>
+              <p>로그인 만료까지</p>
+              <p
+                style={{
+                  color: 'red',
+                  fontSize: '20px',
+                }}
+              >{`${hour}시간${minute}분${second}초`}</p>
+              <p>남았습니다.</p>
+            </TimeWatchBody>
           );
         } else {
           return (
@@ -82,7 +92,7 @@ function CookieTimeWatch() {
       }}
     />
   ) : (
-    <div>권한을 받아오는 중입니다.</div>
+    <TimeWatchBody>권한을 받아오는 중입니다.</TimeWatchBody>
   );
 }
 
@@ -94,45 +104,55 @@ export default function CookieTimeWatchWrapper() {
   };
 
   return (
-    <Wrapper>
-      <CookieTimeWatchBody $state={isShowTimeWatch}>
-        {isShowTimeWatch ? (
-          <Suspense fallback={<div>정보를 받아오는 중입니다.</div>}>
-            <>
-              <CookieTimeWatch />
-              <CommonIconButton onClick={toggleTimeWatch}>
-                <Image src={ClockIcon} alt="clock" sizes={'24'} />
-              </CommonIconButton>
-            </>
-          </Suspense>
-        ) : (
-          <CommonIconButton onClick={toggleTimeWatch}>
-            <Image src={ClockIcon} alt="clock" sizes={'24'} />
-          </CommonIconButton>
-        )}
-      </CookieTimeWatchBody>
-    </Wrapper>
+    <CookieTimeWatchBody $state={isShowTimeWatch}>
+      <IsShow state={isShowTimeWatch}>
+        <Suspense fallback={<div>정보를 받아오는 중입니다.</div>}>
+          <CookieTimeWatch />
+        </Suspense>
+      </IsShow>
+      <IconButton onClick={toggleTimeWatch}>
+        <Image src={ClockIcon} alt="clock" sizes={'24'} />
+      </IconButton>
+    </CookieTimeWatchBody>
   );
 }
-
-const Wrapper = styled(CommonLayoutBox)`
-  position: fixed;
-  top: calc(${HeaderHeight} + 10px);
-  right: 10px;
-`;
 
 interface TimeWatchBodyProps {
   $state: boolean;
 }
 
-const CookieTimeWatchBody = styled.div<TimeWatchBodyProps>`
-  width: ${({ $state }) => ($state ? '300px' : '24px')};
-  height: ${({ $state }) => ($state ? '200px' : '24px')};
-  border-radius: ${({ $state }) => ($state ? '12px' : '24px')};
-
-  transition: all 0.5s ease-in-out;
+const CookieTimeWatchBody = styled(CommonLayoutBox)<TimeWatchBodyProps>`
+  position: fixed;
+  top: calc(${HeaderHeight});
+  right: 40px;
+  z-index: 9999999;
+  width: ${({ $state }) => ($state ? '300px' : '0')};
+  height: ${({ $state }) => ($state ? '200px' : '0')};
+  border-radius: ${({ $state }) => ($state ? '12px' : '48px')};
+  color: rgb(110, 110, 110);
+  transition: all 0.3s ease-in-out;
 
   background-color: white;
 `;
 
-const TimeWatchBody = styled.div``;
+const TimeWatchBody = styled(Column)`
+  height: 100%;
+  padding: 1rem;
+  justify-content: center;
+
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  p {
+    margin: 0;
+    margin-bottom: 6px;
+  }
+`;
+
+const IconButton = styled(CommonIconButton)`
+  position: absolute;
+  top: calc(100% + 24px);
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
