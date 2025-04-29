@@ -3,7 +3,7 @@ import { authRepositories } from '@repositories/auth';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
-import { useCallback, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 interface pageProps {
