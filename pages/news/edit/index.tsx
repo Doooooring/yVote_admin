@@ -166,44 +166,6 @@ const Wrapper = styled.div`
   padding-top: 100px;
 `;
 
-interface ContentWrapperProps {
-  state: boolean;
-}
-
-const TextEditWrapper = styled.div<ContentWrapperProps>`
-  width: 100%;
-  display: ${({ state }) => (state ? 'flex' : 'none')};
-
-  flex-direction: row;
-`;
-
-const ContentEditWrapper = styled.div`
-  width: 1300px;
-  display: flex;
-  flex-direction: column;
-  padding: 0 1rem;
-`;
-
-const NewsPreviewWrapper = styled.div`
-  width: 100%;
-
-  align-items: center;
-  padding: 0.5rem 1rem;
-  margin: 0 0.5rem;
-
-  background-color: #f1f2f3;
-`;
-
-const StateToggleWrapper = styled.div`
-  display: flex;
-  flex-direction: row;
-  padding: 0.5rem 0;
-`;
-
-const ContentWrapper = styled.div<ContentWrapperProps>`
-  display: ${({ state }) => (state ? 'block' : 'none')};
-  width: 100%;
-`;
 const InputWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -218,59 +180,4 @@ const InputTitle = styled.div`
   font-weight: bold;
   padding: 0 1rem;
   min-width: 80px;
-`;
-
-const ToggleTitle = styled.div`
-  flex: 0 1 1;
-  font-size: 14px;
-  font-weight: bold;
-  padding: 0 0.5rem;
-`;
-
-const OpinionTitle = styled.div`
-  flex: 1 0 auto;
-  width: 120px;
-  font-size: 18px;
-`;
-
-const OpinionLeft = styled(OpinionTitle)`
-  color: blue;
-`;
-const OpinionRight = styled(OpinionTitle)`
-  color: red;
-`;
-
-const Input = styled.input``;
-
-const OpinionWrapper = styled.div``;
-
-const InputBody = styled.div`
-  gap: 20px;
-`;
-
-const KeywordSetter = styled.div`
-  padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 5px;
-  padding-right: 5px;
-`;
-
-const KeywordWrapper = styled.ul`
-  padding: 0.375rem 0.75rem;
-  list-style-type: none;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-
-  margin-top: 10px;
-`;
-const KeywordLi = styled.li`
-  padding: 0.375rem 0.75rem;
-  border: 1px solid #ced4da;
-  border-radius: 0.25rem;
-
-  margin-bottom: 5px;
-`;
-
-const SubmitWrapper = styled.div`
-  padding: 0.5rem;
 `;

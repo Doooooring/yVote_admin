@@ -68,6 +68,13 @@ export interface Article {
   newsId: number;
 }
 
+export interface NewsSummary {
+  id: number | null;
+  summary: string;
+  commentType: commentType;
+  newsId: number;
+}
+
 export interface News {
   id: number;
   order: number;
@@ -75,6 +82,7 @@ export interface News {
   subTitle: string;
   slug: string;
   summary: string;
+  summaries: Array<NewsSummary>;
   date: Date | null;
   keywords: Array<Keyword>;
   newsImage: string | null;
@@ -91,7 +99,7 @@ export interface News {
   };
 }
 
-export interface NewsInView extends Omit<News, 'keywords' | 'comments' | ''> {
+export interface NewsInView extends Omit<News, 'keywords' | 'comments'> {
   keywords: Array<{ id: number; keyword: string }>;
   comments: Array<commentType>;
 }
@@ -108,6 +116,7 @@ export interface NewsOrg
     | 'subTitle'
     | 'slug'
     | 'summary'
+    | 'summaries'
     | 'date'
     | 'state'
     | 'newsImage'
@@ -139,6 +148,7 @@ export const defaultNews = {
   subTitle: '',
   slug: '',
   summary: '',
+  summaries: [],
   date: null,
   state: true,
   newsImage: '',

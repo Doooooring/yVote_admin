@@ -6,14 +6,13 @@ import { commentType } from '@interface/news';
 import { useNewsStore } from '@store/news';
 import { complexClone } from '@utils';
 import { useArr } from '@utils/hook/useArr';
+import { getCommentRest } from '@utils/news';
 import styled from 'styled-components';
 
 interface CommentInputProps {
   comments: commentType[];
   setComments: (v: commentType[]) => void;
 }
-
-const commentTypeKey = Object.keys(commentType) as Array<commentType>;
 
 // const getCommentRest = (comments: CommentsArr[]) => {
 //   const curComments = comments;
@@ -28,12 +27,6 @@ const commentTypeKey = Object.keys(commentType) as Array<commentType>;
 //   });
 //   return restComment;
 // };
-
-const getCommentRest = (comments: commentType[]) => {
-  return commentTypeKey.filter((type) => {
-    return !comments.includes(type);
-  });
-};
 
 export default function CommentInput({ comments, setComments }: CommentInputProps) {
   const {
