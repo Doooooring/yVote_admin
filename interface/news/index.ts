@@ -69,7 +69,7 @@ export interface Article {
 }
 
 export interface NewsSummary {
-  id: number | null;
+  id?: number | null;
   summary: string;
   commentType: commentType;
   newsId: number;
@@ -148,7 +148,7 @@ export const defaultNews = {
   subTitle: '',
   slug: '',
   summary: '',
-  summaries: [],
+  summaries: [] as Array<NewsSummary>,
   date: null,
   state: true,
   newsImage: '',

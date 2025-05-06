@@ -1,7 +1,7 @@
 import { ReactNode, useMemo } from 'react';
-import { SelectCompProps } from '../interface';
 import styled from 'styled-components';
 import { Row } from '../../figure';
+import { SelectCompProps } from '../interface';
 
 interface Select_SlideProps<T> extends SelectCompProps<T> {
   direction: 'row' | 'column';
@@ -17,7 +17,7 @@ export default function Select_Slide<T>({
 }: Select_SlideProps<T>) {
   const boxSize = useMemo(() => {
     const splited = `calc(100% / ${menus.length})`;
-    if (direction === 'row') {
+    if (direction === 'column') {
       return {
         width: '100%',
         height: splited,
@@ -60,7 +60,7 @@ export default function Select_Slide<T>({
                 setSelected(i);
               }}
             >
-              {menuToView(menu)}
+              {menuToView(menu, selected === i)}
             </Menu>
           );
         })}
@@ -78,7 +78,7 @@ const Wrapper = styled.div`
   padding: 0.2rem;
   position: relative;
   border-radius: 0.5rem;
-  background-color: ${({ theme }) => theme.colors.gray100};
+  background-color: rgb(235, 235, 235);
   overflow: hidden;
 `;
 
@@ -98,7 +98,7 @@ const Menu = styled(Row)<{ selected: boolean }>`
   width: 100%;
   height: 100%;
   border-radius: 0.5rem;
-  color: ${({ selected, theme }) => (selected ? theme.colors.black : theme.colors.gray500)};
+  color: ${({ selected, theme }) => (selected ? theme.colors.primary : 'black')};
   font-weight: bold;
   font-size: 14px;
   text-align: center;
@@ -116,6 +116,6 @@ const SelectedWrapper = styled.div`
 const Selected = styled.div`
   width: 100%;
   height: 100%;
-  backgroud-color: ${({ theme }) => theme.colors.white};
+  background-color: ${({ theme }) => 'white'};
   border-radius: 0.5rem;
 `;

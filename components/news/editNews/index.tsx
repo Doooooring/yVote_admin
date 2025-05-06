@@ -1,19 +1,21 @@
 import { PrimaryButton } from '@components/common/button';
 import ImageUpload from '@components/common/imageUpload';
-import TextEditor from '@components/common/textEditor';
+import IsShow from '@components/common/isShow';
 import ToggleButton from '@components/common/toggleButton';
 import { KeywordTitle } from '@interface/keywords';
-import { commentType, NewsToEdit, NewsToPatch, TimelineToEdit } from '@interface/news';
+import { commentType, NewsSummary, NewsToEdit, NewsToPatch, TimelineToEdit } from '@interface/news';
 import { useCommonStore } from '@store/common';
-import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
+import { useArr } from '@utils/hook/useArr';
 import useObject from '@utils/hook/useObject';
-import { useReactQuill } from '@utils/hook/useReactQuill';
+import { getCommentRest } from '@utils/news';
 import { getStandardDateForm } from '@utils/tools';
 import { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
 import CommentInput from '../commentInput';
+import EditNewsSummaries from '../editNewsSummaries/editNewsSummaries';
+import EditSummariesToolbar from '../editSummariesToolbar';
 import KeywordSelect from '../keywordSelect';
 import NewsContentPreview from '../newsContentPreview';
 import TimelineInput from '../timelineInput';
@@ -24,27 +26,62 @@ interface EditNewsProps {
 }
 
 export default function EditNews({ newsOrg, submit }: EditNewsProps) {
-  const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
   const [news, setNewsVal] = useObject<NewsToEdit>(newsOrg);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsSelectorModalUp = useCommonStore((state) => state.setIsSelectorModalUp);
 
   const [commentSelected] = useNewsStore((state) => [state.commentSelected]);
-  const keywordTitleList = useKeywordStore((state) => state.keywordTitleList);
+
+  const {
+    curFocus: summarySelected,
+    setCurFocus: setSummarySelected,
+    addArr: addSummary,
+    deleteArr: deleteSummary,
+    moveArrLeft: moveSummaryLeft,
+    moveArrRight: moveSummaryRight,
+  } = useArr(
+    news.summaries,
+    (summaries: Array<NewsSummary>) => {
+      setNewsVal('summaries', summaries);
+    },
+    () => {
+      let restType = getCommentRest(news.summaries.map((summary) => summary.commentType))[0];
+      if (!restType) return null;
+
+      if (
+        news.summaries.filter((summary) => {
+          return summary.commentType == commentType.와이보트;
+        }).length == 0
+      )
+        restType = commentType.와이보트;
+
+      return {
+        commentType: restType,
+        summary: '',
+        newsId: news.id,
+      };
+    },
+    news.summaries.length > 0 ? 0 : null,
+  );
 
   useEffect(() => {
-    if (ref.current) {
-      initializeQuillContents(newsOrg.summary);
+    if (news.summaries.length == 0) {
+      addSummary(0);
+      setSummarySelected(0);
     }
-  }, [window, newsOrg]);
+  }, [news.summaries, addSummary, setSummarySelected]);
 
   const submitNews = useCallback(async () => {
     if (isLoading) return;
-    news.summary = content;
     if (!news.date) news.date = new Date();
+    console.log(news);
     submit(news);
-  }, [news, content, submit]);
+    return;
+  }, [news, submit]);
+
+  console.log('summary selected : ');
+  console.log(summarySelected);
 
   return (
     <>
@@ -110,12 +147,20 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               }}
             />
           </InputWrapper>
-          <TextEditor
-            ref={ref}
-            style={{ height: '600px' }}
-            onChange={handleContents}
-            onMount={() => {
-              initializeQuillContents(news.summary ?? '');
+          <EditSummariesToolbar
+            summaries={news.summaries}
+            addSummary={addSummary}
+            deleteSummary={deleteSummary}
+            moveSummaryLeft={moveSummaryLeft}
+            moveSummaryRight={moveSummaryRight}
+            summarySelected={summarySelected}
+            setSummarySelected={setSummarySelected}
+          />
+          <EditNewsSummaries
+            summarySelected={summarySelected}
+            summaries={news.summaries}
+            setSummaries={(summaries: Array<NewsSummary>) => {
+              setNewsVal('summaries', summaries);
             }}
           />
           <StateToggleWrapper>
@@ -175,12 +220,18 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
           </KeywordSetter>
         </ContentEditWrapper>
         <NewsPreviewWrapper>
-          <NewsContentPreview
-            title={news.title}
-            content={content}
-            state={news.state}
-            keywords={(news.keywords ?? []).map((k) => k.keyword)}
-          />
+          {summarySelected != null ? (
+            <IsShow state={summarySelected !== null}>
+              <NewsContentPreview
+                title={news.title}
+                content={news.summaries[summarySelected!].summary}
+                state={news.state}
+                keywords={(news.keywords ?? []).map((k) => k.keyword)}
+              />
+            </IsShow>
+          ) : (
+            <></>
+          )}
         </NewsPreviewWrapper>
       </TextEditWrapper>
       <ContentWrapper className="mb-5" state={news.id !== null}>
@@ -255,16 +306,6 @@ const ContentEditWrapper = styled.div`
   padding: 0 1rem;
 `;
 
-const NewsPreviewWrapper = styled.div`
-  width: 100%;
-
-  align-items: center;
-  padding: 0.5rem 1rem;
-  margin: 0 0.5rem;
-
-  background-color: #f1f2f3;
-`;
-
 const StateToggleWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -278,6 +319,16 @@ interface ContentWrapperProps {
 const ContentWrapper = styled.div<ContentWrapperProps>`
   display: ${({ state }) => (state ? 'block' : 'none')};
   width: 100%;
+`;
+
+const NewsPreviewWrapper = styled.div`
+  width: 100%;
+
+  align-items: center;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+
+  background-color: #f1f2f3;
 `;
 const InputWrapper = styled.div`
   display: flex;

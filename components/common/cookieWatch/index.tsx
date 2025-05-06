@@ -1,15 +1,15 @@
 import { Column, CommonLayoutBox } from '@components/common/figure';
 import { useSuspenseQuery } from '@tanstack/react-query';
+import Image from 'next/image';
 import { Suspense, useCallback, useState } from 'react';
 import styled from 'styled-components';
-import { authRepositories } from '../../../repositories/auth';
-import TimeWatch from '../timeWatch';
-import { getDateDiffInMillFromToday, milliSecondsToHHMMSS } from '../../../utils/tools/date';
-import { CommonIconButton, TextButton } from '../button';
-import { HeaderHeight } from '../../../styles/layout';
 import ClockIcon from '../../../public/assets/img/clock-icon.svg';
-import Image from 'next/image';
+import { authRepositories } from '../../../repositories/auth';
+import { HeaderHeight } from '../../../styles/layout';
+import { milliSecondsToHHMMSS } from '../../../utils/tools/date';
+import { CommonIconButton, TextButton } from '../button';
 import IsShow from '../isShow';
+import TimeWatch from '../timeWatch';
 
 function CookieTimeWatch() {
   const { data, refetch } = useSuspenseQuery({
@@ -92,7 +92,7 @@ function CookieTimeWatch() {
       }}
     />
   ) : (
-    <TimeWatchBody>권한을 받아오는 중입니다.</TimeWatchBody>
+    <TimeWatchBody>로그인 중 ...</TimeWatchBody>
   );
 }
 

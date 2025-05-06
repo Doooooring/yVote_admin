@@ -1,12 +1,18 @@
 import { changeItemsOrder, complexClone } from '@utils';
 import { useState } from 'react';
 
-export const useArr = <T,>(arr: T[], setArr: (arr: T[]) => void, getInitialValue: () => T) => {
-  const [curFocus, setCurFocus] = useState<number | null>(null);
+export const useArr = <T,>(
+  arr: T[],
+  setArr: (arr: T[]) => void,
+  getInitialValue: () => T | null,
+  defaultSelected: number | null = null,
+) => {
+  const [curFocus, setCurFocus] = useState<number | null>(defaultSelected);
 
   const addArr = (idx: number) => {
     const curArr = complexClone(arr);
     const newData = getInitialValue();
+    if (!newData) return;
     curArr.splice(idx + 1, 0, newData);
     setArr(curArr);
   };
@@ -15,7 +21,7 @@ export const useArr = <T,>(arr: T[], setArr: (arr: T[]) => void, getInitialValue
     const curArr = complexClone(arr);
     curArr.splice(idx, 1);
     setArr(curArr);
-    setCurFocus(null);
+    setCurFocus(defaultSelected);
   };
 
   const moveArrLeft = (idx: number) => {

@@ -1,8 +1,8 @@
 import TextEditor from '@components/common/textEditor';
 import { NewsSummary } from '@interface/news';
-import { useCallback, useEffect, useRef } from '@node_modules/@types/react';
 import { useReactQuill } from '@utils/hook/useReactQuill';
-import { throttle } from '@utils/tools';
+import { debounce } from '@utils/tools';
+import { useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 interface EditNewsSummaryProps {
@@ -17,7 +17,7 @@ export default function EditNewsSummary({
   const isMount = useRef<boolean>(false);
   const { ref, content, handleContents, initializeQuillContents, resetContents } = useReactQuill();
 
-  const throttleSave = useCallback(throttle(_saveSummary, 1000), [_saveSummary]);
+  const throttleSave = useCallback(debounce(_saveSummary, 500), [_saveSummary]);
 
   const updateSummary = useCallback(
     (text: string) => {
