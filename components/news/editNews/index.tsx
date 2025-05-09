@@ -1,4 +1,5 @@
 import { PrimaryButton } from '@components/common/button';
+import { Blank } from '@components/common/figure';
 import ImageUpload from '@components/common/imageUpload';
 import IsShow from '@components/common/isShow';
 import ToggleButton from '@components/common/toggleButton';
@@ -80,9 +81,6 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
     return;
   }, [news, submit]);
 
-  console.log('summary selected : ');
-  console.log(summarySelected);
-
   return (
     <>
       <TextEditWrapper>
@@ -149,6 +147,9 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
           </InputWrapper>
           <EditSummariesToolbar
             summaries={news.summaries}
+            setSummaries={(summaries: Array<NewsSummary>) => {
+              setNewsVal('summaries', summaries);
+            }}
             addSummary={addSummary}
             deleteSummary={deleteSummary}
             moveSummaryLeft={moveSummaryLeft}
@@ -156,6 +157,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
             summarySelected={summarySelected}
             setSummarySelected={setSummarySelected}
           />
+          <Blank size={8} />
           <EditNewsSummaries
             summarySelected={summarySelected}
             summaries={news.summaries}
@@ -163,12 +165,13 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               setNewsVal('summaries', summaries);
             }}
           />
+
           <StateToggleWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
-              <ToggleTitle>최신 아티클</ToggleTitle>
+              <ToggleTitle>뉴스 상태</ToggleTitle>
               <ToggleButton
                 state={news.state ?? false}
-                setState={(state: boolean) => {
+                setState={(state: NewsSTate) => {
                   setNewsVal('state', state);
                 }}
                 style={{

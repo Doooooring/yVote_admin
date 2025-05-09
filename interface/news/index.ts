@@ -59,6 +59,12 @@ export interface TimelineToEdit extends Omit<Timeline, 'id' | 'date'> {
   date?: Date;
 }
 
+export enum NewsState {
+  Published = '0',
+  Pending = '1',
+  NotPublished = '2',
+}
+
 export interface Article {
   id: number;
   commentType: commentType;
@@ -87,7 +93,7 @@ export interface News {
   keywords: Array<Keyword>;
   newsImage: string | null;
   isPublished: boolean;
-  state: boolean;
+  state: NewsState;
   timeline: Array<Timeline>;
   opinionLeft: string;
   opinionRight: string;
@@ -150,7 +156,7 @@ export const defaultNews = {
   summary: '',
   summaries: [] as Array<NewsSummary>,
   date: null,
-  state: true,
+  state: NewsState.NotPublished,
   newsImage: '',
   isPublished: false,
   timeline: [] as TimelineToEdit[],

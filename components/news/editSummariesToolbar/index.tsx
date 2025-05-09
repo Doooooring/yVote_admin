@@ -6,12 +6,13 @@ import Select_Slide from '@components/common/select/select_slide/select_slide';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { commentType, NewsSummary } from '@interface/news';
-import { commentTypeColor } from '@utils/news';
+import { commentTypeColor, getCommentRest } from '@utils/news';
 import { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 interface EditSummariesToolbarProps {
   summaries: Array<NewsSummary>;
+  setSummaries: (summaries: Array<NewsSummary>) => void;
   summarySelected: number | null;
   setSummarySelected: (selected: number | null) => void;
   addSummary: (idx: number) => void;
@@ -22,6 +23,7 @@ interface EditSummariesToolbarProps {
 
 export default function EditSummariesToolbar({
   summaries,
+  setSummaries,
   summarySelected,
   setSummarySelected,
   addSummary,
@@ -43,16 +45,27 @@ export default function EditSummariesToolbar({
     }
   }, [summarySelected, deleteSummary]);
 
+  const onChangeCommentType = useCallback(
+    (commentType: commentType) => {
+      if (!summarySelected) return;
+      const ne = [...summaries];
+      const summary = summaries[summarySelected];
+      summary.commentType = commentType;
+      setSummaries(ne);
+    },
+    [summaries, summarySelected, setSummaries],
+  );
+
+  const commentRest = useCallback(() => {
+    return getCommentRest(summaries.map((summary) => summary.commentType));
+  }, [summaries]);
+
   return (
     <ButtonWrapper>
       <SlideWrapper>
         <PopUpButtonLayout>
           <PopUpButton
             onClick={(e) => {
-              console.log('is here');
-              console.log(e.currentTarget);
-              console.log(e.target);
-
               setIsMenuOpen(!isMenuOpen);
             }}
           >
@@ -78,6 +91,22 @@ export default function EditSummariesToolbar({
                   <FontAwesomeIcon icon={faChevronRight} width="12px" />
                 </OrderButton>
               </UpdowButtonWrapper>
+              <SelectWrapper>
+                <CommentSelect
+                  className="form-select"
+                  value={summaries[summarySelected!].commentType}
+                >
+                  {[summaries[summarySelected!].commentType, ...commentRest()].map(
+                    (comment, idx) => {
+                      return (
+                        <option key={comment + JSON.stringify(idx)} value={comment}>
+                          {comment}
+                        </option>
+                      );
+                    },
+                  )}
+                </CommentSelect>
+              </SelectWrapper>
             </OptionWrapper>
           </IsShow>
         </PopUpButtonLayout>
@@ -186,4 +215,10 @@ const Button = styled.button`
   width: 55px;
   height: 35px;
   font-size: 12px;
+`;
+
+const SelectWrapper = styled.div``;
+
+const CommentSelect = styled.select`
+  width: 200px;
 `;

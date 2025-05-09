@@ -1,4 +1,4 @@
-import styled, { keyframes } from 'styled-components';
+import styled from 'styled-components';
 
 export const Row = styled.div`
   display: flex;
@@ -23,3 +23,7 @@ export const CommonLayoutBox = styled.div`
   border-radius: 10px;
   box-shadow: 0 0 35px -30px;
 `;
+
+export const Blank = ({ size }: { size: number }) => {
+  return <div style={{ height: `${size}px` }}></div>;
+};

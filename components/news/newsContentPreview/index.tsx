@@ -1,13 +1,11 @@
-import { htmlFromString } from '@utils/tools';
+import { NewsState } from '@interface/news';
 import styled from 'styled-components';
-import icoNew from '@images/ico_new_2x.png';
-import Image from 'next/image';
 
 interface NewsContentPreviewProps {
   title: string;
   content: string;
   keywords: string[];
-  state: boolean;
+  state: NewsState;
 }
 
 export default function NewsContentPreview({
@@ -26,7 +24,6 @@ export default function NewsContentPreview({
             </div>
             <h2 className="head">
               <span>{title}</span>
-              {state ? <Image src={icoNew} alt="new" height="16" /> : <div></div>}
             </h2>
             <div dangerouslySetInnerHTML={{ __html: content }}></div>
           </div>
