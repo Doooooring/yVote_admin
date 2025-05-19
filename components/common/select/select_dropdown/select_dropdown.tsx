@@ -1,7 +1,8 @@
+import IsShow from '@components/common/isShow';
 import { ReactNode, useCallback, useState } from 'react';
-import { SelectCompProps } from '../interface';
 import styled from 'styled-components';
-import { CommonLayoutBox, Row } from '../../figure';
+import { CommonLayoutBox } from '../../figure';
+import { SelectCompProps } from '../interface';
 
 interface SelectDropDownProps<T> extends SelectCompProps<T> {
   menus: Array<T>;
@@ -33,7 +34,30 @@ export default function Select_DropDown<T>({
     },
     [selected, setSelected, setIsFocused],
   );
-  return;
+  return (
+    <Wrapper>
+      <Selected onClick={clickDropBox}>
+        {selected ? selectedToView(menus[selected]) : fallback}
+      </Selected>
+      <IsShow state={isFocused}>
+        <MenusWrapper>
+          <Menus>
+            {menus.map((menu, i) => {
+              return (
+                <MenuWrapper key={i} onClick={() => selectMenu(i)}>
+                  <Menu selected={selected === i}>
+                    {menuToView(menu, selected === i)}
+                  </Menu>
+                  
+                </MenuWrapper>
+              );
+            })}
+          </Menus>
+        </MenusWrapper>
+      </IsShow>
+      {fallback}
+    </Wrapper>
+  );
 }
 
 const Wrapper = styled.div`

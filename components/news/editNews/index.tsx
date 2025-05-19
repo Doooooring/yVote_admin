@@ -2,9 +2,17 @@ import { PrimaryButton } from '@components/common/button';
 import { Blank } from '@components/common/figure';
 import ImageUpload from '@components/common/imageUpload';
 import IsShow from '@components/common/isShow';
-import ToggleButton from '@components/common/toggleButton';
+import Select_DropDown from '@components/common/select/select_dropdown/select_dropdown';
 import { KeywordTitle } from '@interface/keywords';
-import { commentType, NewsSummary, NewsToEdit, NewsToPatch, TimelineToEdit } from '@interface/news';
+import {
+  commentType,
+  NewsState,
+  NewsStateKor,
+  NewsSummary,
+  NewsToEdit,
+  NewsToPatch,
+  TimelineToEdit,
+} from '@interface/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
 import { useArr } from '@utils/hook/useArr';
@@ -26,11 +34,14 @@ interface EditNewsProps {
   submit: (news: NewsToPatch) => void;
 }
 
+const NewsStates = Object.values(NewsState);
+
 export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const [news, setNewsVal] = useObject<NewsToEdit>(newsOrg);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsSelectorModalUp = useCommonStore((state) => state.setIsSelectorModalUp);
+  const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
 
   const [commentSelected] = useNewsStore((state) => [state.commentSelected]);
 
@@ -165,29 +176,33 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               setNewsVal('summaries', summaries);
             }}
           />
-
           <StateToggleWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>뉴스 상태</ToggleTitle>
-              <ToggleButton
-                state={news.state ?? false}
-                setState={(state: NewsSTate) => {
-                  setNewsVal('state', state);
+              <Select_DropDown
+                selected={NewsStates.indexOf(news.state)}
+                setSelected={(i: number) => {
+                  setNewsVal('state', NewsStates[i]);
                 }}
-                style={{
-                  width: '50px',
-                  height: '25px',
-                  backgroundColor: '#77C998',
-                  padding: '0.3rem',
+                menus={NewsStates}
+                selectedToView={(state: NewsState) => {
+                  return <div>{NewsStateKor(state)}</div>;
                 }}
-                circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
-                activeColor="#4F69E7"
-                unactiveColor="#A8A8A8"
-                activeCircleColor="#EDF0F1"
-                unactiveCircleColor="#EDF0F1"
+                menuToView={(state: NewsState, selected?: boolean) => {
+                  return <>{NewsStateKor(state)}</>;
+                }}
               />
             </InputWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
+              <PrimaryButton
+                title={'평론 편집'}
+                click={() => {
+                  if (summarySelected == null) return;
+                  setCommentSelected(news.summaries[summarySelected!].commentType);
+                }}
+              />
+            </InputWrapper>
+            {/* <InputWrapper className="pb-1 pt-1 mb-1">
               <ToggleTitle>퍼블리시 상태</ToggleTitle>
               <ToggleButton
                 state={news.isPublished ?? false}
@@ -206,7 +221,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                 activeCircleColor="#EDF0F1"
                 unactiveCircleColor="#EDF0F1"
               />
-            </InputWrapper>
+            </InputWrapper> */}
           </StateToggleWrapper>
           <KeywordSetter>
             <PrimaryButton

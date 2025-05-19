@@ -65,6 +65,17 @@ export enum NewsState {
   NotPublished = '2',
 }
 
+export const NewsStateKor = (state: NewsState) => {
+  switch (state) {
+    case NewsState.Published:
+      return '발행 완료';
+    case NewsState.Pending:
+      return '발행 대기';
+    case NewsState.NotPublished:
+      return '발행 전';
+  }
+};
+
 export interface Article {
   id: number;
   commentType: commentType;
