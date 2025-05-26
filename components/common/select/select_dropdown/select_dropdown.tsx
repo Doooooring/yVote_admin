@@ -37,7 +37,7 @@ export default function Select_DropDown<T>({
   return (
     <Wrapper>
       <Selected onClick={clickDropBox}>
-        {selected ? selectedToView(menus[selected]) : fallback}
+        {selected !== null ? selectedToView(menus[selected]) : fallback}
       </Selected>
       <IsShow state={isFocused}>
         <MenusWrapper>
@@ -45,10 +45,7 @@ export default function Select_DropDown<T>({
             {menus.map((menu, i) => {
               return (
                 <MenuWrapper key={i} onClick={() => selectMenu(i)}>
-                  <Menu selected={selected === i}>
-                    {menuToView(menu, selected === i)}
-                  </Menu>
-                  
+                  <Menu selected={selected === i}>{menuToView(menu, selected === i)}</Menu>
                 </MenuWrapper>
               );
             })}
@@ -73,8 +70,9 @@ const Selected = styled(CommonLayoutBox)`
   color: ${({ theme }) => theme.colors.gray900};
   font-size: 14px;
   font-weight: 700;
+  padding: 0.5rem;
   transition: border-color 0.4s ease;
-  overlofw: hidden;
+  overflow: hidden;
   cursor: pointer;
 `;
 

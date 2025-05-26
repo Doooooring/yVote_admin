@@ -22,7 +22,6 @@ import { getStandardDateForm } from '@utils/tools';
 import { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
-import CommentInput from '../commentInput';
 import EditNewsSummaries from '../editNewsSummaries/editNewsSummaries';
 import EditSummariesToolbar from '../editSummariesToolbar';
 import KeywordSelect from '../keywordSelect';
@@ -87,7 +86,6 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const submitNews = useCallback(async () => {
     if (isLoading) return;
     if (!news.date) news.date = new Date();
-    console.log(news);
     submit(news);
     return;
   }, [news, submit]);
@@ -157,6 +155,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
             />
           </InputWrapper>
           <EditSummariesToolbar
+            newsId={news.id}
             summaries={news.summaries}
             setSummaries={(summaries: Array<NewsSummary>) => {
               setNewsVal('summaries', summaries);
@@ -202,26 +201,6 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                 }}
               />
             </InputWrapper>
-            {/* <InputWrapper className="pb-1 pt-1 mb-1">
-              <ToggleTitle>퍼블리시 상태</ToggleTitle>
-              <ToggleButton
-                state={news.isPublished ?? false}
-                setState={(state: boolean) => {
-                  setNewsVal('isPublished', state);
-                }}
-                style={{
-                  width: '50px',
-                  height: '25px',
-                  backgroundColor: '#77C998',
-                  padding: '0.3rem',
-                }}
-                circleStyle={{ width: '13px', height: '13px', backgroundColor: '#EDF0F1' }}
-                activeColor="#4F69E7"
-                unactiveColor="#A8A8A8"
-                activeCircleColor="#EDF0F1"
-                unactiveCircleColor="#EDF0F1"
-              />
-            </InputWrapper> */}
           </StateToggleWrapper>
           <KeywordSetter>
             <PrimaryButton
@@ -257,12 +236,6 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
           timeline={news.timeline}
           handleTimeline={(timeline: TimelineToEdit[]) => {
             setNewsVal('timeline', timeline);
-          }}
-        />
-        <CommentInput
-          comments={news.comments}
-          setComments={(comments: commentType[]) => {
-            setNewsVal('comments', comments);
           }}
         />
         <OpinionWrapper className="d-flex flex-row  align-items-center mb-3 mt-3">
@@ -327,6 +300,7 @@ const ContentEditWrapper = styled.div`
 const StateToggleWrapper = styled.div`
   display: flex;
   flex-direction: row;
+  gap: 10px;
   padding: 0.5rem 0;
 `;
 
@@ -365,7 +339,7 @@ const InputTitle = styled.div`
 `;
 
 const ToggleTitle = styled.div`
-  flex: 0 1 1;
+  flex: 0 0 auto;
   font-size: 14px;
   font-weight: bold;
   padding: 0 0.5rem;

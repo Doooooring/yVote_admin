@@ -46,6 +46,33 @@ class NewsRepositories {
     return response.data.success;
   }
 
+  async saveNewComment(id: number, commentType: commentType) {
+    const response: { data: Response<boolean> } = await axios.post(
+      `${HOST_URL}/news/edit/${id}/comment_type`,
+      {
+        commentType: commentType,
+      },
+      {
+        withCredentials: true,
+      },
+    );
+    return response.data.result;
+  }
+
+  async changeCommentType(id: number, prev: commentType, next: commentType) {
+    const response: { data: Response<boolean> } = await axios.patch(
+      `${HOST_URL}/news/edit/${id}/comment_type`,
+      {
+        prev,
+        next,
+      },
+      {
+        withCredentials: true,
+      },
+    );
+    return response.data.success;
+  }
+
   async postNews(news: NewsToPost) {
     const response: { data: Response<number> } = await axios.post(
       `${HOST_URL}/news/edit`,

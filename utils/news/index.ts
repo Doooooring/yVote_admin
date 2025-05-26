@@ -36,10 +36,10 @@ export const convertCommentArrToPatch = (comments: Array<CommentsArr>) => {
   return result;
 };
 
-export const commentTypeKey = Object.keys(commentType) as Array<commentType>;
+export const commentTypes = Object.values(commentType) as Array<commentType>;
 
 export const getCommentRest = (comments: commentType[]) => {
-  return commentTypeKey.filter((type) => {
+  return commentTypes.filter((type) => {
     return !comments.includes(type);
   });
 };

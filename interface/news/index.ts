@@ -70,9 +70,11 @@ export const NewsStateKor = (state: NewsState) => {
     case NewsState.Published:
       return '발행 완료';
     case NewsState.Pending:
-      return '발행 대기';
+      return '발행 중';
     case NewsState.NotPublished:
       return '발행 전';
+    default:
+      return '?';
   }
 };
 

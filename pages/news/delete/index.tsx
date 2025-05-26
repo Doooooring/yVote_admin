@@ -55,35 +55,30 @@ export default function NewsDelete({ data }: pageProps) {
     }
   }, []);
 
-  const deleteNews = useCallback(
-    async (id: number) => {
-      try {
-        setIsLoading(true);
-        const response = await newsRepositories.deleteNews(id);
-        if (!response) Error;
-        setNewsList([]);
-        setDeleteId(null);
-      } catch (e) {
-        alert('잘 안감');
-      }
-      setIsLoading(false);
-    },
-    [deleteId],
-  );
+  const deleteNews = useCallback(async (id: number) => {
+    try {
+      setIsLoading(true);
+      const response = await newsRepositories.deleteNews(id);
+      if (!response) Error;
+      setNewsList([]);
+      setDeleteId(null);
+    } catch (e) {
+      alert('잘 안감');
+    }
+    setIsLoading(false);
+  }, []);
+
+  const onClickDeleteButton = useCallback(() => {
+    if (!deleteId || isLoading) return;
+    const response = window.confirm('정말로 삭제하시겠습니까?');
+    if (response) {
+      deleteNews(deleteId);
+    }
+  }, [deleteNews, deleteId]);
 
   return (
     <ProtectedLayout>
       <Wrapper>
-        {/* <div className="delete-all">
-        <div
-          className="btn btn-primary"
-          onClick={() => {
-            newsRepositories.deleteNewsAll();
-          }}
-        >
-          전체 삭제
-        </div>
-      </div> */}
         <SearchBox findKeyword={findNews} />
         <SelectWrapper>
           <NewsUl>
@@ -104,10 +99,7 @@ export default function NewsDelete({ data }: pageProps) {
           <SubmitWrapper>
             <PrimaryButton
               title="SUBMIT"
-              click={async () => {
-                if (isLoading || !deleteId) return;
-                await deleteNews(deleteId);
-              }}
+              click={onClickDeleteButton}
             />
           </SubmitWrapper>
         </SelectWrapper>
