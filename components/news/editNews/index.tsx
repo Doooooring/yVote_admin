@@ -86,7 +86,8 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const submitNews = useCallback(async () => {
     if (isLoading) return;
     if (!news.date) news.date = new Date();
-    submit(news);
+    const {comments, ...rest} = news;
+    submit(rest);
     return;
   }, [news, submit]);
 

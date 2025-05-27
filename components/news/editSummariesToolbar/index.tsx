@@ -1,6 +1,6 @@
 import { CommonIconButton, TextButton } from '@components/common/button';
 import CommonModal from '@components/common/comonModal';
-import { Center, CommonLayoutBox, Row } from '@components/common/figure';
+import { Blank, Center, CommonLayoutBox, Row } from '@components/common/figure';
 import EditIcon from '@components/common/icon/edit';
 import IsShow from '@components/common/isShow';
 import Select_Slide from '@components/common/select/select_slide/select_slide';
@@ -45,12 +45,21 @@ export default function EditSummariesToolbar({
     setIsOpenAddComment(true);
   }, [summarySelected, addSummary]);
 
-  const onClickDeleteButton = useCallback(() => {
-    const is = window.confirm('삭제 하시겠습니까?');
+  const onClickDeleteButton = useCallback(async () => {
+    const is = window.confirm('삭제 하시겠습니까? (되돌릴 수 없습니다.)');
     if (is) {
-      deleteSummary(summarySelected!);
+      const response = await newsRepositories.deleteCommentType(
+        newsId,
+        summaries[summarySelected!].commentType,
+      );
+      if (response) {
+        deleteSummary(summarySelected!);
+        alert('삭제 되었습니다.');
+      } else {
+        alert('삭제에 실패했습니다. 다시 시도해 주세요.');
+      }
     }
-  }, [summarySelected, deleteSummary]);
+  }, [summaries, summarySelected, deleteSummary]);
 
   const onSaveCommentType = useCallback(
     async (commentType: commentType) => {
@@ -115,33 +124,31 @@ export default function EditSummariesToolbar({
               />
             ) : (
               <OptionWrapper>
-                <>
-                  <PopButtonWrapper>
-                    <Button className="btn btn-primary" onClick={onClickAddButton}>
-                      추가
-                    </Button>
-                    <Button className="btn btn-secondary" onClick={onClickDeleteButton}>
-                      삭제
-                    </Button>
-                  </PopButtonWrapper>
-                  <UpdowButtonWrapper>
-                    <OrderButton onClick={() => moveSummaryLeft(summarySelected!)}>
-                      <FontAwesomeIcon icon={faChevronLeft} width="12px" />
-                    </OrderButton>
-                    <Text>이동</Text>
-
-                    <OrderButton onClick={() => moveSummaryRight(summarySelected!)}>
-                      <FontAwesomeIcon icon={faChevronRight} width="12px" />
-                    </OrderButton>
-                  </UpdowButtonWrapper>
-                  <OrderButton
-                    onClick={() => {
-                      setIsOpenChangeComment(true);
-                    }}
-                  >
-                    논평 변경하기
+                <PopButtonWrapper>
+                  <Button className="btn btn-primary" onClick={onClickAddButton}>
+                    논평 추가
+                  </Button>
+                  <Button className="btn btn-secondary" onClick={onClickDeleteButton}>
+                    논평 삭제
+                  </Button>
+                </PopButtonWrapper>
+                <UpdowButtonWrapper>
+                  <OrderButton onClick={() => moveSummaryLeft(summarySelected!)}>
+                    <FontAwesomeIcon icon={faChevronLeft} width="12px" />
                   </OrderButton>
-                </>
+                  <Text>이동</Text>
+
+                  <OrderButton onClick={() => moveSummaryRight(summarySelected!)}>
+                    <FontAwesomeIcon icon={faChevronRight} width="12px" />
+                  </OrderButton>
+                </UpdowButtonWrapper>
+                <TextButton
+                  onClick={() => {
+                    setIsOpenChangeComment(true);
+                  }}
+                >
+                  논평 변경하기
+                </TextButton>
               </OptionWrapper>
             )}
           </IsShow>
@@ -255,18 +262,18 @@ function ChangeComment({
     useState<commentType>(commentTypeSelectedOrg);
 
   const mergedCommentTypes = useMemo(() => {
-    if (commentTypes.includes(commentTypeSelected)) {
+    if (commentTypes.includes(commentTypeSelectedOrg)) {
       return commentTypes;
     }
-    return [commentTypeSelected, ...commentTypes];
-  }, [commentTypeSelected, commentTypes]);
+    return [commentTypeSelectedOrg, ...commentTypes];
+  }, [commentTypeSelectedOrg, commentTypes]);
 
   const onSave = useCallback(async () => {
     try {
       setIsSaving(true);
       const response = await change(commentTypeSelected);
 
-      alert('생성 되었습니다~');
+      alert('변경 되었습니다~');
       close();
     } catch (e) {
       console.log(e);
@@ -279,29 +286,28 @@ function ChangeComment({
 
   return (
     <CommonModal state={true} outClickAction={close}>
-      <SelectWrapper>
-        <CommentSelect
-          className="form-select"
-          value={commentTypeSelected}
-          onChange={(e) => setCommentTypeSelected(e.currentTarget.value as commentType)}
-        >
-          {mergedCommentTypes.map((comment, idx) => {
-            return (
-              <option key={comment + JSON.stringify(idx)} value={comment}>
-                {comment}
-              </option>
-            );
-          })}
-        </CommentSelect>
-      </SelectWrapper>
-      <PopButtonWrapper>
-        <Button className="btn btn-primary" onClick={onSave}>
-          저장
-        </Button>
-        <Button className="btn btn-secondary" onClick={close}>
-          닫기
-        </Button>
-      </PopButtonWrapper>
+      <ChangeCommentModalBody>
+        <SelectWrapper>
+          <SelectorHead>* 변깅시 기존 자료, 요약 논평 타입이 수정되니 주의하세요.</SelectorHead>
+          <Blank size={8} />
+          <Select_DropDown
+            selected={mergedCommentTypes.indexOf(commentTypeSelected)}
+            setSelected={(idx) => setCommentTypeSelected(mergedCommentTypes[idx])}
+            menus={mergedCommentTypes}
+            selectedToView={(menu) => <>{menu}</>}
+            menuToView={(menu, selected) => <>{menu}</>}
+          />
+          <Blank size={8} />
+          <PopButtonWrapper>
+            <Button className="btn btn-primary" onClick={onSave}>
+              저장
+            </Button>
+            <Button className="btn btn-secondary" onClick={close}>
+              닫기
+            </Button>
+          </PopButtonWrapper>
+        </SelectWrapper>
+      </ChangeCommentModalBody>
     </CommonModal>
   );
 }
@@ -332,6 +338,7 @@ const SlideWrapper = styled.div`
 `;
 
 const OptionWrapper = styled(CommonLayoutBox)`
+  width: 200px;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -390,12 +397,25 @@ const OrderButton = styled(Center)`
 `;
 
 const Button = styled.button`
-  width: 55px;
-  height: 35px;
+  padding: 0.5rem 1rem;
   font-size: 12px;
 `;
 
-const SelectWrapper = styled.div``;
+const ChangeCommentModalBody = styled(CommonLayoutBox)`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+`;
+
+const SelectWrapper = styled.div`
+  padding: 0.5rem;
+`;
+
+const SelectorHead = styled(CommonLayoutBox)`
+  padding: 0.25rem;
+  font-size: 12px;
+`;
 
 const CommentSelect = styled.select`
   width: 200px;

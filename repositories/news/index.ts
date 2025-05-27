@@ -73,6 +73,17 @@ class NewsRepositories {
     return response.data.success;
   }
 
+  async deleteCommentType(id: number, commentType: commentType) {
+    const response: { data: Response<boolean> } = await axios.delete(
+      `${HOST_URL}/news/edit/${id}/comment_type/${commentType}`,
+      {
+        withCredentials: true,
+      },
+    );
+
+    return response.data.success;
+  }
+
   async postNews(news: NewsToPost) {
     const response: { data: Response<number> } = await axios.post(
       `${HOST_URL}/news/edit`,
