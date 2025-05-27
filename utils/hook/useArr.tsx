@@ -9,10 +9,13 @@ export const useArr = <T,>(
 ) => {
   const [curFocus, setCurFocus] = useState<number | null>(defaultSelected);
 
-  const addArr = (idx: number) => {
+  const addArr = (idx: number, target: Partial<T> | null = null) => {
     const curArr = complexClone(arr);
     const newData = getInitialValue();
     if (!newData) return;
+    if (target) {
+      Object.assign(newData, target);
+    }
     curArr.splice(idx + 1, 0, newData);
     setArr(curArr);
   };

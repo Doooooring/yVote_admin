@@ -11,6 +11,8 @@ import { newsRepositories } from '@repositories/news';
 import { commentTypeColor, getCommentRest } from '@utils/news';
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
+import Dropdown from '../../common/dropdown';
+import Select_DropDown from '../../common/select/select_dropdown/select_dropdown';
 
 interface EditSummariesToolbarProps {
   newsId: number;
@@ -18,7 +20,7 @@ interface EditSummariesToolbarProps {
   setSummaries: (summaries: Array<NewsSummary>) => void;
   summarySelected: number | null;
   setSummarySelected: (selected: number | null) => void;
-  addSummary: (idx: number) => void;
+  addSummary: (idx: number, target?: Partial<NewsSummary> | null) => void;
   deleteSummary: (idx: number) => void;
   moveSummaryLeft: (idx: number) => void;
   moveSummaryRight: (idx: number) => void;
@@ -40,8 +42,7 @@ export default function EditSummariesToolbar({
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
 
   const onClickAddButton = useCallback(() => {
-    let next = summarySelected ?? 0;
-    addSummary(next);
+    setIsOpenAddComment(true);
   }, [summarySelected, addSummary]);
 
   const onClickDeleteButton = useCallback(() => {
@@ -51,10 +52,33 @@ export default function EditSummariesToolbar({
     }
   }, [summarySelected, deleteSummary]);
 
+  const onSaveCommentType = useCallback(
+    async (commentType: commentType) => {
+      console.log('======');
+      console.log(summarySelected);
+      if (summarySelected === null) return;
+      const response = await newsRepositories.saveNewComment(newsId, commentType);
+      if (!response) {
+        throw new Error('결과가 이상하네??');
+      }
+
+      addSummary(summarySelected, {
+        commentType: commentType,
+      });
+    },
+    [newsId, summaries, summarySelected, setSummaries],
+  );
+
   const onChangeCommentType = useCallback(
     async (commentType: commentType) => {
-      if (!summarySelected) return;
-      const response = await newsRepositories.saveNewComment(newsId, commentType);
+      console.log('======');
+      console.log(summarySelected);
+      if (summarySelected === null) return;
+      const response = await newsRepositories.changeCommentType(
+        newsId,
+        summaries[summarySelected].commentType,
+        commentType,
+      );
       if (!response) {
         throw new Error('결과가 이상하네??');
       }
@@ -86,7 +110,7 @@ export default function EditSummariesToolbar({
             {isOpenAddComment ? (
               <SaveComment
                 commentTypes={commentRest()}
-                save={onChangeCommentType}
+                save={onSaveCommentType}
                 close={() => setIsOpenAddComment(false)}
               />
             ) : (
@@ -110,27 +134,13 @@ export default function EditSummariesToolbar({
                       <FontAwesomeIcon icon={faChevronRight} width="12px" />
                     </OrderButton>
                   </UpdowButtonWrapper>
-
-                  {summarySelected !== null ? (
-                    <SelectWrapper>
-                      <CommentSelect
-                        className="form-select"
-                        value={summaries[summarySelected].commentType}
-                      >
-                        {[summaries[summarySelected!].commentType, ...commentRest()].map(
-                          (comment, idx) => {
-                            return (
-                              <option key={comment + JSON.stringify(idx)} value={comment}>
-                                {comment}
-                              </option>
-                            );
-                          },
-                        )}
-                      </CommentSelect>
-                    </SelectWrapper>
-                  ) : (
-                    <></>
-                  )}
+                  <OrderButton
+                    onClick={() => {
+                      setIsOpenChangeComment(true);
+                    }}
+                  >
+                    논평 변경하기
+                  </OrderButton>
                 </>
               </OptionWrapper>
             )}
@@ -156,14 +166,14 @@ export default function EditSummariesToolbar({
             }}
           />
         </IsShow>
-        <IsShow state={isOpenChangeComment}>
+        {isOpenChangeComment && (
           <ChangeComment
             commentTypeSelectedOrg={summaries[summarySelected!].commentType}
             commentTypes={commentRest()}
             change={onChangeCommentType}
             close={() => setIsOpenChangeComment(false)}
           />
-        </IsShow>
+        )}
       </SlideWrapper>
     </ButtonWrapper>
   );
@@ -207,15 +217,13 @@ function SaveComment({
       ) : (
         <>
           <SelectWrapper>
-            <CommentSelect className="form-select" value={commentTypeSelected}>
-              {commentTypes.map((comment, idx) => {
-                return (
-                  <option key={comment + JSON.stringify(idx)} value={comment}>
-                    {comment}
-                  </option>
-                );
-              })}
-            </CommentSelect>
+            <Select_DropDown
+              selected={commentTypes.indexOf(commentTypeSelected)}
+              setSelected={(idx) => setCommentTypeSelected(commentTypes[idx])}
+              menus={commentTypes}
+              selectedToView={(menu) => <>{menu}</>}
+              menuToView={(menu, selected) => <>{menu}</>}
+            />
           </SelectWrapper>
           <PopButtonWrapper>
             <Button className="btn btn-primary" onClick={onSave}>
