@@ -46,6 +46,10 @@ export default function EditSummariesToolbar({
   }, [summarySelected, addSummary]);
 
   const onClickDeleteButton = useCallback(async () => {
+    if (summaries.length === 1) {
+      alert('최소 1개의 논평은 있어야 합니다.');
+      return;
+    }
     const is = window.confirm('삭제 하시겠습니까? (되돌릴 수 없습니다.)');
     if (is) {
       const response = await newsRepositories.deleteCommentType(

@@ -74,6 +74,9 @@ const Selected = styled(CommonLayoutBox)`
   transition: border-color 0.4s ease;
   overflow: hidden;
   cursor: pointer;
+  &:hover {
+    background-color: #f0f0f0;
+  }
 `;
 
 const MenusWrapper = styled(CommonLayoutBox)`
