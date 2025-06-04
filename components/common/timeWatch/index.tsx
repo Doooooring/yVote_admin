@@ -5,9 +5,15 @@ import IsShow from '../isShow';
 interface TimeWatchProps {
   expiredAt: Date;
   timeFormatter: (timeLeft: number) => ReactNode;
+  isThrowError?: boolean;
 }
 
-export default function TimeWatch({ expiredAt, timeFormatter }: TimeWatchProps) {
+export default function TimeWatch({
+  expiredAt,
+  timeFormatter,
+  isThrowError = false,
+}: TimeWatchProps) {
+  const [isError, setIsError] = useState<boolean>(false);
   const [curTimeLeft, setCurTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
@@ -23,6 +29,10 @@ export default function TimeWatch({ expiredAt, timeFormatter }: TimeWatchProps) 
       clearInterval(timeout);
     };
   }, [expiredAt, setCurTimeLeft]);
+
+  if (isThrowError && curTimeLeft !== null && curTimeLeft < 0) {
+    throw new Error('TIME_WATCH_ERROR');
+  }
 
   return (
     <Wrapper>

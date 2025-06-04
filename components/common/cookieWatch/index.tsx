@@ -7,22 +7,61 @@ import ClockIcon from '../../../public/assets/img/clock-icon.svg';
 import { authRepositories } from '../../../repositories/auth';
 import { HeaderHeight } from '../../../styles/layout';
 import { milliSecondsToHHMMSS } from '../../../utils/tools/date';
-import { CommonIconButton, TextButton } from '../button';
+import { CommonIconButton, PrimaryButton } from '../button';
+import ErrorBoundary_Refresh from '../errorBoundary/errorBoundary_refresh';
 import IsShow from '../isShow';
 import TimeWatch from '../timeWatch';
 
 function CookieTimeWatch() {
-  const { data, refetch } = useSuspenseQuery({
+  const { data } = useSuspenseQuery({
+    queryKey: ['ADMIN_COOKIE_INFO'],
+    queryFn: async () => {
+      const res = await authRepositories.getCookieInfo();
+      if (!res) throw new Error('COOKIE_NOT_FOUND');
+      if (res.expiredAt.getTime() - Date.now() < 0) {
+        throw new Error('COOKIE_EXPIRED');
+      }
+      return res;
+    },
+  });
+
+  const { expiredAt } = data;
+
+  return (
+    <TimeWatch
+      expiredAt={expiredAt}
+      timeFormatter={(timeLeft: number) => {
+        const { hour, minute, second } = milliSecondsToHHMMSS(timeLeft);
+        return (
+          <TimeWatchBody>
+            <p>로그인 만료까지</p>
+            <p
+              style={{
+                color: 'red',
+                fontSize: '20px',
+              }}
+            >{`${hour}시간${minute}분${second}초`}</p>
+            <p>남았습니다.</p>
+          </TimeWatchBody>
+        );
+      }}
+      isThrowError={true}
+    />
+  );
+}
+
+function ReLogin({ refresh }: { refresh: () => void }) {
+  const { refetch } = useSuspenseQuery({
     queryKey: ['ADMIN_COOKIE_INFO'],
     queryFn: async () => {
       const res = await authRepositories.getCookieInfo();
       if (!res) throw new Error('COOKIE_NOT_FOUND');
       return res;
     },
+    retry: false,
   });
 
-  const { expiredAt } = data;
-  const [token, setToken] = useState('');
+  const [token, setToken] = useState<string>('');
   const [isFetchingLogin, setIsFetchingLogin] = useState<boolean>(false);
 
   const login = useCallback(
@@ -31,7 +70,8 @@ function CookieTimeWatch() {
       try {
         const response = await authRepositories.login(token);
         if (response) {
-          refetch();
+          await refetch();
+          refresh();
           return;
         } else {
           throw Error('error');
@@ -43,56 +83,35 @@ function CookieTimeWatch() {
         setIsFetchingLogin(false);
       }
     },
-    [refetch],
+    [refetch, refresh],
   );
 
-  return !isFetchingLogin ? (
-    <TimeWatch
-      expiredAt={expiredAt}
-      timeFormatter={(timeLeft: number) => {
-        if (timeLeft > 0) {
-          const { hour, minute, second } = milliSecondsToHHMMSS(timeLeft);
-          return (
-            <TimeWatchBody>
-              <p>로그인 만료까지</p>
-              <p
-                style={{
-                  color: 'red',
-                  fontSize: '20px',
-                }}
-              >{`${hour}시간${minute}분${second}초`}</p>
-              <p>남았습니다.</p>
-            </TimeWatchBody>
-          );
-        } else {
-          return (
-            <TimeWatchBody>
-              <p>{`로그인 만료되었습니다.`}</p>
-              <div>
-                <input
-                  type="text"
-                  className="form-control mb-4"
-                  placeholder="코드를 입력해주세요."
-                  onChange={(e) => {
-                    setToken(e.target.value);
-                  }}
-                />
-                <TextButton
-                  title="로그인"
-                  onClick={() => {
-                    login(token);
-                  }}
-                >
-                  로그인
-                </TextButton>
-              </div>
-            </TimeWatchBody>
-          );
-        }
-      }}
-    />
-  ) : (
-    <TimeWatchBody>로그인 중 ...</TimeWatchBody>
+  return (
+    <TimeWatchBody>
+      {isFetchingLogin ? (
+        <p>ㄱㄷ</p>
+      ) : (
+        <>
+          <p>{`로그인 만료되었습니다.`}</p>
+          <div>
+            <input
+              type="text"
+              className="form-control mb-4"
+              placeholder="코드를 입력해주세요."
+              onChange={(e) => {
+                setToken(e.target.value);
+              }}
+            />
+            <PrimaryButton
+              title="로그인"
+              click={() => {
+                login(token);
+              }}
+            />
+          </div>
+        </>
+      )}
+    </TimeWatchBody>
   );
 }
 
@@ -106,9 +125,11 @@ export default function CookieTimeWatchWrapper() {
   return (
     <CookieTimeWatchBody $state={isShowTimeWatch}>
       <IsShow state={isShowTimeWatch}>
-        <Suspense fallback={<div>정보를 받아오는 중입니다.</div>}>
-          <CookieTimeWatch />
-        </Suspense>
+        <ErrorBoundary_Refresh fallback={ReLogin}>
+          <Suspense fallback={<div>정보를 받아오는 중입니다.</div>}>
+            <CookieTimeWatch />
+          </Suspense>
+        </ErrorBoundary_Refresh>
       </IsShow>
       <IconButton onClick={toggleTimeWatch}>
         <Image src={ClockIcon} alt="clock" sizes={'24'} />
