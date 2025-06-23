@@ -12,6 +12,7 @@ import { Keyword } from '../keywords';
 
 export enum commentType {
   와이보트 = '와이보트',
+  입법부 = '입법부',
   행정부 = '행정부',
   대통령실 = '대통령실',
   국민의힘 = '국민의힘',
