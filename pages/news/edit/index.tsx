@@ -11,7 +11,6 @@ import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
-import { useNewsStore } from '@store/news';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -52,7 +51,6 @@ export default function NewsPatch({ data }: pageProps) {
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
 
-  const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
   const setKeywordTitleList = useKeywordStore((state) => state.setKeywordTitleList);
 
   useEffect(() => {

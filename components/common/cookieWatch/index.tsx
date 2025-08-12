@@ -1,5 +1,7 @@
 import { Column, CommonLayoutBox } from '@components/common/figure';
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { ErrorBoundary } from '@suspensive/react';
+import { Mutation } from '@suspensive/react-query';
+import { queryOptions, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import Image from 'next/image';
 import { Suspense, useCallback, useState } from 'react';
 import styled from 'styled-components';
@@ -8,22 +10,17 @@ import { authRepositories } from '../../../repositories/auth';
 import { HeaderHeight } from '../../../styles/layout';
 import { milliSecondsToHHMMSS } from '../../../utils/tools/date';
 import { CommonIconButton, PrimaryButton } from '../button';
-import ErrorBoundary_Refresh from '../errorBoundary/errorBoundary_refresh';
-import IsShow from '../isShow';
+import LoadingCommon from '../loadingCommon';
 import TimeWatch from '../timeWatch';
 
+const adminCookieInfoQueryOption = queryOptions({
+  queryKey: ['AdminCookieInfo'],
+  queryFn: authRepositories.getCookieInfo,
+  staleTime: 0,
+});
+
 function CookieTimeWatch() {
-  const { data } = useSuspenseQuery({
-    queryKey: ['ADMIN_COOKIE_INFO'],
-    queryFn: async () => {
-      const res = await authRepositories.getCookieInfo();
-      if (!res) throw new Error('COOKIE_NOT_FOUND');
-      if (res.expiredAt.getTime() - Date.now() < 0) {
-        throw new Error('COOKIE_EXPIRED');
-      }
-      return res;
-    },
-  });
+  const { data } = useSuspenseQuery(adminCookieInfoQueryOption);
 
   const { expiredAt } = data;
 
@@ -51,22 +48,15 @@ function CookieTimeWatch() {
 }
 
 function ReLogin({ refresh }: { refresh: () => void }) {
-  const { refetch } = useSuspenseQuery({
-    queryKey: ['ADMIN_COOKIE_INFO'],
-    queryFn: async () => {
-      const res = await authRepositories.getCookieInfo();
-      if (!res) throw new Error('COOKIE_NOT_FOUND');
-      return res;
-    },
+  const { refetch } = useQuery({
+    ...adminCookieInfoQueryOption,
     retry: false,
   });
 
   const [token, setToken] = useState<string>('');
-  const [isFetchingLogin, setIsFetchingLogin] = useState<boolean>(false);
 
   const login = useCallback(
     async (token: string) => {
-      setIsFetchingLogin(true);
       try {
         const response = await authRepositories.login(token);
         if (response) {
@@ -77,10 +67,7 @@ function ReLogin({ refresh }: { refresh: () => void }) {
           throw Error('error');
         }
       } catch (e) {
-        console.log(e);
-        alert('다시');
-      } finally {
-        setIsFetchingLogin(false);
+        alert('다시해주세요');
       }
     },
     [refetch, refresh],
@@ -88,29 +75,51 @@ function ReLogin({ refresh }: { refresh: () => void }) {
 
   return (
     <TimeWatchBody>
-      {isFetchingLogin ? (
-        <p>ㄱㄷ</p>
-      ) : (
-        <>
-          <p>{`로그인 만료되었습니다.`}</p>
-          <div>
-            <input
-              type="text"
-              className="form-control mb-4"
-              placeholder="코드를 입력해주세요."
-              onChange={(e) => {
-                setToken(e.target.value);
-              }}
-            />
-            <PrimaryButton
-              title="로그인"
-              click={() => {
-                login(token);
-              }}
-            />
-          </div>
-        </>
-      )}
+      <Mutation
+        key="Relogin"
+        mutationFn={async (token: string) => {
+          return login(token);
+        }}
+      >
+        {(loginMutation) => (
+          <>
+            <p>{`로그인 만료되었습니다.`}</p>
+            <div>
+              <input
+                type="text"
+                className="form-control mb-4"
+                disabled={loginMutation.isPending}
+                placeholder="코드를 입력해주세요."
+                onChange={(e) => {
+                  setToken(e.target.value);
+                }}
+              />
+              <PrimaryButton
+                title="로그인"
+                disabled={loginMutation.isPending}
+                click={() => {
+                  if (loginMutation.isPending) return;
+                  loginMutation.mutate(token);
+                }}
+              />
+            </div>
+            {loginMutation.isPending && (
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                }}
+              >
+                <LoadingCommon fontColor="black" iconSize={24} />
+              </div>
+            )}
+          </>
+        )}
+      </Mutation>
     </TimeWatchBody>
   );
 }
@@ -124,13 +133,25 @@ export default function CookieTimeWatchWrapper() {
 
   return (
     <CookieTimeWatchBody $state={isShowTimeWatch}>
-      <IsShow state={isShowTimeWatch}>
-        <ErrorBoundary_Refresh fallback={ReLogin}>
-          <Suspense fallback={<div>정보를 받아오는 중입니다.</div>}>
+      {isShowTimeWatch && (
+        <ErrorBoundary fallback={({ reset }) => <ReLogin refresh={reset} />}>
+          <Suspense
+            fallback={
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  backgroundColor: 'rgba(255, 255, 255, 0.3)',
+                }}
+              >
+                <LoadingCommon fontColor="black" iconSize={24} />
+              </div>
+            }
+          >
             <CookieTimeWatch />
           </Suspense>
-        </ErrorBoundary_Refresh>
-      </IsShow>
+        </ErrorBoundary>
+      )}
       <IconButton onClick={toggleTimeWatch}>
         <Image src={ClockIcon} alt="clock" sizes={'24'} />
       </IconButton>

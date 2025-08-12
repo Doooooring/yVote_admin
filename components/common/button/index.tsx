@@ -5,11 +5,12 @@ import { CommonLayoutBox } from '../figure';
 interface PrimaryButtonProps {
   title: string;
   click: () => void;
+  disabled?: boolean;
 }
 
-export function PrimaryButton({ title, click }: PrimaryButtonProps) {
+export function PrimaryButton({ title, click, disabled = false }: PrimaryButtonProps) {
   return (
-    <button className="btn btn-primary" onClick={click}>
+    <button className="btn btn-primary" disabled={disabled} onClick={click}>
       {title}
     </button>
   );
