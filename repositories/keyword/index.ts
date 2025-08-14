@@ -1,6 +1,6 @@
-import { HOST_URL } from '@asset';
+import { HOST_URL } from '@/asset';
 import { Response } from '@interface/basic';
-import { Keyword, KeywordTitle, KeywordToPatch, KeywordToPost } from '@interface/keywords';
+import { KeywordTitle, KeywordToPatch, KeywordToPost } from '@interface/keywords';
 import axios from 'axios';
 
 class KeywordRepositories {

@@ -1,4 +1,4 @@
-import { HOST_URL } from '@asset';
+import { HOST_URL } from '@/asset';
 import { Response } from '@interface/basic';
 import {
   Comment,

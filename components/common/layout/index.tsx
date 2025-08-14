@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
+import { useRouteState } from '@/utils/hook/useRouteState';
 import { useCommonStore } from '@store/common';
-import { useRouteState } from '@utils/hook/useRouteState';
 import { ReactNode } from 'react';
 import LoadingIndicator from './loading';
 

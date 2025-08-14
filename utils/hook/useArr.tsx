@@ -1,4 +1,4 @@
-import { changeItemsOrder, complexClone } from '@utils';
+import { changeItemsOrder, complexClone } from '@/utils';
 import { useState } from 'react';
 
 export const useArr = <T,>(

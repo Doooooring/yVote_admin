@@ -1,7 +1,7 @@
+import { useReactQuill } from '@/utils/hook/useReactQuill';
+import { debounce } from '@/utils/tools';
 import TextEditor from '@components/common/textEditor';
 import { NewsSummary } from '@interface/news';
-import { useReactQuill } from '@utils/hook/useReactQuill';
-import { debounce } from '@utils/tools';
 import { useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 

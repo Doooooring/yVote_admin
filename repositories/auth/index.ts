@@ -1,4 +1,4 @@
-import { HOST_URL } from '@asset';
+import { HOST_URL } from '@/asset';
 import axios from 'axios';
 import { AuthPayload, Response } from '../../interface/basic';
 

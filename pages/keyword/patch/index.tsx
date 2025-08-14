@@ -1,3 +1,4 @@
+import { useReactQuill } from '@/utils/hook/useReactQuill';
 import { PrimaryButton } from '@components/common/button';
 import ImageUpload from '@components/common/imageUpload';
 import ProtectedLayout from '@components/common/protectedLayout';
@@ -12,7 +13,6 @@ import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
-import { useReactQuill } from '@utils/hook/useReactQuill';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';

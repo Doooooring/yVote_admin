@@ -1,6 +1,6 @@
+import { Device, useDevice } from '@/utils/hook/useDevice';
 import CommonModal from '@components/common/comonModal';
 import LoadingCommon from '@components/common/loadingCommon';
-import { Device, useDevice } from '@utils/hook/useDevice';
 
 export default function LoadingIndicator({ state }: { state: boolean }) {
   const device = useDevice();
