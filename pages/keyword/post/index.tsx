@@ -9,13 +9,13 @@ import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
 
+import { useReactQuill } from '@/utils/hook/useReactQuill';
 import ImageUpload from '@components/common/imageUpload';
 import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
 import ExplainPreview from '@components/keyword/explainPreview';
 import { Keyword, KeywordCategory, KeywordTitle } from '@interface/keywords';
 import { keywordRepositories } from '@repositories/keyword';
-import { useReactQuill } from '@utils/hook/useReactQuill';
 import { GetServerSideProps } from 'next';
 
 interface pageProps {

@@ -15,12 +15,16 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@*": ["./*"],
+      "@/*": ["./*"],
+      "@asset/*": ["./asset/*"],
       "@pages/*": ["./pages/*"],
       "@components/*": ["./components/*"],
+      "@interface/*": ["./interface/*"],
       "@utils/*": ["./utils/*"],
       "@apis/*": ["./apis/*"],
       "@assets/*": ["./assets/*"],
+      "@store/*": ["./store/*"],
+      "@repositories/*": ["./repositories/*"],
       "@images/*": ["./public/assets/img/*"]
     }
   },

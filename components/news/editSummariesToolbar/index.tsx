@@ -1,3 +1,4 @@
+import { commentTypeColor, getCommentRest } from '@/utils/news';
 import { CommonIconButton, TextButton } from '@components/common/button';
 import CommonModal from '@components/common/comonModal';
 import { Blank, Center, CommonLayoutBox, Row } from '@components/common/figure';
@@ -8,10 +9,8 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { commentType, NewsSummary } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
-import { commentTypeColor, getCommentRest } from '@utils/news';
 import { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import Dropdown from '../../common/dropdown';
 import Select_DropDown from '../../common/select/select_dropdown/select_dropdown';
 
 interface EditSummariesToolbarProps {
