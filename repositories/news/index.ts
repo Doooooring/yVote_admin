@@ -13,6 +13,8 @@ import axios from 'axios';
 
 class NewsRepositories {
   async getNewsTitles(search: string) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+
     const response: {
       data: Response<Array<NewsTitle>>;
     } = await axios.get(`${HOST_URL}/news/titles?search=${search}`);

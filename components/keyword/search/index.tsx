@@ -4,27 +4,27 @@ import { PrimaryButton } from '@components/common/button';
 import { useState } from 'react';
 
 interface SearchBoxProps {
-  findKeyword: (word: string) => Promise<boolean>;
+  setSearchWord: (word: string) => void;
 }
 
-export default function SearchBox({ findKeyword }: SearchBoxProps) {
-  const [searchWord, setSearchWord] = useState<string>('');
+export default function SearchBox({ setSearchWord }: SearchBoxProps) {
+  const [input, setInput] = useState<string>('');
   return (
     <Wrapper>
       <InputWrapper>
         <InputTitle>검색</InputTitle>
         <Input
           type="text"
-          value={searchWord}
+          value={input}
           className="form-control"
           onChange={(e) => {
-            setSearchWord(e.currentTarget.value);
+            setInput(e.currentTarget.value);
           }}
         ></Input>
         <PrimaryButton
           title="검색"
           click={async () => {
-            const response = await findKeyword(searchWord);
+            setSearchWord(input);
           }}
         />
       </InputWrapper>

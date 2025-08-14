@@ -1,4 +1,11 @@
-import Document, { DocumentContext, DocumentInitialProps } from 'next/document';
+import Document, {
+  DocumentContext,
+  DocumentInitialProps,
+  Head,
+  Html,
+  Main,
+  NextScript,
+} from 'next/document';
 import { ServerStyleSheet } from 'styled-components';
 
 export default class MyDocument extends Document {
@@ -26,5 +33,17 @@ export default class MyDocument extends Document {
     } finally {
       sheet.seal();
     }
+  }
+  render() {
+    return (
+      <Html>
+        <Head />
+        <body>
+          <Main />
+          <div id="portal-root" />
+          <NextScript />
+        </body>
+      </Html>
+    );
   }
 }
