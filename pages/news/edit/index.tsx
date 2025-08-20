@@ -41,7 +41,7 @@ export default function NewsPatch({ data }: pageProps) {
   const a = useRef<ReactQuill>(null);
   const router = useRouter();
 
-  const { open, close } = useOpenNewsSearch();
+  const { open } = useOpenNewsSearch();
   const [news, setNews] = useState<NewsToEdit | null>(null);
 
   const isLoading = useCommonStore((state) => state.isLoading);
@@ -95,12 +95,6 @@ export default function NewsPatch({ data }: pageProps) {
   return (
     <ProtectedLayout>
       <Wrapper>
-        {/* <IdSelector
-          newsSearchList={newsSearchList}
-          getNews={getNews}
-          newsSelectorUp={newsSelectorUp}
-          setNewsSelectorUp={setNewsSelectorup}
-        /> */}
         {news ? (
           <EditNews newsOrg={news} submit={submit} />
         ) : (
@@ -112,7 +106,6 @@ export default function NewsPatch({ data }: pageProps) {
             <SearchBox setSearchWord={(v: string) => open({ searchWord: v, selectNews })} />
           </>
         )}
-        {/* <NewsSelector searchWord={} selectNews={() => {}} close={() => {}} /> */}
       </Wrapper>
       <PreLoaded>
         <TextEditor ref={a} onChange={() => {}} />

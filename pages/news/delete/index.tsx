@@ -1,13 +1,16 @@
+import { Mutation, SuspenseQuery } from '@suspensive/react-query';
 import styled from 'styled-components';
 
+import { getNewsListQueryOption } from '@/queryOption/news';
 import { PrimaryButton } from '@components/common/button';
 import ProtectedLayout from '@components/common/protectedLayout';
 import SearchBox from '@components/keyword/search';
 import { NewsTitle } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
+import { useQueryClient } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
-import { useCallback, useState } from 'react';
+import { Suspense, useCallback, useState } from 'react';
 
 export interface NewsToDelete {
   id: string;
@@ -32,76 +35,95 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 };
 
 export default function NewsDelete({ data }: pageProps) {
-  const [newsList, setNewsList] = useState<NewsTitle[]>([]);
+  const queryClient = useQueryClient();
+
+  const [searchWord, setSearchWord] = useState<string | null>(null);
+
   const [deleteId, setDeleteId] = useState<number | null>(null);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
-
-  const findNews = useCallback(async (searchWord: string) => {
-    try {
-      setIsLoading(true);
-      const response = await newsRepositories.getNewsTitles(searchWord);
-      if (response.length == 0) {
-        Error;
-      } else {
-        setNewsList(response);
-      }
-      return true;
-    } catch {
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   const deleteNews = useCallback(async (id: number) => {
     try {
       setIsLoading(true);
       const response = await newsRepositories.deleteNews(id);
       if (!response) Error;
-      setNewsList([]);
-      setDeleteId(null);
     } catch (e) {
       alert('잘 안감');
     }
     setIsLoading(false);
   }, []);
 
-  const onClickDeleteButton = useCallback(() => {
-    if (!deleteId || isLoading) return;
-    const response = window.confirm('정말로 삭제하시겠습니까?');
-    if (response) {
-      deleteNews(deleteId);
-    }
-  }, [deleteNews, deleteId]);
-
   return (
     <ProtectedLayout>
       <Wrapper>
-        <SearchBox findKeyword={findNews} />
+        <SearchBox
+          setSearchWord={(word: string) => {
+            setSearchWord(word);
+          }}
+        />
         <SelectWrapper>
-          <NewsUl>
-            {newsList.map((news, idx) => {
-              return (
-                <NewsLi
-                  key={idx}
-                  state={deleteId === news.id}
-                  onClick={async () => {
-                    setDeleteId(news.id);
-                  }}
-                >
-                  {news.title}
-                </NewsLi>
-              );
-            })}
-          </NewsUl>
-          <SubmitWrapper>
-            <PrimaryButton
-              title="SUBMIT"
-              click={onClickDeleteButton}
-            />
-          </SubmitWrapper>
+          {searchWord && (
+            <Suspense>
+              <SuspenseQuery {...getNewsListQueryOption({ searchWord })}>
+                {({ data: newsList }) => {
+                  return (
+                    <>
+                      <NewsUl>
+                        {newsList.map((news, idx) => {
+                          return (
+                            <NewsLi
+                              key={idx}
+                              state={deleteId === news.id}
+                              onClick={async () => {
+                                setDeleteId(news.id);
+                              }}
+                            >
+                              {news.title}
+                            </NewsLi>
+                          );
+                        })}
+                      </NewsUl>
+                      <Mutation
+                        mutationFn={async (id: number) => {
+                          setIsLoading(true);
+                          return newsRepositories.deleteNews(id);
+                        }}
+                        onSuccess={(_, __, context) => {
+                          queryClient.invalidateQueries(getNewsListQueryOption({ searchWord }));
+                          alert('잘 감');
+                        }}
+                        onError={() => {
+                          alert('다시 해보셈');
+                        }}
+                        onSettled={() => {
+                          setIsLoading(false);
+                        }}
+                      >
+                        {({ mutate }) => {
+                          return (
+                            <SubmitWrapper>
+                              <PrimaryButton
+                                title="SUBMIT"
+                                click={() => {
+                                  if (!deleteId || isLoading) return;
+                                  const response = window.confirm('정말로 삭제하시겠습니까?');
+                                  if (response) {
+                                    mutate(deleteId);
+                                  }
+                                }}
+                              />
+                            </SubmitWrapper>
+                          );
+                        }}
+                      </Mutation>
+                    </>
+                  );
+                }}
+              </SuspenseQuery>
+            </Suspense>
+          )}
         </SelectWrapper>
       </Wrapper>
     </ProtectedLayout>

@@ -1,18 +1,13 @@
 import LoadingCommon from '@/components/common/loadingCommon';
 import { CommonModalLayout } from '@/components/common/modal/component';
 import { NewsOrg } from '@/interface/news';
+import { getNewsListQueryOption } from '@/queryOption/news';
 import { newsRepositories } from '@repositories/news';
 import { ErrorBoundary } from '@suspensive/react';
 import { SuspenseQuery } from '@suspensive/react-query';
-import { queryOptions, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { Suspense } from 'react';
 import styled from 'styled-components';
-
-const getNewsListQueryOption = ({ searchWord }: { searchWord: string }) =>
-  queryOptions({
-    queryKey: ['getNewsListQueryOption', searchWord],
-    queryFn: () => newsRepositories.getNewsTitles(searchWord),
-  });
 
 export function NewsSelector({
   searchWord,

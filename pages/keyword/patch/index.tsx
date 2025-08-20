@@ -80,11 +80,9 @@ export default function KeywordPatch({ data }: pageProps) {
       setKeyword('');
       setKeywordSearchErr(true);
       setIsLoading(false);
-      return false;
     }
 
     setIsLoading(false);
-    return true;
   };
 
   const resetInput = () => {
@@ -123,7 +121,7 @@ export default function KeywordPatch({ data }: pageProps) {
   return (
     <ProtectedLayout>
       <Wrapper>
-        <SearchBox findKeyword={findKeyword} />
+        <SearchBox setSearchWord={findKeyword} />
         <ContentWrapper state={id === null}>
           <InputWrapper>
             <InputTitle>키워드</InputTitle>

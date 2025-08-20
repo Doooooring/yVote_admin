@@ -4,7 +4,7 @@ import { PrimaryButton } from '@components/common/button';
 import { useState } from 'react';
 
 interface SearchBoxProps {
-  setSearchWord: (word: string) => void;
+  setSearchWord: (word: string) => Promise<void> | void;
 }
 
 export default function SearchBox({ setSearchWord }: SearchBoxProps) {

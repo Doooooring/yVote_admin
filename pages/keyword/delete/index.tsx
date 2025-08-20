@@ -1,14 +1,13 @@
 import styled from 'styled-components';
 
 import { PrimaryButton } from '@components/common/button';
+import ProtectedLayout from '@components/common/protectedLayout';
 import SearchBox from '@components/keyword/search';
+import { KeywordTitle } from '@interface/keywords';
 import { keywordRepositories } from '@repositories/keyword';
 import { useCommonStore } from '@store/common';
 import { GetServerSideProps } from 'next';
 import { useCallback, useState } from 'react';
-import { NewsTitle } from '@interface/news';
-import { KeywordTitle } from '@interface/keywords';
-import ProtectedLayout from '@components/common/protectedLayout';
 
 export interface NewsToDelete {
   _id: string;
@@ -46,13 +45,11 @@ export default function KeywordDelete({ data }: pageProps) {
         Error;
       } else {
         setKeywordList(response);
-        setIsLoading(false);
       }
-      return true;
-    } catch {
+    } catch (e) {
+      alert('뭔가 이상하네');
+    } finally {
       setIsLoading(false);
-      console.log('is here');
-      return false;
     }
   }, []);
 
@@ -79,7 +76,7 @@ export default function KeywordDelete({ data }: pageProps) {
           전체 삭제
         </div>
       </div> */}
-        <SearchBox findKeyword={findKeyword} />
+        <SearchBox setSearchWord={findKeyword} />
         <SelectWrapper>
           <NewsUl>
             {keywordList.map((keyword, idx) => {
