@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 import styled from 'styled-components';
-import { Center, Column, Row } from '../figure';
+import { Column, Row } from '../figure';
 
 export default function ListEditView({
   title,
@@ -8,7 +8,7 @@ export default function ListEditView({
   editView,
   isRightOpen,
 }: {
-  title: string;
+  title: ReactNode;
   listView: ReactNode;
   editView: ReactNode;
   isRightOpen: boolean;

@@ -18,7 +18,8 @@ import LoadingCommon from '@components/common/loadingCommon';
 import { CommentToEdit, commentType } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { EditBulkComments } from './component';
 
 interface CommentModalProps {
   newsId: number;
@@ -32,6 +33,8 @@ export default function CommentModal({ newsId }: CommentModalProps) {
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
+
+  const [isBulkCommentEdit, setIsBulkCommentEdit] = useState<boolean>(false);
 
   const {
     curComments,
@@ -102,152 +105,179 @@ export default function CommentModal({ newsId }: CommentModalProps) {
       }}
     >
       <ContentWrapper>
-        <ListEditView
-          title={`${commentSelected} 평론 수정`}
-          isRightOpen={curFocus !== null}
-          listView={
-            <>
-              {commentsToEdit?.map((item, idx) => {
-                return (
-                  <CommentInputLayer
-                    id={`comment-${idx}`}
-                    key={idx}
-                    $focus={idx === curFocus}
-                    onClick={() => setCurFocus(curFocus === idx ? null : idx)}
-                    className="p-3"
-                  >
-                    <p className="title">
-                      {item.title}{' '}
-                      {item.title === '' ? (
-                        <span className="example">예시 제목 입니다.</span>
-                      ) : (
-                        <></>
-                      )}
-                    </p>
-                  </CommentInputLayer>
-                );
-              })}
-              {commentsToEdit.length == 0 ? (
-                <VacantInputLayer $focus={false} onClick={() => addComments(0)}>
-                  <div className="row_layer">
-                    <div className="plus">+</div>
-                  </div>
-                </VacantInputLayer>
-              ) : (
-                <></>
-              )}
-            </>
-          }
-          editView={
-            curFocus != null ? (
-              <RightColumnLayer>
-                <InputLayerHeader>
-                  <UpdowButtonWrapper>
-                    <OrderButton onClick={() => moveCommentUp(curFocus!)}>
-                      <FontAwesomeIcon icon={faChevronUp} width="12px" />
-                    </OrderButton>
-                    <OrderButton onClick={() => moveCommentDown(curFocus!)}>
-                      <FontAwesomeIcon icon={faChevronDown} width="12px" />
-                    </OrderButton>
-                  </UpdowButtonWrapper>
-                  <AddDelButtonWrapper>
-                    <Button className="btn btn-primary" onClick={() => addComments(curFocus!)}>
-                      {' '}
-                      추가{' '}
-                    </Button>
-                    <Button className="btn btn-secondary" onClick={() => deleteComments(curFocus!)}>
-                      {' '}
-                      삭제{' '}
-                    </Button>
-                  </AddDelButtonWrapper>
-                </InputLayerHeader>
-
-                <InputWrapper>
-                  <SubInputTitle>제목</SubInputTitle>
-                  <TitleInput
-                    type="text"
-                    className="form-control"
-                    value={commentsToEdit[curFocus].title}
-                    onChange={(e) => {
-                      const curCommentsToEdit = complexClone(commentsToEdit);
-                      curCommentsToEdit[curFocus!].title = e.currentTarget.value;
-                      setCurCommentsToEdit(curCommentsToEdit);
-                    }}
-                  ></TitleInput>
-                </InputWrapper>
-                <InputWrapper>
-                  <SubInputTitle>날짜</SubInputTitle>
-                  <DateInput
-                    type="date"
-                    min="1000-01-01"
-                    max="9999-12-31"
-                    className="form-control"
-                    value={
-                      commentsToEdit[curFocus!].date
-                        ? getStandardDateForm(commentsToEdit[curFocus!].date!)
-                        : ''
-                    }
-                    onChange={(e) => {
-                      const nextValue = e.target.value;
-                      const dateObj = new Date(nextValue);
-                      const isValid = !isNaN(dateObj.valueOf());
-                      if (!isValid) return;
-                      const curCommentsToEdit = complexClone(commentsToEdit);
-                      curCommentsToEdit[curFocus!].date = new Date(e.currentTarget.value);
-                      setCurCommentsToEdit(curCommentsToEdit);
-                    }}
-                    onClick={(e) => {
-                      if (e.currentTarget.showPicker) {
-                        e.currentTarget.showPicker();
-                      }
-                    }}
-                  />
-                  <span style={{ paddingLeft: '0.5rem' }}>
-                    {commentsToEdit[curFocus!].date
-                      ? getStandardDateForm(commentsToEdit[curFocus!].date!)
-                      : ''}
-                  </span>
-                </InputWrapper>
-                <InputWrapper>
-                  <SubInputTitle>내용</SubInputTitle>
-                  <TitleInput
-                    type="text"
-                    className="form-control"
-                    value={commentsToEdit[curFocus!].comment}
-                    onChange={(e) => {
-                      const curCommentsToEdit = complexClone(commentsToEdit);
-                      curCommentsToEdit[curFocus!].comment = e.currentTarget.value;
-                      setCurCommentsToEdit(curCommentsToEdit);
-                    }}
-                  ></TitleInput>
-                </InputWrapper>
-                <InputWrapper>
-                  <SubInputTitle>출처</SubInputTitle>
-                  <TitleInput
-                    type="text"
-                    className="form-control"
-                    value={commentsToEdit[curFocus!].url ?? ''}
-                    onChange={(e) => {
-                      const curCommentsToEdit = complexClone(commentsToEdit);
-                      curCommentsToEdit[curFocus!].url = e.currentTarget.value;
-                      setCurCommentsToEdit(curCommentsToEdit);
-                    }}
-                  ></TitleInput>
-                </InputWrapper>
-              </RightColumnLayer>
-            ) : (
-              <RightColumnLayer />
-            )
-          }
-        />
-        <SubmitWrapper>
-          <PrimaryButton
-            title="SUBMIT"
-            click={() => {
-              saveComments(newsId, commentSelected!, commentsToEdit);
+        {isBulkCommentEdit ? (
+          <EditBulkComments
+            commentType={commentSelected!}
+            setComments={(comments: CommentToEdit[]) => {
+              setCurCommentsToEdit((prevComments) => [...comments, ...prevComments]);
+            }}
+            onBack={() => {
+              setIsBulkCommentEdit(false);
             }}
           />
-        </SubmitWrapper>
+        ) : (
+          <>
+            <ListEditView
+              title={
+                <Row>
+                  {commentSelected} 평론 수정
+                  <PrimaryButton
+                    title="평론 붙여넣기"
+                    click={() => {
+                      setIsBulkCommentEdit(true);
+                    }}
+                  />
+                </Row>
+              }
+              isRightOpen={curFocus !== null}
+              listView={
+                <>
+                  {commentsToEdit?.map((item, idx) => {
+                    return (
+                      <CommentInputLayer
+                        id={`comment-${idx}`}
+                        key={idx}
+                        $focus={idx === curFocus}
+                        onClick={() => setCurFocus(curFocus === idx ? null : idx)}
+                        className="p-3"
+                      >
+                        <p className="title">
+                          {item.title}{' '}
+                          {item.title === '' ? (
+                            <span className="example">예시 제목 입니다.</span>
+                          ) : (
+                            <></>
+                          )}
+                        </p>
+                      </CommentInputLayer>
+                    );
+                  })}
+                  {commentsToEdit.length == 0 ? (
+                    <VacantInputLayer $focus={false} onClick={() => addComments(0)}>
+                      <div className="row_layer">
+                        <div className="plus">+</div>
+                      </div>
+                    </VacantInputLayer>
+                  ) : (
+                    <></>
+                  )}
+                </>
+              }
+              editView={
+                curFocus != null ? (
+                  <RightColumnLayer>
+                    <InputLayerHeader>
+                      <UpdowButtonWrapper>
+                        <OrderButton onClick={() => moveCommentUp(curFocus!)}>
+                          <FontAwesomeIcon icon={faChevronUp} width="12px" />
+                        </OrderButton>
+                        <OrderButton onClick={() => moveCommentDown(curFocus!)}>
+                          <FontAwesomeIcon icon={faChevronDown} width="12px" />
+                        </OrderButton>
+                      </UpdowButtonWrapper>
+                      <AddDelButtonWrapper>
+                        <Button className="btn btn-primary" onClick={() => addComments(curFocus!)}>
+                          {' '}
+                          추가{' '}
+                        </Button>
+                        <Button
+                          className="btn btn-secondary"
+                          onClick={() => deleteComments(curFocus!)}
+                        >
+                          {' '}
+                          삭제{' '}
+                        </Button>
+                      </AddDelButtonWrapper>
+                    </InputLayerHeader>
+
+                    <InputWrapper>
+                      <SubInputTitle>제목</SubInputTitle>
+                      <TitleInput
+                        type="text"
+                        className="form-control"
+                        value={commentsToEdit[curFocus].title}
+                        onChange={(e) => {
+                          const curCommentsToEdit = complexClone(commentsToEdit);
+                          curCommentsToEdit[curFocus!].title = e.currentTarget.value;
+                          setCurCommentsToEdit(curCommentsToEdit);
+                        }}
+                      ></TitleInput>
+                    </InputWrapper>
+                    <InputWrapper>
+                      <SubInputTitle>날짜</SubInputTitle>
+                      <DateInput
+                        type="date"
+                        min="1000-01-01"
+                        max="9999-12-31"
+                        className="form-control"
+                        value={
+                          commentsToEdit[curFocus!].date
+                            ? getStandardDateForm(commentsToEdit[curFocus!].date!)
+                            : ''
+                        }
+                        onChange={(e) => {
+                          const nextValue = e.target.value;
+                          const dateObj = new Date(nextValue);
+                          const isValid = !isNaN(dateObj.valueOf());
+                          if (!isValid) return;
+                          const curCommentsToEdit = complexClone(commentsToEdit);
+                          curCommentsToEdit[curFocus!].date = new Date(e.currentTarget.value);
+                          setCurCommentsToEdit(curCommentsToEdit);
+                        }}
+                        onClick={(e) => {
+                          if (e.currentTarget.showPicker) {
+                            e.currentTarget.showPicker();
+                          }
+                        }}
+                      />
+                      <span style={{ paddingLeft: '0.5rem' }}>
+                        {commentsToEdit[curFocus!].date
+                          ? getStandardDateForm(commentsToEdit[curFocus!].date!)
+                          : ''}
+                      </span>
+                    </InputWrapper>
+                    <InputWrapper>
+                      <SubInputTitle>내용</SubInputTitle>
+                      <TitleInput
+                        type="text"
+                        className="form-control"
+                        value={commentsToEdit[curFocus!].comment}
+                        onChange={(e) => {
+                          const curCommentsToEdit = complexClone(commentsToEdit);
+                          curCommentsToEdit[curFocus!].comment = e.currentTarget.value;
+                          setCurCommentsToEdit(curCommentsToEdit);
+                        }}
+                      ></TitleInput>
+                    </InputWrapper>
+                    <InputWrapper>
+                      <SubInputTitle>출처</SubInputTitle>
+                      <TitleInput
+                        type="text"
+                        className="form-control"
+                        value={commentsToEdit[curFocus!].url ?? ''}
+                        onChange={(e) => {
+                          const curCommentsToEdit = complexClone(commentsToEdit);
+                          curCommentsToEdit[curFocus!].url = e.currentTarget.value;
+                          setCurCommentsToEdit(curCommentsToEdit);
+                        }}
+                      ></TitleInput>
+                    </InputWrapper>
+                  </RightColumnLayer>
+                ) : (
+                  <RightColumnLayer />
+                )
+              }
+            />
+            <SubmitWrapper>
+              <PrimaryButton
+                title="SUBMIT"
+                click={() => {
+                  saveComments(newsId, commentSelected!, commentsToEdit);
+                }}
+              />
+            </SubmitWrapper>
+          </>
+        )}
         <Loading $state={isRequesting}>
           <LoadingCommon comment="" fontSize="3rem" iconSize={128} />
         </Loading>
