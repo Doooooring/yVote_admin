@@ -119,14 +119,24 @@ export default function CommentModal({ newsId }: CommentModalProps) {
           <>
             <ListEditView
               title={
-                <Row>
+                <Row
+                  style={{
+                    alignItems: 'center',
+                    gap: '12px',
+                  }}
+                >
                   {commentSelected} 평론 수정
-                  <PrimaryButton
-                    title="평론 붙여넣기"
-                    click={() => {
+                  <button
+                    className="btn btn-primary"
+                    style={{
+                      fontSize: '12px',
+                    }}
+                    onClick={() => {
                       setIsBulkCommentEdit(true);
                     }}
-                  />
+                  >
+                    평론 붙여넣기
+                  </button>
                 </Row>
               }
               isRightOpen={curFocus !== null}
