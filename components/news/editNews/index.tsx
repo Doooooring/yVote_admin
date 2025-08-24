@@ -1,3 +1,7 @@
+import { useArr } from '@/utils/hook/useArr';
+import useObject from '@/utils/hook/useObject';
+import { getCommentRest } from '@/utils/news';
+import { getStandardDateForm } from '@/utils/tools';
 import { PrimaryButton } from '@components/common/button';
 import { Blank } from '@components/common/figure';
 import ImageUpload from '@components/common/imageUpload';
@@ -15,10 +19,6 @@ import {
 } from '@interface/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
-import { useArr } from '@utils/hook/useArr';
-import useObject from '@utils/hook/useObject';
-import { getCommentRest } from '@utils/news';
-import { getStandardDateForm } from '@utils/tools';
 import { useCallback, useEffect } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
@@ -86,7 +86,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const submitNews = useCallback(async () => {
     if (isLoading) return;
     if (!news.date) news.date = new Date();
-    const {comments, ...rest} = news;
+    const { comments, ...rest } = news;
     submit(rest);
     return;
   }, [news, submit]);

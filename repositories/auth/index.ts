@@ -1,4 +1,4 @@
-import { HOST_URL } from '@asset';
+import { HOST_URL } from '@/asset';
 import axios from 'axios';
 import { AuthPayload, Response } from '../../interface/basic';
 
@@ -27,11 +27,14 @@ class AuthRepositories {
 
       const data = response.data.result;
       if (data) data.expiredAt = new Date(data.expiredAt);
+      if (data.expiredAt.getTime() - Date.now() < 0) {
+        throw new Error('COOKIE_EXPIRED');
+      }
 
       return data;
     } catch (e) {
       console.log(e);
-      return null;
+      throw e;
     }
   }
 

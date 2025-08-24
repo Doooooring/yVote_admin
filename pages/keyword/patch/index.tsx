@@ -1,3 +1,4 @@
+import { useReactQuill } from '@/utils/hook/useReactQuill';
 import { PrimaryButton } from '@components/common/button';
 import ImageUpload from '@components/common/imageUpload';
 import ProtectedLayout from '@components/common/protectedLayout';
@@ -12,7 +13,6 @@ import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
-import { useReactQuill } from '@utils/hook/useReactQuill';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
 import { useEffect, useState } from 'react';
@@ -80,11 +80,9 @@ export default function KeywordPatch({ data }: pageProps) {
       setKeyword('');
       setKeywordSearchErr(true);
       setIsLoading(false);
-      return false;
     }
 
     setIsLoading(false);
-    return true;
   };
 
   const resetInput = () => {
@@ -123,7 +121,7 @@ export default function KeywordPatch({ data }: pageProps) {
   return (
     <ProtectedLayout>
       <Wrapper>
-        <SearchBox findKeyword={findKeyword} />
+        <SearchBox setSearchWord={findKeyword} />
         <ContentWrapper state={id === null}>
           <InputWrapper>
             <InputTitle>키워드</InputTitle>

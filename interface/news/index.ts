@@ -7,7 +7,7 @@
 //   동아 = '동아',
 // }
 
-import { complexClone } from '@utils';
+import { complexClone } from '@/utils';
 import { Keyword } from '../keywords';
 
 export enum commentType {

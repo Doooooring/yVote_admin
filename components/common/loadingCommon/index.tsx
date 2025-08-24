@@ -5,7 +5,7 @@ import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 export interface LoadingCommonProps {
-  comment: string;
+  comment?: string;
   isRow?: boolean;
   fontSize?: string;
   fontColor?: string;
@@ -13,7 +13,7 @@ export interface LoadingCommonProps {
 }
 
 export default function LoadingCommon({
-  comment,
+  comment = '',
   isRow = true,
   fontSize = '1rem',
   fontColor = 'white',

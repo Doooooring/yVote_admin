@@ -1,17 +1,15 @@
+import { useOpenNewsSearch } from '@/utils/hook/news/useOpenNewsSearch';
 import { PrimaryButton } from '@components/common/button';
 import ProtectedLayout from '@components/common/protectedLayout';
 import TextEditor from '@components/common/textEditor';
 import SearchBox from '@components/keyword/search';
-import { SearchState } from '@components/keyword/searchState';
 import EditNews from '@components/news/editNews';
-import IdSelector from '@components/news/idSelector';
 import { KeywordTitle } from '@interface/keywords';
-import { initNews, NewsTitle, NewsToEdit, NewsToPatch, setDefaultNews } from '@interface/news';
+import { initNews, NewsOrg, NewsToEdit, NewsToPatch, setDefaultNews } from '@interface/news';
 import { keywordRepositories } from '@repositories/keyword';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
 import { useKeywordStore } from '@store/keyword';
-import { useNewsStore } from '@store/news';
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -43,50 +41,16 @@ export default function NewsPatch({ data }: pageProps) {
   const a = useRef<ReactQuill>(null);
   const router = useRouter();
 
+  const { open } = useOpenNewsSearch();
   const [news, setNews] = useState<NewsToEdit | null>(null);
-
-  const [newsSearchList, setNewsSearchList] = useState<NewsTitle[]>([]);
-  const [newsSearchErr, setNewsSearchErr] = useState<boolean>(false);
-  const [newsSelectorUp, setNewsSelectorup] = useState<boolean>(false);
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
 
-  const setCommentSelected = useNewsStore((state) => state.setCommentSelected);
   const setKeywordTitleList = useKeywordStore((state) => state.setKeywordTitleList);
 
   useEffect(() => {
     setKeywordTitleList(data.keywordTitles);
-  }, []);
-
-  const findNews = useCallback(async (searchWord: string) => {
-    setIsLoading(true);
-
-    try {
-      const response = await newsRepositories.getNewsTitles(searchWord);
-
-      setNewsSearchList(response);
-      setNewsSelectorup(true);
-
-      return true;
-    } catch {
-      setNewsSearchErr(true);
-      return false;
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const getNews = useCallback(async (id: number) => {
-    setIsLoading(true);
-    try {
-      const newsOrg = await newsRepositories.getNewsDetails(id);
-      setNews(setDefaultNews(newsOrg) as NewsToEdit);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setIsLoading(false);
-    }
   }, []);
 
   const generateNewNews = useCallback(async () => {
@@ -124,15 +88,13 @@ export default function NewsPatch({ data }: pageProps) {
     }
   };
 
+  const selectNews = (news: NewsOrg) => {
+    setNews(setDefaultNews(news) as NewsToEdit);
+  };
+
   return (
     <ProtectedLayout>
       <Wrapper>
-        <IdSelector
-          newsSearchList={newsSearchList}
-          getNews={getNews}
-          newsSelectorUp={newsSelectorUp}
-          setNewsSelectorUp={setNewsSelectorup}
-        />
         {news ? (
           <EditNews newsOrg={news} submit={submit} />
         ) : (
@@ -141,10 +103,9 @@ export default function NewsPatch({ data }: pageProps) {
               <InputTitle>새로 만들기</InputTitle>
               <PrimaryButton title="+" click={generateNewNews} />
             </InputWrapper>
-            <SearchBox findKeyword={findNews} />
+            <SearchBox setSearchWord={(v: string) => open({ searchWord: v, selectNews })} />
           </>
         )}
-        <SearchState searchErr={newsSearchErr} loading={isLoading} />
       </Wrapper>
       <PreLoaded>
         <TextEditor ref={a} onChange={() => {}} />

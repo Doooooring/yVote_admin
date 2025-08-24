@@ -14,9 +14,9 @@ export const throttle = <T>(cb: (...args: T[]) => any, sec: number) => {
   };
 };
 
-export const debounce = <T>(cb: (...args: T[]) => any, sec: number) => {
+export const debounce = <T extends unknown[]>(cb: (...args: T) => any, sec: number) => {
   let timer: NodeJS.Timeout | null = null;
-  return (...arg: T[]) => {
+  return (...arg: T) => {
     if (timer) {
       clearTimeout(timer);
     }

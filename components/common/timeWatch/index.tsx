@@ -1,6 +1,5 @@
 import { ReactNode, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import IsShow from '../isShow';
 
 interface TimeWatchProps {
   expiredAt: Date;
@@ -13,7 +12,6 @@ export default function TimeWatch({
   timeFormatter,
   isThrowError = false,
 }: TimeWatchProps) {
-  const [isError, setIsError] = useState<boolean>(false);
   const [curTimeLeft, setCurTimeLeft] = useState<number | null>(null);
 
   useEffect(() => {
@@ -34,11 +32,7 @@ export default function TimeWatch({
     throw new Error('TIME_WATCH_ERROR');
   }
 
-  return (
-    <Wrapper>
-      <IsShow state={curTimeLeft != null}>{timeFormatter(curTimeLeft!)}</IsShow>
-    </Wrapper>
-  );
+  return <Wrapper>{curTimeLeft !== null && timeFormatter(curTimeLeft)}</Wrapper>;
 }
 
 const Wrapper = styled.div`
