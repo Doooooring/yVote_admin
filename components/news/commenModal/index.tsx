@@ -139,7 +139,7 @@ export default function CommentModal({ newsId }: CommentModalProps) {
                   </button>
                 </Row>
               }
-              isRightOpen={curFocus !== null}
+              isRightOpen={true}
               listView={
                 <>
                   {commentsToEdit?.map((item, idx) => {
@@ -301,7 +301,7 @@ interface WrapperProps {
 }
 
 const ContentWrapper = styled.div`
-  min-width: 1100px;
+  min-width: 800px;
 
   max-height: 700px;
   border: 1px solid #ced4da;
@@ -317,7 +317,7 @@ const ContentWrapper = styled.div`
 `;
 
 const RightColumnLayer = styled.div`
-  width: 100%;
+  width: 400px;
   min-height: 100px;
   div.input_layer_header {
     display: flex;

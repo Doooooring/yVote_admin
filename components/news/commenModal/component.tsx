@@ -1,5 +1,5 @@
 import { CommonIconButton, PrimaryButton, TextButton } from '@/components/common/button';
-import { Column, Row } from '@/components/common/figure';
+import { Column, CommonLayoutBox, Row } from '@/components/common/figure';
 import { CommentToEdit, commentType } from '@/interface/news';
 import { complexClone } from '@/utils';
 import { getStandardDateForm } from '@/utils/tools';
@@ -103,26 +103,45 @@ export function EditBulkComments({
             onChange={(e) => setInput(e.target.value)}
           />
         </LeftWrapper>
-        <CommonIconButton
+        <CommonLayoutBox
           style={{
-            width: '20px',
-            height: '20px',
-          }}
-          onClick={() => {
-            try {
-              const response = convertInputToCommentForm(input);
-              setCurComments(
-                response.map((d) => {
-                  return { ...d, commentType };
-                }),
-              );
-            } catch (e) {
-              alert('입력 양식을 맞춰주세요.');
-            }
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '4px',
           }}
         >
-          <FontAwesomeIcon icon={faArrowRight} width="12px" height="12px" />
-        </CommonIconButton>
+          <p
+            style={{
+              padding: 0,
+              margin: 0,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            변환하기
+          </p>
+          <CommonIconButton
+            style={{
+              width: '20px',
+              height: '20px',
+            }}
+            onClick={() => {
+              try {
+                const response = convertInputToCommentForm(input);
+                setCurComments(
+                  response.map((d) => {
+                    return { ...d, commentType };
+                  }),
+                );
+              } catch (e) {
+                alert('입력 양식을 맞춰주세요.');
+              }
+            }}
+          >
+            <FontAwesomeIcon icon={faArrowRight} width="12px" height="12px" />
+          </CommonIconButton>
+        </CommonLayoutBox>
         <RightWrapper>
           <RightColumnLayer>
             {curComments.map((comment, index) => {
@@ -167,7 +186,7 @@ export function EditBulkComments({
                         }
                       }}
                     />
-                    <span style={{ paddingLeft: '0.5rem' }}>
+                    <span style={{ paddingLeft: '0.5rem', whiteSpace: 'nowrap' }}>
                       {comment.date ? getStandardDateForm(comment.date!) : ''}
                     </span>
                   </InputWrapper>
@@ -248,7 +267,7 @@ const InputTitle = styled.div`
 const InputSubTitle = styled.p``;
 
 const CommentInputLayer = styled.div`
-  width: 500px;
+  width: 400px;
   gap: 10px;
   background-color: white;
   border: 0.8px solid rgb(170, 170, 170);
@@ -290,11 +309,11 @@ const DateInput = styled.input`
 `;
 
 const TitleInput = styled.input`
-  width: 400px;
+  width: 300px;
 `;
 
 const RightColumnLayer = styled.div`
-  min-width: 500px;
+  min-width: 300px;
 
   min-height: 100px;
   max-height: 500px;
