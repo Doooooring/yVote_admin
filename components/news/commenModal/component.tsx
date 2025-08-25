@@ -33,7 +33,7 @@ function convertInputToCommentForm(input: string) {
     } else if (key === 'content') {
       cur.comment = val;
     } else if (key === 'date') {
-      cur.date = new Date(val);
+      cur.date = new Date(new Date(val).getTime() + 9 * 60 * 60 * 1000);
     }
   });
 
@@ -239,10 +239,10 @@ const LayerTitleWrapper = styled.div`
 `;
 
 const RowLayer = styled(Row)`
-  height: 500px;
   flex: 0 1 auto;
   align-items: center;
   gap: 10px;
+  margin-bottom: 10px;
 `;
 
 const LeftColumnLayer = styled(Column)`
@@ -250,8 +250,10 @@ const LeftColumnLayer = styled(Column)`
 `;
 
 const LeftWrapper = styled(Layer)`
-  width: 400px;
-  height: 400px;
+  width: 1100px;
+  max-width: calc(100vw - 900px);
+  height: 700px;
+  max-height: calc(100vh - 300px);
 `;
 
 const RightWrapper = styled(Layer)``;
