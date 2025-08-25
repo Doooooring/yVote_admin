@@ -60,6 +60,7 @@ export default function NewsDelete({ data }: pageProps) {
         <SelectWrapper>
           {deleteNews && (
             <Mutation
+              key={openTrigger}
               mutationFn={async (id: number) => {
                 setIsLoading(true);
                 return newsRepositories.deleteNews(id);
@@ -67,7 +68,7 @@ export default function NewsDelete({ data }: pageProps) {
               onSuccess={(_, __, context) => {
                 alert('잘 감');
                 setDeleteNews(null);
-                setOpenTrigger((s) => s++);
+                setOpenTrigger((s) => s + 1);
               }}
               onError={() => {
                 alert('다시 해보셈');
