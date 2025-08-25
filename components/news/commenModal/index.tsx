@@ -303,7 +303,6 @@ interface WrapperProps {
 const ContentWrapper = styled.div`
   min-width: 800px;
 
-  max-height: 700px;
   border: 1px solid #ced4da;
   border-radius: 1rem;
   background-color: white;

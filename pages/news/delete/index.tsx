@@ -1,16 +1,15 @@
-import { Mutation, SuspenseQuery } from '@suspensive/react-query';
+import { Mutation } from '@suspensive/react-query';
 import styled from 'styled-components';
 
-import { getNewsListQueryOption } from '@/queryOption/news';
+import { useOpenNewsSearch } from '@/utils/hook/news/useOpenNewsSearch';
 import { PrimaryButton } from '@components/common/button';
 import ProtectedLayout from '@components/common/protectedLayout';
 import SearchBox from '@components/keyword/search';
-import { NewsTitle } from '@interface/news';
+import { NewsOrg, NewsTitle } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
-import { useQueryClient } from '@tanstack/react-query';
 import { GetServerSideProps } from 'next';
-import { Suspense, useCallback, useState } from 'react';
+import { useState } from 'react';
 
 export interface NewsToDelete {
   id: string;
@@ -35,94 +34,69 @@ export const getServerSideProps: GetServerSideProps<pageProps> = async () => {
 };
 
 export default function NewsDelete({ data }: pageProps) {
-  const queryClient = useQueryClient();
+  const [deleteNews, setDeleteNews] = useState<NewsOrg | null>(null);
 
-  const [searchWord, setSearchWord] = useState<string | null>(null);
+  const [openTrigger, setOpenTrigger] = useState<number>(0);
 
-  const [deleteId, setDeleteId] = useState<number | null>(null);
+  const { open } = useOpenNewsSearch();
 
   const isLoading = useCommonStore((state) => state.isLoading);
   const setIsLoading = useCommonStore((state) => state.setIsLoading);
-
-  const deleteNews = useCallback(async (id: number) => {
-    try {
-      setIsLoading(true);
-      const response = await newsRepositories.deleteNews(id);
-      if (!response) Error;
-    } catch (e) {
-      alert('잘 안감');
-    }
-    setIsLoading(false);
-  }, []);
 
   return (
     <ProtectedLayout>
       <Wrapper>
         <SearchBox
+          key={openTrigger}
           setSearchWord={(word: string) => {
-            setSearchWord(word);
+            open({
+              searchWord: word,
+              selectNews: (news) => {
+                setDeleteNews(news);
+              },
+            });
           }}
         />
         <SelectWrapper>
-          {searchWord && (
-            <Suspense>
-              <SuspenseQuery {...getNewsListQueryOption({ searchWord })}>
-                {({ data: newsList }) => {
-                  return (
-                    <>
-                      <NewsUl>
-                        {newsList.map((news, idx) => {
-                          return (
-                            <NewsLi
-                              key={idx}
-                              state={deleteId === news.id}
-                              onClick={async () => {
-                                setDeleteId(news.id);
-                              }}
-                            >
-                              {news.title}
-                            </NewsLi>
-                          );
-                        })}
-                      </NewsUl>
-                      <Mutation
-                        mutationFn={async (id: number) => {
-                          setIsLoading(true);
-                          return newsRepositories.deleteNews(id);
-                        }}
-                        onSuccess={(_, __, context) => {
-                          queryClient.invalidateQueries(getNewsListQueryOption({ searchWord }));
-                          alert('잘 감');
-                        }}
-                        onError={() => {
-                          alert('다시 해보셈');
-                        }}
-                        onSettled={() => {
-                          setIsLoading(false);
-                        }}
-                      >
-                        {({ mutate }) => {
-                          return (
-                            <SubmitWrapper>
-                              <PrimaryButton
-                                title="SUBMIT"
-                                click={() => {
-                                  if (!deleteId || isLoading) return;
-                                  const response = window.confirm('정말로 삭제하시겠습니까?');
-                                  if (response) {
-                                    mutate(deleteId);
-                                  }
-                                }}
-                              />
-                            </SubmitWrapper>
-                          );
-                        }}
-                      </Mutation>
-                    </>
-                  );
-                }}
-              </SuspenseQuery>
-            </Suspense>
+          {deleteNews && (
+            <Mutation
+              mutationFn={async (id: number) => {
+                setIsLoading(true);
+                return newsRepositories.deleteNews(id);
+              }}
+              onSuccess={(_, __, context) => {
+                alert('잘 감');
+                setDeleteNews(null);
+                setOpenTrigger((s) => s++);
+              }}
+              onError={() => {
+                alert('다시 해보셈');
+              }}
+              onSettled={() => {
+                setIsLoading(false);
+              }}
+            >
+              {({ mutate }) => {
+                return (
+                  <SubmitWrapper>
+                    <NewsLi>
+                      <p className="title">{deleteNews.title}</p>
+                      <p className="subTitle">{deleteNews.subTitle}</p>
+                    </NewsLi>
+                    <PrimaryButton
+                      title="삭제하기"
+                      click={() => {
+                        if (!deleteNews.id || isLoading) return;
+                        const response = window.confirm('정말로 삭제하시겠습니까?');
+                        if (response) {
+                          mutate(deleteNews.id);
+                        }
+                      }}
+                    />
+                  </SubmitWrapper>
+                );
+              }}
+            </Mutation>
           )}
         </SelectWrapper>
       </Wrapper>
@@ -155,20 +129,33 @@ const NewsUl = styled.ul`
   padding: 0.375rem 0.75rem;
 `;
 
-interface NewsLi {
-  state: boolean;
-}
-
-const NewsLi = styled.li<NewsLi>`
-  background-color: ${({ state }) => (state ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0)')};
+const NewsLi = styled.div`
+  background-color: 'rgba(0,0,0,0)';
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
-  &:hover {
-    cursor: pointer;
-    background-color: rgba(0, 0, 0, 0.5);
-  }
+
   padding: 0.375rem 0.75rem;
   margin-bottom: 10px;
+
+  p {
+    display: block;
+    margin: 0;
+  }
+
+  .title {
+    font-size: 14px;
+    color: black;
+  }
+
+  .subTitle {
+    display: -webkit-box;
+    font-size: 12px;
+    color: rgb(100, 100, 100);
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `;
 
 const SubmitWrapper = styled.div``;
