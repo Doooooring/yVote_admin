@@ -28,6 +28,47 @@ export enum CommentQualification {
   ETC = 3,
 }
 
+export enum NewsType {
+  bill = 'bill',
+  constitution = 'constitution',
+  executive = 'executive',
+  cabinet = 'cabinet',
+  diplomat = 'diplomat',
+  govern = 'govern',
+  debate = 'debate',
+  election = 'election',
+  original = 'original',
+  others = 'others',
+}
+
+export const newsTypesToKor = (newsType: NewsType) => {
+  switch (newsType) {
+    case NewsType.bill:
+      return '법률';
+    case NewsType.constitution:
+      return '헌법재판소';
+    case NewsType.executive:
+      return '시행령';
+    case NewsType.cabinet:
+      return '국무회의';
+    case NewsType.diplomat:
+      return '정상외교';
+    case NewsType.govern:
+      return '행정';
+    case NewsType.debate:
+      return '논평';
+    case NewsType.election:
+      return '선거';
+    case NewsType.original:
+      return '자체제작';
+    case NewsType.others:
+      return '기타';
+    default:
+      // newsType satisfies never;
+      return '기타';
+  }
+};
+
 export interface Comment {
   id: number;
   order: number;
@@ -100,6 +141,7 @@ export interface News {
   order: number;
   title: string;
   subTitle: string;
+  newsType: NewsType;
   slug: string;
   summary: string;
   summaries: Array<NewsSummary>;
@@ -125,7 +167,10 @@ export interface NewsInView extends Omit<News, 'keywords' | 'comments'> {
 }
 
 export interface Preview
-  extends Pick<News, 'id' | 'order' | 'newsImage' | 'title' | 'summary' | 'keywords' | 'state'> {}
+  extends Pick<
+    News,
+    'id' | 'order' | 'newsImage' | 'title' | 'newsType' | 'summary' | 'keywords' | 'state'
+  > {}
 
 export interface NewsTitle extends Pick<News, 'id' | 'title' | 'subTitle'> {}
 
@@ -134,6 +179,7 @@ export interface NewsOrg
     News,
     | 'title'
     | 'subTitle'
+    | 'newsType'
     | 'slug'
     | 'summary'
     | 'summaries'
@@ -166,6 +212,7 @@ export interface NewsToPatch extends Partial<NewsOrg> {
 export const defaultNews = {
   title: '',
   subTitle: '',
+  newsType: NewsType.others,
   slug: '',
   summary: '',
   summaries: [] as Array<NewsSummary>,
