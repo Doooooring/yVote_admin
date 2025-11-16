@@ -15,6 +15,8 @@ import {
   NewsSummary,
   NewsToEdit,
   NewsToPatch,
+  NewsType,
+  newsTypesToKor,
   TimelineToEdit,
 } from '@interface/news';
 import { useCommonStore } from '@store/common';
@@ -34,6 +36,7 @@ interface EditNewsProps {
 }
 
 const NewsStates = Object.values(NewsState);
+const NewsTypes = Object.values(NewsType);
 
 export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   const [news, setNewsVal] = useObject<NewsToEdit>(newsOrg);
@@ -105,6 +108,21 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                 setNewsVal('title', e.currentTarget.value);
               }}
             ></Input>
+            <div style={{ width: '150px', height: '100%', paddingLeft: '10px' }}>
+              <Select_DropDown
+                selected={NewsTypes.indexOf(news.newsType)}
+                setSelected={(i: number) => {
+                  setNewsVal('newsType', NewsTypes[i]);
+                }}
+                menus={NewsTypes}
+                selectedToView={(newsType) => {
+                  return <div>{newsTypesToKor(newsType)}</div>;
+                }}
+                menuToView={(newsType: NewsType, selected?: boolean) => {
+                  return <>{newsTypesToKor(newsType)}</>;
+                }}
+              />
+            </div>
           </InputWrapper>
           <InputWrapper className="pb-1 pt-1 mb-1">
             <InputTitle>부제목</InputTitle>
