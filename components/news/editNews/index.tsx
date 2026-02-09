@@ -6,6 +6,7 @@ import { PrimaryButton } from '@components/common/button';
 import { Blank } from '@components/common/figure';
 import ImageUpload from '@components/common/imageUpload';
 import IsShow from '@components/common/isShow';
+import TextEditor from '@components/common/textEditor';
 import Select_DropDown from '@components/common/select/select_dropdown/select_dropdown';
 import { KeywordTitle } from '@interface/keywords';
 import {
@@ -21,7 +22,7 @@ import {
 } from '@interface/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
 import EditNewsSummaries from '../editNewsSummaries/editNewsSummaries';
@@ -29,6 +30,7 @@ import EditSummariesToolbar from '../editSummariesToolbar';
 import KeywordSelect from '../keywordSelect';
 import NewsContentPreview from '../newsContentPreview';
 import TimelineInput from '../timelineInput';
+import { useReactQuill } from '@/utils/hook/useReactQuill';
 
 interface EditNewsProps {
   newsOrg: NewsToEdit;
@@ -86,11 +88,103 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
     }
   }, [news.summaries, addSummary, setSummarySelected]);
 
+  // Helper: Parse HTML agenda input into JSON structure (browser-safe)
+  function htmlAgendaToJson(html: string) {
+    if (!html) return [];
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    type AgendaGroup = { title: string; items: string[] };
+    const groups: AgendaGroup[] = [];
+    let currentGroup: AgendaGroup | null = null;
+    Array.from(doc.body.children).forEach((el) => {
+      if (el.tagName === 'UL') {
+        const title = el.querySelector('li')?.textContent?.trim() || '';
+        if (currentGroup && (currentGroup as AgendaGroup).items.length) groups.push(currentGroup as AgendaGroup);
+        currentGroup = { title, items: [] };
+      } else if (el.tagName === 'P') {
+        const item = el.textContent?.trim() || '';
+        if (currentGroup && item) (currentGroup as AgendaGroup).items.push(item);
+      }
+    });
+    if (currentGroup && (currentGroup as AgendaGroup).items.length) groups.push(currentGroup as AgendaGroup);
+    return groups;
+  }
+
+  // Helper: Parse HTML speech input into JSON structure (browser-safe)
+  // Helper: Parse HTML speech input into grouped JSON structure (browser-safe)
+  function htmlSpeechToJson(html: string) {
+    if (!html) return [];
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    type SpeechGroup = { title: string; items: string[] };
+    const groups: SpeechGroup[] = [];
+    let currentGroup: SpeechGroup | null = null;
+    Array.from(doc.body.children).forEach((el) => {
+      if (el.tagName === 'UL') {
+        const title = el.querySelector('li')?.textContent?.trim() || '';
+        if (currentGroup && currentGroup.items.length) groups.push(currentGroup);
+        currentGroup = { title, items: [] };
+      } else if (el.tagName === 'P') {
+        const item = el.textContent?.trim() || '';
+        if (currentGroup && item) currentGroup.items.push(item);
+      }
+    });
+    if (currentGroup && currentGroup.items.length) groups.push(currentGroup);
+    return groups;
+  }
+
+  // Helper: Convert agendaList JSON to HTML for editor display
+  function agendaJsonToHtml(json: string) {
+    let groups: { title: string; items: string[] }[] = [];
+    try {
+      groups = JSON.parse(json);
+    } catch {
+      return json || '';
+    }
+    return groups
+      .map(
+        (group) =>
+          `<ul><li>${group.title}</li></ul>` +
+          group.items.map((item) => `<p>${item}</p>`).join('')
+      )
+      .join('');
+  }
+
+  // Helper: Convert speechContent JSON to HTML for editor display
+  function speechJsonToHtml(json: string) {
+    let groups: { title: string; items: string[] }[] = [];
+    try {
+      groups = JSON.parse(json);
+    } catch {
+      return json || '';
+    }
+    if (!Array.isArray(groups)) return '';
+    return groups
+      .map((group) => {
+        const title = group && typeof group.title === 'string' ? group.title : '';
+        const items = Array.isArray(group?.items) ? group.items : [];
+        return `<ul><li>${title}</li></ul>` + items.map((item) => `<p>${item}</p>`).join('');
+      })
+      .join('');
+  }
+
   const submitNews = useCallback(async () => {
     if (isLoading) return;
     if (!news.date) news.date = new Date();
+    let agendaList = news.agendaList;
+    let speechContent = news.speechContent;
+    // If agendaList is not valid JSON, try to parse it from HTML
+    try {
+      JSON.parse(agendaList ?? '');
+    } catch {
+      agendaList = JSON.stringify(htmlAgendaToJson(agendaList ?? ''));
+    }
+    // If speechContent is not valid JSON, try to parse it from HTML
+    try {
+      JSON.parse(speechContent ?? '');
+    } catch {
+      speechContent = JSON.stringify(htmlSpeechToJson(speechContent ?? ''));
+    }
     const { comments, ...rest } = news;
-    submit(rest);
+    submit({ ...rest, agendaList, speechContent });
     return;
   }, [news, submit]);
 
@@ -235,20 +329,47 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
             </KeywordWrapper>
           </KeywordSetter>
         </ContentEditWrapper>
-        <NewsPreviewWrapper>
-          {summarySelected != null ? (
-            <IsShow state={summarySelected !== null}>
-              <NewsContentPreview
-                title={news.title}
-                content={news.summaries[summarySelected!].summary}
-                state={news.state}
-                keywords={(news.keywords ?? []).map((k) => k.keyword)}
+        {news.newsType === NewsType.cabinet ? (
+          <CabinetExtraWrapper>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>안건 목록</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={agendaJsonToHtml(news.agendaList ?? '')}
+                onChange={(value) => {
+                  // Parse HTML to JSON structure for agendaList
+                  const agendaJson = htmlAgendaToJson(value);
+                  setNewsVal('agendaList', JSON.stringify(agendaJson));
+                }}
               />
-            </IsShow>
-          ) : (
-            <></>
-          )}
-        </NewsPreviewWrapper>
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>주요 발언 내용</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={speechJsonToHtml(news.speechContent ?? '')}
+                onChange={(value) => {
+                  // Parse HTML to JSON array for speechContent
+                  const speechJson = htmlSpeechToJson(value);
+                  setNewsVal('speechContent', JSON.stringify(speechJson));
+                }}
+              />
+            </CabinetExtraBox>
+          </CabinetExtraWrapper>
+        ) : (
+          <NewsPreviewWrapper>
+            {summarySelected != null ? (
+              <IsShow state={summarySelected !== null}>
+                <NewsContentPreview
+                  title={news.title}
+                  content={news.summaries[summarySelected!].summary}
+                  state={news.state}
+                  keywords={(news.keywords ?? []).map((k) => k.keyword)}
+                />
+              </IsShow>
+            ) : (
+              <></>
+            )}
+          </NewsPreviewWrapper>
+        )}
       </TextEditWrapper>
       <ContentWrapper className="mb-5" state={news.id !== null}>
         <TimelineInput
@@ -302,6 +423,46 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   );
 }
 
+function CabinetTextEditor({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const isMount = useRef(false);
+  const { ref, handleContents, initializeQuillContents } = useReactQuill();
+
+  const updateValue = useCallback(
+    (text: string) => {
+      handleContents(text);
+      onChange(text);
+    },
+    [handleContents, onChange],
+  );
+
+  useEffect(() => {
+    if (ref.current && !isMount.current) {
+      initializeQuillContents(value ?? '');
+      isMount.current = true;
+    }
+  }, [value, initializeQuillContents, ref]);
+
+  return (
+    <CabinetEditorWrapper>
+      <TextEditor
+        ref={ref}
+        style={{ height: '240px' }}
+        onChange={updateValue}
+        onMount={() => {
+          initializeQuillContents(value ?? '');
+        }}
+      />
+    </CabinetEditorWrapper>
+  );
+}
+
+
 const TextEditWrapper = styled.div`
   width: 100%;
   display: flex;
@@ -341,6 +502,36 @@ const NewsPreviewWrapper = styled.div`
 
   background-color: #f1f2f3;
 `;
+
+const CabinetExtraWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0.5rem 1rem;
+  margin: 0 0.5rem;
+`;
+
+const CabinetExtraBox = styled.div`
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  background-color: #ffffff;
+  padding: 12px;
+`;
+
+const CabinetExtraTitle = styled.div`
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 8px;
+`;
+
+const CabinetEditorWrapper = styled.div`
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  min-height: 240px;
+`;
+
 const InputWrapper = styled.div`
   display: flex;
   flex-direction: row;
@@ -391,6 +582,7 @@ const KeywordSetter = styled.div`
   padding-left: 5px;
   padding-right: 5px;
 `;
+
 
 const KeywordWrapper = styled.ul`
   padding: 0.375rem 0.75rem;

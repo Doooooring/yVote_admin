@@ -30,6 +30,7 @@ export enum CommentQualification {
 
 export enum NewsType {
   bill = 'bill',
+  teukprosecution = 'teukprosecution',
   constitution = 'constitution',
   executive = 'executive',
   cabinet = 'cabinet',
@@ -61,6 +62,8 @@ export const newsTypesToKor = (newsType: NewsType) => {
       return '선거';
     case NewsType.original:
       return '자체제작';
+    case NewsType.teukprosecution:
+      return '특검';
     case NewsType.others:
       return '기타';
     default:
@@ -145,6 +148,8 @@ export interface News {
   slug: string;
   summary: string;
   summaries: Array<NewsSummary>;
+  agendaList?: string;
+  speechContent?: string;
   date: Date | null;
   keywords: Array<Keyword>;
   newsImage: string | null;
@@ -183,6 +188,8 @@ export interface NewsOrg
     | 'slug'
     | 'summary'
     | 'summaries'
+    | 'agendaList'
+    | 'speechContent'
     | 'date'
     | 'state'
     | 'newsImage'
@@ -216,6 +223,8 @@ export const defaultNews = {
   slug: '',
   summary: '',
   summaries: [] as Array<NewsSummary>,
+  agendaList: '',
+  speechContent: '',
   date: null,
   state: NewsState.NotPublished,
   newsImage: '',
