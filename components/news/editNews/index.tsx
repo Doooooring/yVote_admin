@@ -120,14 +120,14 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
     Array.from(doc.body.children).forEach((el) => {
       if (el.tagName === 'UL') {
         const title = el.querySelector('li')?.textContent?.trim() || '';
-        if (currentGroup && currentGroup.items.length) groups.push(currentGroup);
+        if (currentGroup && (currentGroup as SpeechGroup).items.length) groups.push(currentGroup as SpeechGroup);
         currentGroup = { title, items: [] };
       } else if (el.tagName === 'P') {
         const item = el.textContent?.trim() || '';
-        if (currentGroup && item) currentGroup.items.push(item);
+        if (currentGroup && item) (currentGroup as SpeechGroup).items.push(item);
       }
     });
-    if (currentGroup && currentGroup.items.length) groups.push(currentGroup);
+    if (currentGroup && (currentGroup as SpeechGroup).items.length) groups.push(currentGroup as SpeechGroup);
     return groups;
   }
 
