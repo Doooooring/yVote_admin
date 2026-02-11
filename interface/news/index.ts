@@ -102,6 +102,7 @@ export interface Timeline {
 export interface TimelineToEdit extends Omit<Timeline, 'id' | 'date'> {
   id?: number;
   date?: Date;
+  commentType?: commentType;
 }
 
 export enum NewsState {

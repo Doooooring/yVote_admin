@@ -5,7 +5,7 @@ import { Center, Column, Row } from '@components/common/figure';
 import ListEditView from '@components/common/listEditView';
 import { faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { TimelineToEdit } from '@interface/news';
+import { TimelineToEdit, commentType } from '@interface/news';
 import styled from 'styled-components';
 
 interface TimelineInputProps {
@@ -22,7 +22,7 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
     moveArrLeft: moveTimelineLeft,
     moveArrRight: moveTimelineRight,
   } = useArr(timeline, handleTimeline, () => {
-    return { title: '', order: 0 };
+    return { title: '', order: 0, commentType: commentType.기타 };
   });
   return (
     <ListEditView
@@ -126,6 +126,24 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
                 }}
               ></TitleInput>
             </InputWrapper>
+            <InputWrapper>
+              <SubInputTitle>카테고리</SubInputTitle>
+              <Select
+                className="form-control"
+                value={timeline[curFocus!].commentType ?? commentType.기타}
+                onChange={(e) => {
+                  const curTimeline = complexClone(timeline);
+                  curTimeline[curFocus!].commentType = e.currentTarget.value as commentType;
+                  handleTimeline(curTimeline);
+                }}
+              >
+                {Object.values(commentType).map((ct) => (
+                  <option key={ct} value={ct}>
+                    {ct}
+                  </option>
+                ))}
+              </Select>
+            </InputWrapper>
           </RightColumnLayer>
         ) : (
           <></>
@@ -226,6 +244,10 @@ const DateInput = styled.input`
 
 const TitleInput = styled.input`
   width: 400px;
+`;
+
+const Select = styled.select`
+  width: 200px;
 `;
 
 const InputWrapper = styled.div`
