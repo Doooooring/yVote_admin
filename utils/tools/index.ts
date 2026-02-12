@@ -10,10 +10,22 @@ export const getDotDateForm = (date: Date) => {
   return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
 };
 
-export const getStandardDateForm = (date: Date) => {
-  if (typeof date === 'string') date = new Date(date);
+export const getStandardDateForm = (date: Date | string) => {
+  if (typeof date === 'string') {
+    // If it's an ISO string, parse it
+    const parsed = new Date(date);
+    if (!isNaN(parsed.valueOf())) {
+      date = parsed;
+    } else {
+      // If it's already YYYY-MM-DD, return as is
+      return date;
+    }
+  }
 
-  return date.toISOString().split('T')[0];
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 export const sortKorCallback = (a: string, b: string) => {

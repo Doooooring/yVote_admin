@@ -1,5 +1,6 @@
 import { CommentToEdit, commentType } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
+import { getStandardDateForm } from '@/utils/tools';
 import { useRef, useState } from 'react';
 
 export const useFetchNewsComment = (id: number, comment: commentType | null, limit: number) => {
@@ -14,7 +15,11 @@ export const useFetchNewsComment = (id: number, comment: commentType | null, lim
       if (!response || response.length == 0) {
         return false;
       } else {
-        setCurComments(response);
+        const converted = response.map(c => ({
+          ...c,
+          date: c.date ? getStandardDateForm(c.date) : undefined
+        }));
+        setCurComments(converted);
         return true;
       }
     } catch (e) {

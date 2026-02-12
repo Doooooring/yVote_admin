@@ -2,7 +2,7 @@ import { CommonIconButton, PrimaryButton, TextButton } from '@/components/common
 import { Column, CommonLayoutBox, Row } from '@/components/common/figure';
 import { CommentToEdit, commentType } from '@/interface/news';
 import { complexClone } from '@/utils';
-import { getStandardDateForm } from '@/utils/tools';
+import { getStandardDateForm, getDotDateForm } from '@/utils/tools';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useCallback, useState } from 'react';
@@ -11,7 +11,7 @@ import styled from 'styled-components';
 type CommentForm = {
   title: string;
   comment: string;
-  date?: Date;
+  date?: string;
 };
 
 function convertInputToCommentForm(input: string) {
@@ -33,7 +33,7 @@ function convertInputToCommentForm(input: string) {
     } else if (key === 'content') {
       cur.comment = val;
     } else if (key === 'date') {
-      cur.date = new Date(new Date(val).getTime() + 9 * 60 * 60 * 1000);
+      cur.date = getStandardDateForm(new Date(val));
     }
   });
 
@@ -74,7 +74,7 @@ export function EditBulkComments({
             const dateObj = new Date(value);
             const isValid = !isNaN(dateObj.valueOf());
             if (!isValid) break;
-            comment.date = dateObj;
+            comment.date = getStandardDateForm(dateObj);
             break;
           }
         }
@@ -176,7 +176,7 @@ export function EditBulkComments({
                       min="1000-01-01"
                       max="9999-12-31"
                       className="form-control"
-                      value={comment.date ? getStandardDateForm(comment.date!) : ''}
+                      value={comment.date || ''}
                       onChange={(e) => {
                         onChangeInput(index, 'date', e.target.value);
                       }}
@@ -187,7 +187,7 @@ export function EditBulkComments({
                       }}
                     />
                     <span style={{ paddingLeft: '0.5rem', whiteSpace: 'nowrap' }}>
-                      {comment.date ? getStandardDateForm(comment.date!) : ''}
+                      {comment.date ? getDotDateForm(new Date(comment.date)) : ''}
                     </span>
                   </InputWrapper>
                 </CommentInputLayer>

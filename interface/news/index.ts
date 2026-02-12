@@ -84,7 +84,7 @@ export interface Comment {
 
 export interface CommentToEdit extends Omit<Comment, 'id' | 'date'> {
   id?: number;
-  date?: Date;
+  date?: string;
 }
 
 export interface CommentsArr {
@@ -151,7 +151,7 @@ export interface News {
   summaries: Array<NewsSummary>;
   agendaList?: string;
   speechContent?: string;
-  date: Date | null;
+  date: string | null;
   keywords: Array<Keyword>;
   newsImage: string | null;
   isPublished: boolean;

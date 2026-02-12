@@ -248,10 +248,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               value={news.date ? getStandardDateForm(news.date!) : ''}
               onChange={(e) => {
                 const nextValue = e.target.value;
-                const dateObj = new Date(nextValue);
-                const isValid = !isNaN(dateObj.valueOf());
-                if (!isValid) return;
-                setNewsVal('date', dateObj);
+                setNewsVal('date', nextValue);
               }}
               onClick={(e) => {
                 if (e.currentTarget.showPicker) {
