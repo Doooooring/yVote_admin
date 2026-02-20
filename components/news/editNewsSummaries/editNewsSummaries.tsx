@@ -1,20 +1,23 @@
 import IsShow from '@components/common/isShow';
 
-import { NewsSummary } from '@interface/news';
+import { NewsSummary, NewsType } from '@interface/news';
 import { useCallback } from 'react';
 import styled from 'styled-components';
 import EditNewsSummary from './editNewsSummary';
+import EditWeeklySummary from './editWeeklySummary';
 
 interface EditNewsSummariesProps {
   summarySelected: number | null;
   summaries: Array<NewsSummary>;
   setSummaries: (summaries: Array<NewsSummary>) => void;
+  newsType?: NewsType;
 }
 
 export default function EditNewsSummaries({
   summarySelected,
   summaries,
   setSummaries,
+  newsType,
 }: EditNewsSummariesProps) {
   const saveSummary = useCallback(
     (summary: NewsSummary) => {
@@ -34,9 +37,10 @@ export default function EditNewsSummaries({
       <div>
         <SummaryEditorWrapper>
           {summaries.map((summary, idx) => {
+            const Editor = newsType === NewsType.weekly ? EditWeeklySummary : EditNewsSummary;
             return (
               <IsShow key={summary.commentType} state={summarySelected === idx}>
-                <EditNewsSummary summary={summary} saveSummary={saveSummary} />
+                <Editor summary={summary} saveSummary={saveSummary} />
               </IsShow>
             );
           })}

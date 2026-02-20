@@ -62,15 +62,8 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
       setNewsVal('summaries', summaries);
     },
     () => {
-      let restType = getCommentRest(news.summaries.map((summary) => summary.commentType))[0];
+      const restType = getCommentRest(news.summaries.map((summary) => summary.commentType))[0];
       if (!restType) return null;
-
-      if (
-        news.summaries.filter((summary) => {
-          return summary.commentType == commentType.와이보트;
-        }).length == 0
-      )
-        restType = commentType.와이보트;
 
       return {
         commentType: restType,
@@ -80,13 +73,6 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
     },
     news.summaries.length > 0 ? 0 : null,
   );
-
-  useEffect(() => {
-    if (news.summaries.length == 0) {
-      addSummary(0);
-      setSummarySelected(0);
-    }
-  }, [news.summaries, addSummary, setSummarySelected]);
 
   // Helper: Parse HTML agenda input into JSON structure (browser-safe)
   function htmlAgendaToJson(html: string) {
@@ -168,7 +154,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
 
   const submitNews = useCallback(async () => {
     if (isLoading) return;
-    if (!news.date) news.date = new Date();
+    if (!news.date) news.date = new Date().toISOString();
     let agendaList = news.agendaList;
     let speechContent = news.speechContent;
     // If agendaList is not valid JSON, try to parse it from HTML
@@ -183,8 +169,23 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
     } catch {
       speechContent = JSON.stringify(htmlSpeechToJson(speechContent ?? ''));
     }
+    // Sort summaries by fixed commentType order
+    const summaryOrder: string[] = [
+      commentType.와이보트,
+      commentType.헌법재판소,
+      commentType.대통령실,
+      commentType.행정부,
+      commentType.국민의힘,
+      commentType.더불어민주당,
+      commentType.기타,
+    ];
+    const sortedSummaries = [...news.summaries].sort((a, b) => {
+      const ai = summaryOrder.indexOf(a.commentType);
+      const bi = summaryOrder.indexOf(b.commentType);
+      return (ai === -1 ? summaryOrder.length : ai) - (bi === -1 ? summaryOrder.length : bi);
+    });
     const { comments, ...rest } = news;
-    submit({ ...rest, agendaList, speechContent });
+    submit({ ...rest, summaries: sortedSummaries, agendaList, speechContent });
     return;
   }, [news, submit]);
 
@@ -284,6 +285,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
             setSummaries={(summaries: Array<NewsSummary>) => {
               setNewsVal('summaries', summaries);
             }}
+            newsType={news.newsType}
           />
           <StateToggleWrapper>
             <InputWrapper className="pb-1 pt-1 mb-1">
