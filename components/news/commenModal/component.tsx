@@ -33,7 +33,7 @@ function convertInputToCommentForm(input: string) {
     } else if (key === 'content') {
       cur.comment = val;
     } else if (key === 'date') {
-      cur.date = getStandardDateForm(new Date(val));
+      cur.date = getStandardDateForm(val);
     }
   });
 
@@ -71,10 +71,8 @@ export function EditBulkComments({
             break;
           }
           case 'date': {
-            const dateObj = new Date(value);
-            const isValid = !isNaN(dateObj.valueOf());
-            if (!isValid) break;
-            comment.date = getStandardDateForm(dateObj);
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) break;
+            comment.date = value;
             break;
           }
         }
@@ -187,7 +185,7 @@ export function EditBulkComments({
                       }}
                     />
                     <span style={{ paddingLeft: '0.5rem', whiteSpace: 'nowrap' }}>
-                      {comment.date ? getDotDateForm(new Date(comment.date)) : ''}
+                      {comment.date ? getDotDateForm(comment.date) : ''}
                     </span>
                   </InputWrapper>
                 </CommentInputLayer>

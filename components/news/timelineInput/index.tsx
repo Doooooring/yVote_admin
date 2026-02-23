@@ -99,11 +99,9 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
                 }
                 onChange={(e) => {
                   const nextValue = e.target.value;
-                  const dateObj = new Date(nextValue);
-                  const isValid = !isNaN(dateObj.valueOf());
-                  if (!isValid) return;
+                  if (!/^\d{4}-\d{2}-\d{2}$/.test(nextValue)) return;
                   const curTimeline = complexClone(timeline);
-                  curTimeline[curFocus!].date = new Date(e.currentTarget.value);
+                  curTimeline[curFocus!].date = nextValue;
                   handleTimeline(curTimeline);
                 }}
                 onClick={(e) => {

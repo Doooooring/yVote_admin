@@ -5,23 +5,24 @@ export const htmlFromString = (s: string) => {
   return doc.body;
 };
 
-export const getDotDateForm = (date: Date) => {
-  if (typeof date === 'string') date = new Date(date);
-  return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+export const getDotDateForm = (date: string | Date): string => {
+  if (date instanceof Date) {
+    return `${date.getFullYear()}.${date.getMonth() + 1}.${date.getDate()}`;
+  }
+  const m = String(date).match(/^(\d{4})[.\-](\d{1,2})[.\-](\d{1,2})/);
+  if (!m) return String(date);
+  return `${m[1]}.${+m[2]}.${+m[3]}`;
 };
 
-export const getStandardDateForm = (date: Date | string) => {
+export const getStandardDateForm = (date: string | Date): string => {
   if (typeof date === 'string') {
-    // If it's an ISO string, parse it
-    const parsed = new Date(date);
-    if (!isNaN(parsed.valueOf())) {
-      date = parsed;
-    } else {
-      // If it's already YYYY-MM-DD, return as is
-      return date;
-    }
+    // If already YYYY-MM-DD, return as-is
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+    // Try to parse YYYY.MM.DD or similar
+    const m = String(date).match(/^(\d{4})[.\-](\d{1,2})[.\-](\d{1,2})/);
+    if (m) return `${m[1]}-${String(+m[2]).padStart(2, '0')}-${String(+m[3]).padStart(2, '0')}`;
+    return date;
   }
-
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, '0');
   const day = String(date.getDate()).padStart(2, '0');

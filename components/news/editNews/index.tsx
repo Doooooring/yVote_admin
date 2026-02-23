@@ -154,7 +154,10 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
 
   const submitNews = useCallback(async () => {
     if (isLoading) return;
-    if (!news.date) news.date = new Date().toISOString();
+    if (!news.date) {
+      const now = new Date();
+      news.date = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    }
     let agendaList = news.agendaList;
     let speechContent = news.speechContent;
     // If agendaList is not valid JSON, try to parse it from HTML

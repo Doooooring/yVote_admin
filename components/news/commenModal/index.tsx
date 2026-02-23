@@ -227,11 +227,9 @@ export default function CommentModal({ newsId }: CommentModalProps) {
                         }
                         onChange={(e) => {
                           const nextValue = e.target.value;
-                          const dateObj = new Date(nextValue);
-                          const isValid = !isNaN(dateObj.valueOf());
-                          if (!isValid) return;
+                          if (!/^\d{4}-\d{2}-\d{2}$/.test(nextValue)) return;
                           const curCommentsToEdit = complexClone(commentsToEdit);
-                          curCommentsToEdit[curFocus!].date = new Date(e.currentTarget.value);
+                          curCommentsToEdit[curFocus!].date = nextValue;
                           setCurCommentsToEdit(curCommentsToEdit);
                         }}
                         onClick={(e) => {

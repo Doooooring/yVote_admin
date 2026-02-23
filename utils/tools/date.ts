@@ -1,17 +1,36 @@
-export const getDotDateForm = (date: Date) => {
-  if (typeof date === 'string') date = new Date(date);
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(
-    date.getDate(),
-  ).padStart(2, '0')}`;
+/**
+ * Parse a YYYY-MM-DD (or YYYY.MM.DD) string into {year, month, day}.
+ * Returns null if the string doesn't match.
+ */
+function parseDateStr(date: string): { year: number; month: number; day: number } | null {
+  const m = String(date).match(/^(\d{4})[.\-](\d{1,2})[.\-](\d{1,2})/);
+  if (!m) return null;
+  return { year: +m[1], month: +m[2], day: +m[3] };
+}
+
+/** Convert a YYYY-MM-DD string to local Date for arithmetic only. */
+function toLocalDate(date: string): Date {
+  return new Date(date + 'T00:00:00');
+}
+
+export const getDotDateForm = (date: string | Date): string => {
+  if (date instanceof Date) {
+    return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(
+      date.getDate(),
+    ).padStart(2, '0')}`;
+  }
+  const p = parseDateStr(date);
+  if (!p) return String(date);
+  return `${p.year}.${String(p.month).padStart(2, '0')}.${String(p.day).padStart(2, '0')}`;
 };
 
 export const getToday = () => {
   return new Date();
 };
 
-export const getDateDiff = (baseDate: Date, targetDate: Date) => {
-  const date1 = new Date(baseDate);
-  const date2 = new Date(targetDate);
+export const getDateDiff = (baseDate: string | Date, targetDate: string | Date) => {
+  const date1 = typeof baseDate === 'string' ? toLocalDate(baseDate) : new Date(baseDate);
+  const date2 = typeof targetDate === 'string' ? toLocalDate(targetDate) : new Date(targetDate);
 
   const diff = date1.getTime() - date2.getTime();
 
@@ -28,14 +47,22 @@ export const getDateDiffInMillFromToday = (date: Date) => {
   return getDateDiffInMill(today, date);
 };
 
-export const getStandardDateForm = (date: Date) => {
-  const d = new Date(date);
-  return d.toISOString().split('T')[0];
+export const getStandardDateForm = (date: string | Date): string => {
+  if (typeof date === 'string') {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(date)) return date;
+    const p = parseDateStr(date);
+    if (p) return `${p.year}-${String(p.month).padStart(2, '0')}-${String(p.day).padStart(2, '0')}`;
+    return date;
+  }
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
-export const getKoreanTimeDifference = (baseDate: Date, targetDate: Date) => {
-  const date1 = new Date(baseDate);
-  const date2 = new Date(targetDate);
+export const getKoreanTimeDifference = (baseDate: string | Date, targetDate: string | Date) => {
+  const date1 = typeof baseDate === 'string' ? toLocalDate(baseDate) : new Date(baseDate);
+  const date2 = typeof targetDate === 'string' ? toLocalDate(targetDate) : new Date(targetDate);
 
   const diff = date1.getTime() - date2.getTime();
 
@@ -71,24 +98,35 @@ export const getKoreanTimeDifference = (baseDate: Date, targetDate: Date) => {
   return prefix + ' ' + subfix;
 };
 
-export const getKoreanTimeDiffBeforeToday = (date: Date) => {
+export const getKoreanTimeDiffBeforeToday = (date: string | Date) => {
   return getKoreanTimeDifference(new Date(), date);
 };
 
-export const getDateHidingCurrentYear = (d: Date) => {
-  const date = new Date(d);
-
+export const getDateHidingCurrentYear = (d: string | Date): string => {
+  if (typeof d === 'string') {
+    const p = parseDateStr(d);
+    if (!p) return String(d);
+    const currentYear = new Date().getFullYear();
+    if (p.year !== currentYear) {
+      return `${String(p.month).padStart(2, '0')}/${String(p.day).padStart(2, '0')}/${String(p.year).slice(-2)}`;
+    }
+    return `${String(p.month).padStart(2, '0')}/${String(p.day).padStart(2, '0')}`;
+  }
   const currentYear = new Date().getFullYear();
-  const year = date.getFullYear();
-
-  return date.toLocaleDateString('en-US', {
+  const year = d.getFullYear();
+  return d.toLocaleDateString('en-US', {
     year: year !== currentYear ? '2-digit' : undefined,
     month: '2-digit',
     day: '2-digit',
   });
 };
 
-export const useKoreanDateFormat = (date: Date) => {
+export const useKoreanDateFormat = (date: string | Date): string => {
+  if (typeof date === 'string') {
+    const p = parseDateStr(date);
+    if (!p) return String(date);
+    return `${p.year}년 ${p.month}월 ${p.day}일`;
+  }
   const d = new Date(date);
   const year = d.getFullYear();
   const month = d.getMonth() + 1;

@@ -78,7 +78,7 @@ export interface Comment {
   commentType: commentType;
   title: string;
   comment: string;
-  date: Date;
+  date: string;
   url?: string;
 }
 
@@ -95,13 +95,13 @@ export interface CommentsArr {
 export interface Timeline {
   id: number;
   order: number;
-  date: Date;
+  date: string;
   title: string;
 }
 
 export interface TimelineToEdit extends Omit<Timeline, 'id' | 'date'> {
   id?: number;
-  date?: Date;
+  date?: string;
   commentType?: commentType;
 }
 
@@ -129,7 +129,7 @@ export interface Article {
   commentType: commentType;
   title: string;
   comment: string;
-  date: Date;
+  date: string;
   newsId: number;
 }
 
