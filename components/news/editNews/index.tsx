@@ -18,11 +18,12 @@ import {
   NewsToPatch,
   NewsType,
   newsTypesToKor,
+  PartyVote,
   TimelineToEdit,
 } from '@interface/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
 import EditNewsSummaries from '../editNewsSummaries/editNewsSummaries';
@@ -73,6 +74,10 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
     },
     news.summaries.length > 0 ? 0 : null,
   );
+
+  // Drag-and-drop for party vote rows
+  const dragIdxRef = useRef<number | null>(null);
+  const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
 
   // Helper: Parse HTML agenda input into JSON structure (browser-safe)
   function htmlAgendaToJson(html: string) {
@@ -176,7 +181,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
     const summaryOrder: string[] = [
       commentType.와이보트,
       commentType.헌법재판소,
-      commentType.대통령실,
+      commentType.청와대,
       commentType.행정부,
       commentType.국민의힘,
       commentType.더불어민주당,
@@ -187,8 +192,24 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
       const bi = summaryOrder.indexOf(b.commentType);
       return (ai === -1 ? summaryOrder.length : ai) - (bi === -1 ? summaryOrder.length : bi);
     });
+    // Trim leading/trailing whitespace (including &nbsp;) from text inside HTML tags for billSummary
+    const trimmedBillSummary = (news.billSummary ?? '')
+      .replace(/&nbsp;/g, ' ')
+      .replace(/>([^<]*)</g, (_, text: string) => `>${text.trim()}<`);
     const { comments, ...rest } = news;
-    submit({ ...rest, summaries: sortedSummaries, agendaList, speechContent });
+    submit({
+      ...rest,
+      summaries: sortedSummaries,
+      agendaList,
+      speechContent,
+      billSummary: trimmedBillSummary,
+      proDebate: news.proDebate,
+      conDebate: news.conDebate,
+      etcDebate: news.etcDebate,
+      billVoteResult: news.billVoteResult,
+      billVoteTotal: news.billVoteTotal,
+      billVoteByParty: news.billVoteByParty,
+    });
     return;
   }, [news, submit]);
 
@@ -352,6 +373,164 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                   // Parse HTML to JSON array for speechContent
                   const speechJson = htmlSpeechToJson(value);
                   setNewsVal('speechContent', JSON.stringify(speechJson));
+                }}
+              />
+            </CabinetExtraBox>
+          </CabinetExtraWrapper>
+        ) : news.newsType === NewsType.bill ? (
+          <CabinetExtraWrapper>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>법안 요약</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.billSummary ?? ''}
+                onChange={(value) => {
+                  setNewsVal('billSummary', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>표결 정보</CabinetExtraTitle>
+              <VoteInputRow>
+                <VoteInputGroup>
+                  <VoteInputLabel>의결결과</VoteInputLabel>
+                  <VoteInput
+                    type="text"
+                    value={news.billVoteResult ?? ''}
+                    onChange={(e) => setNewsVal('billVoteResult', e.target.value)}
+                    placeholder="원안가결, 수정가결, 부결 등"
+                  />
+                </VoteInputGroup>
+                <VoteInputGroup>
+                  <VoteInputLabel>총투표</VoteInputLabel>
+                  <VoteInput
+                    type="number"
+                    value={news.billVoteTotal ?? 0}
+                    onChange={(e) => setNewsVal('billVoteTotal', Number(e.target.value))}
+                  />
+                </VoteInputGroup>
+              </VoteInputRow>
+              <VotePartyTable>
+                <thead>
+                  <tr>
+                    <th style={{ width: '28px' }}></th>
+                    <th>정당</th>
+                    <th>찬성</th>
+                    <th>반대</th>
+                    <th>기권</th>
+                    <th>불참</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {(news.billVoteByParty ?? []).map((pv, idx) => (
+                    <VotePartyRow
+                      key={idx}
+                      draggable
+                      $isDragOver={dragOverIdx === idx}
+                      onDragStart={() => {
+                        dragIdxRef.current = idx;
+                      }}
+                      onDragOver={(e) => {
+                        e.preventDefault();
+                        setDragOverIdx(idx);
+                      }}
+                      onDragLeave={() => {
+                        if (dragOverIdx === idx) setDragOverIdx(null);
+                      }}
+                      onDrop={() => {
+                        const from = dragIdxRef.current;
+                        if (from !== null && from !== idx) {
+                          const updated = [...(news.billVoteByParty ?? [])];
+                          const [item] = updated.splice(from, 1);
+                          updated.splice(idx, 0, item);
+                          setNewsVal('billVoteByParty', updated);
+                        }
+                        dragIdxRef.current = null;
+                        setDragOverIdx(null);
+                      }}
+                      onDragEnd={() => {
+                        dragIdxRef.current = null;
+                        setDragOverIdx(null);
+                      }}
+                    >
+                      <td>
+                        <DragHandle>⠿</DragHandle>
+                      </td>
+                      <td>
+                        <VoteInput
+                          type="text"
+                          value={pv.party}
+                          onChange={(e) => {
+                            const updated = [...(news.billVoteByParty ?? [])];
+                            updated[idx] = { ...updated[idx], party: e.target.value };
+                            setNewsVal('billVoteByParty', updated);
+                          }}
+                          placeholder="정당명"
+                        />
+                      </td>
+                      {(['for', 'against', 'abstain', 'absent'] as const).map((field) => (
+                        <td key={field}>
+                          <VoteInput
+                            type="number"
+                            value={pv[field]}
+                            onChange={(e) => {
+                              const updated = [...(news.billVoteByParty ?? [])];
+                              updated[idx] = { ...updated[idx], [field]: Number(e.target.value) };
+                              setNewsVal('billVoteByParty', updated);
+                            }}
+                            style={{ width: '70px' }}
+                          />
+                        </td>
+                      ))}
+                      <td>
+                        <VoteDeleteBtn
+                          onClick={() => {
+                            const updated = (news.billVoteByParty ?? []).filter((_, i) => i !== idx);
+                            setNewsVal('billVoteByParty', updated);
+                          }}
+                        >
+                          ✕
+                        </VoteDeleteBtn>
+                      </td>
+                    </VotePartyRow>
+                  ))}
+                </tbody>
+              </VotePartyTable>
+              <VoteAddBtn
+                onClick={() => {
+                  setNewsVal('billVoteByParty', [
+                    ...(news.billVoteByParty ?? []),
+                    { party: '', for: 0, against: 0, abstain: 0, absent: 0 },
+                  ]);
+                }}
+              >
+                + 정당 추가
+              </VoteAddBtn>
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>찬성 토론</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.proDebate ?? ''}
+                onChange={(value) => {
+                  setNewsVal('proDebate', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>반대 토론</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.conDebate ?? ''}
+                onChange={(value) => {
+                  setNewsVal('conDebate', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>기타</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.etcDebate ?? ''}
+                onChange={(value) => {
+                  setNewsVal('etcDebate', value);
                 }}
               />
             </CabinetExtraBox>
@@ -600,6 +779,100 @@ const KeywordLi = styled.li`
   border-radius: 0.25rem;
 
   margin-bottom: 5px;
+`;
+
+const VoteInputRow = styled.div`
+  display: flex;
+  gap: 16px;
+  margin-bottom: 12px;
+`;
+
+const VoteInputGroup = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+`;
+
+const VoteInputLabel = styled.span`
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+`;
+
+const VoteInput = styled.input`
+  padding: 4px 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  font-size: 13px;
+  &[type='number'] {
+    width: 80px;
+  }
+`;
+
+const VotePartyTable = styled.table`
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+  font-size: 13px;
+
+  th {
+    text-align: left;
+    padding: 4px 6px;
+    border-bottom: 1px solid #dee2e6;
+    font-weight: 600;
+  }
+
+  td {
+    padding: 4px 6px;
+    border-bottom: 1px solid #f1f3f5;
+  }
+`;
+
+const VotePartyRow = styled.tr<{ $isDragOver: boolean }>`
+  background: ${({ $isDragOver }) => ($isDragOver ? '#e9ecef' : 'transparent')};
+  transition: background 0.15s;
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+`;
+
+const DragHandle = styled.span`
+  cursor: grab;
+  color: #adb5bd;
+  font-size: 16px;
+  user-select: none;
+  display: inline-block;
+  width: 20px;
+  text-align: center;
+
+  &:hover {
+    color: #495057;
+  }
+`;
+
+const VoteDeleteBtn = styled.button`
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 2px 6px;
+`;
+
+const VoteAddBtn = styled.button`
+  background: #f8f9fa;
+  border: 1px dashed #ced4da;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #495057;
+
+  &:hover {
+    background: #e9ecef;
+  }
 `;
 
 const SubmitWrapper = styled.div`

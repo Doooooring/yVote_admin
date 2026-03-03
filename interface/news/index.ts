@@ -14,7 +14,7 @@ export enum commentType {
   와이보트 = '와이보트',
   입법부 = '입법부',
   행정부 = '행정부',
-  대통령실 = '대통령실',
+  청와대 = '청와대',
   국민의힘 = '국민의힘',
   더불어민주당 = '더불어민주당',
   기타 = '기타',
@@ -140,6 +140,14 @@ export interface NewsSummary {
   newsId: number;
 }
 
+export interface PartyVote {
+  party: string;
+  for: number;
+  against: number;
+  abstain: number;
+  absent: number;
+}
+
 export interface News {
   id: number;
   order: number;
@@ -151,6 +159,13 @@ export interface News {
   summaries: Array<NewsSummary>;
   agendaList?: string;
   speechContent?: string;
+  proDebate?: string;
+  conDebate?: string;
+  etcDebate?: string;
+  billSummary?: string;
+  billVoteResult?: string;
+  billVoteTotal?: number;
+  billVoteByParty?: PartyVote[];
   date: string | null;
   keywords: Array<Keyword>;
   newsImage: string | null;
@@ -191,6 +206,13 @@ export interface NewsOrg
     | 'summaries'
     | 'agendaList'
     | 'speechContent'
+    | 'proDebate'
+    | 'conDebate'
+    | 'etcDebate'
+    | 'billSummary'
+    | 'billVoteResult'
+    | 'billVoteTotal'
+    | 'billVoteByParty'
     | 'date'
     | 'state'
     | 'newsImage'
@@ -226,6 +248,13 @@ export const defaultNews = {
   summaries: [] as Array<NewsSummary>,
   agendaList: '',
   speechContent: '',
+  proDebate: '',
+  conDebate: '',
+  etcDebate: '',
+  billSummary: '',
+  billVoteResult: '',
+  billVoteTotal: 0,
+  billVoteByParty: [],
   date: null,
   state: NewsState.NotPublished,
   newsImage: '',
