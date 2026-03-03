@@ -50,7 +50,7 @@ export const commentTypeColor = (type: commentType) => {
       return 'rgb(11, 104, 179)';
     case commentType.국민의힘:
       return 'rgb(230, 30, 43)';
-    case commentType.대통령실:
+    case commentType.청와대:
       return 'rgb(0, 32, 92)';
     case commentType.입법부:
       return 'rgb(255, 153, 0)';

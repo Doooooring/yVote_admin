@@ -66,15 +66,12 @@ export default function EditSummariesToolbar({
 
   const onSaveCommentType = useCallback(
     async (commentType: commentType) => {
-      console.log('======');
-      console.log(summarySelected);
-      if (summarySelected === null) return;
       const response = await newsRepositories.saveNewComment(newsId, commentType);
       if (!response) {
         throw new Error('결과가 이상하네??');
       }
 
-      addSummary(summarySelected, {
+      addSummary(summarySelected ?? -1, {
         commentType: commentType,
       });
     },
