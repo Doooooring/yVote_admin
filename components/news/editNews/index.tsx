@@ -192,20 +192,21 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
       const bi = summaryOrder.indexOf(b.commentType);
       return (ai === -1 ? summaryOrder.length : ai) - (bi === -1 ? summaryOrder.length : bi);
     });
-    // Trim leading/trailing whitespace (including &nbsp;) from text inside HTML tags for billSummary
-    const trimmedBillSummary = (news.billSummary ?? '')
+    // Normalize &nbsp; and insert space after numbered prefixes like "25." when missing
+    const trimmedBillDetail = (news.billDetail ?? '')
       .replace(/&nbsp;/g, ' ')
-      .replace(/>([^<]*)</g, (_, text: string) => `>${text.trim()}<`);
+      .replace(/>(\d+(?:의\d+)?\.)(<)/g, '>$1 $2');
     const { comments, ...rest } = news;
     submit({
       ...rest,
       summaries: sortedSummaries,
       agendaList,
       speechContent,
-      billSummary: trimmedBillSummary,
+      billDetail: trimmedBillDetail,
+      billSummary: news.billSummary,
       proDebate: news.proDebate,
       conDebate: news.conDebate,
-      etcDebate: news.etcDebate,
+      billAmendment: news.billAmendment,
       billVoteResult: news.billVoteResult,
       billVoteTotal: news.billVoteTotal,
       billVoteByParty: news.billVoteByParty,
@@ -389,6 +390,15 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               />
             </CabinetExtraBox>
             <CabinetExtraBox>
+              <CabinetExtraTitle>법안 상세보기</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.billDetail ?? ''}
+                onChange={(value) => {
+                  setNewsVal('billDetail', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
               <CabinetExtraTitle>표결 정보</CabinetExtraTitle>
               <VoteInputRow>
                 <VoteInputGroup>
@@ -508,6 +518,15 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               </VoteAddBtn>
             </CabinetExtraBox>
             <CabinetExtraBox>
+              <CabinetExtraTitle>수정안 내용</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.billAmendment ?? ''}
+                onChange={(value) => {
+                  setNewsVal('billAmendment', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
               <CabinetExtraTitle>찬성 토론</CabinetExtraTitle>
               <CabinetTextEditor
                 value={news.proDebate ?? ''}
@@ -522,15 +541,6 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                 value={news.conDebate ?? ''}
                 onChange={(value) => {
                   setNewsVal('conDebate', value);
-                }}
-              />
-            </CabinetExtraBox>
-            <CabinetExtraBox>
-              <CabinetExtraTitle>기타</CabinetExtraTitle>
-              <CabinetTextEditor
-                value={news.etcDebate ?? ''}
-                onChange={(value) => {
-                  setNewsVal('etcDebate', value);
                 }}
               />
             </CabinetExtraBox>
