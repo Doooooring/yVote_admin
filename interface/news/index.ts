@@ -161,8 +161,9 @@ export interface News {
   speechContent?: string;
   proDebate?: string;
   conDebate?: string;
-  etcDebate?: string;
+  billAmendment?: string;
   billSummary?: string;
+  billDetail?: string;
   billVoteResult?: string;
   billVoteTotal?: number;
   billVoteByParty?: PartyVote[];
@@ -208,8 +209,9 @@ export interface NewsOrg
     | 'speechContent'
     | 'proDebate'
     | 'conDebate'
-    | 'etcDebate'
+    | 'billAmendment'
     | 'billSummary'
+    | 'billDetail'
     | 'billVoteResult'
     | 'billVoteTotal'
     | 'billVoteByParty'
@@ -250,8 +252,9 @@ export const defaultNews = {
   speechContent: '',
   proDebate: '',
   conDebate: '',
-  etcDebate: '',
+  billAmendment: '',
   billSummary: '',
+  billDetail: '',
   billVoteResult: '',
   billVoteTotal: 0,
   billVoteByParty: [],
