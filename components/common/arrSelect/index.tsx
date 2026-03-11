@@ -201,7 +201,8 @@ const SourceGrid = styled.div`
 const SourceUl = styled.ul`
   width: 100%;
   height: 400px;
-  overflow-y: scroll;
+  overflow-y: auto;
+  background-color: white;
   list-style-type: none;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;

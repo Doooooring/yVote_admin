@@ -57,7 +57,8 @@ const LeftColumnLayer = styled(Column)`
 `;
 
 const LeftWrapper = styled(Layer)`
-  overflow-y: scroll;
+  overflow-y: auto;
+  background-color: white;
 `;
 
 const RightWrapper = styled(Layer)``;
