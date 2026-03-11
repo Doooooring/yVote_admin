@@ -317,7 +317,8 @@ const RightColumnLayer = styled.div`
 
   min-height: 100px;
   max-height: 500px;
-  overflow: scroll;
+  overflow: auto;
+  background-color: white;
   div.input_layer_header {
     display: flex;
     flex-direction: row;
