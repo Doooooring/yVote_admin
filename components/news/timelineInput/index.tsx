@@ -1,3 +1,4 @@
+import React from 'react';
 import { complexClone } from '@/utils';
 import { useArr } from '@/utils/hook/useArr';
 import { getDotDateForm, getStandardDateForm } from '@/utils/tools';
@@ -97,14 +98,14 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
                 value={
                   timeline[curFocus!].date ? getStandardDateForm(timeline[curFocus!].date!) : ''
                 }
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const nextValue = e.target.value;
                   if (!/^\d{4}-\d{2}-\d{2}$/.test(nextValue)) return;
                   const curTimeline = complexClone(timeline);
                   curTimeline[curFocus!].date = nextValue;
                   handleTimeline(curTimeline);
                 }}
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                   if (e.currentTarget.showPicker) {
                     e.currentTarget.showPicker();
                   }
@@ -117,7 +118,7 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
                 type="text"
                 className="form-control"
                 value={timeline[curFocus!].title}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   const curTimeline = complexClone(timeline);
                   curTimeline[curFocus!].title = e.currentTarget.value;
                   handleTimeline(curTimeline);
@@ -129,7 +130,7 @@ export default function TimelineInput({ timeline, handleTimeline }: TimelineInpu
               <Select
                 className="form-control"
                 value={timeline[curFocus!].commentType ?? commentType.기타}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                   const curTimeline = complexClone(timeline);
                   curTimeline[curFocus!].commentType = e.currentTarget.value as commentType;
                   handleTimeline(curTimeline);

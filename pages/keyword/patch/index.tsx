@@ -15,7 +15,7 @@ import { useKeywordStore } from '@store/keyword';
 import { useNewsStore } from '@store/news';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { GetServerSideProps } from 'next';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import styled from 'styled-components';
 
@@ -129,7 +129,7 @@ export default function KeywordPatch({ data }: pageProps) {
               type="text"
               className="form-control"
               value={keyword}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setKeyword(e.currentTarget.value);
               }}
             ></Input>
@@ -144,7 +144,7 @@ export default function KeywordPatch({ data }: pageProps) {
             <Select
               className="form-select"
               value={category}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                 setCategory(e.currentTarget.value as KeywordCategory);
               }}
             >

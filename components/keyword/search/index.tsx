@@ -1,7 +1,7 @@
+import React, { useState } from 'react';
 import styled from 'styled-components';
 
 import { PrimaryButton } from '@components/common/button';
-import { useState } from 'react';
 
 interface SearchBoxProps {
   setSearchWord: (word: string) => Promise<void> | void;
@@ -17,7 +17,7 @@ export default function SearchBox({ setSearchWord }: SearchBoxProps) {
           type="text"
           value={input}
           className="form-control"
-          onChange={(e) => {
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             setInput(e.currentTarget.value);
           }}
         ></Input>

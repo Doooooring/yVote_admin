@@ -1,3 +1,4 @@
+import React from 'react';
 import { NewsTitle } from '@interface/news';
 import styled from 'styled-components';
 
@@ -15,7 +16,7 @@ export default function IdSelector({
   return (
     <Wrapper
       state={newsSelectorUp}
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
           setNewsSelectorUp(false);
         }

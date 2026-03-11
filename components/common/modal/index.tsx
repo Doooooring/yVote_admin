@@ -1,3 +1,4 @@
+import React from 'react';
 import { useCommonStore } from '@store/common';
 import styled from 'styled-components';
 
@@ -14,7 +15,7 @@ export default function Modal({ children }: ModalProps) {
   return isSelectorModalUp ? (
     <Wrapper
       state={isSelectorModalUp}
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
           setIsSelectorModalUp(false);
         }

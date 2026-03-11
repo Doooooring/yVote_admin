@@ -18,7 +18,7 @@ import LoadingCommon from '@components/common/loadingCommon';
 import { CommentToEdit, commentType } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
 import { useCommonStore } from '@store/common';
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { EditBulkComments } from './component';
 
 interface CommentModalProps {
@@ -206,7 +206,7 @@ export default function CommentModal({ newsId }: CommentModalProps) {
                         type="text"
                         className="form-control"
                         value={commentsToEdit[curFocus].title}
-                        onChange={(e) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const curCommentsToEdit = complexClone(commentsToEdit);
                           curCommentsToEdit[curFocus!].title = e.currentTarget.value;
                           setCurCommentsToEdit(curCommentsToEdit);
@@ -225,14 +225,14 @@ export default function CommentModal({ newsId }: CommentModalProps) {
                             ? getStandardDateForm(commentsToEdit[curFocus!].date!)
                             : ''
                         }
-                        onChange={(e) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const nextValue = e.target.value;
                           if (!/^\d{4}-\d{2}-\d{2}$/.test(nextValue)) return;
                           const curCommentsToEdit = complexClone(commentsToEdit);
                           curCommentsToEdit[curFocus!].date = nextValue;
                           setCurCommentsToEdit(curCommentsToEdit);
                         }}
-                        onClick={(e) => {
+                        onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                           if (e.currentTarget.showPicker) {
                             e.currentTarget.showPicker();
                           }
@@ -250,7 +250,7 @@ export default function CommentModal({ newsId }: CommentModalProps) {
                         type="text"
                         className="form-control"
                         value={commentsToEdit[curFocus!].comment}
-                        onChange={(e) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const curCommentsToEdit = complexClone(commentsToEdit);
                           curCommentsToEdit[curFocus!].comment = e.currentTarget.value;
                           setCurCommentsToEdit(curCommentsToEdit);
@@ -263,7 +263,7 @@ export default function CommentModal({ newsId }: CommentModalProps) {
                         type="text"
                         className="form-control"
                         value={commentsToEdit[curFocus!].url ?? ''}
-                        onChange={(e) => {
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                           const curCommentsToEdit = complexClone(commentsToEdit);
                           curCommentsToEdit[curFocus!].url = e.currentTarget.value;
                           setCurCommentsToEdit(curCommentsToEdit);

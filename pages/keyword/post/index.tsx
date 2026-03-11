@@ -1,6 +1,6 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { PrimaryButton } from '@components/common/button';
@@ -100,7 +100,7 @@ export default function KeywordPost({ data }: pageProps) {
               type="text"
               className="form-control"
               value={keyword}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setKeyword(e.currentTarget.value);
               }}
             ></Input>
@@ -115,7 +115,7 @@ export default function KeywordPost({ data }: pageProps) {
             <Select
               className="form-select"
               value={category}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                 setCategory(e.currentTarget.value as KeywordCategory);
               }}
             >

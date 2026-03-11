@@ -1,6 +1,6 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { debounce } from '@/utils/tools';
 import { NewsSummary } from '@interface/news';
-import { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 
 interface DateEntry {
@@ -98,7 +98,7 @@ export default function EditWeeklySummary({
               type="text"
               placeholder="2026.01.19"
               value={entry.date}
-              onChange={(e) => updateEntry(idx, 'date', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEntry(idx, 'date', e.target.value)}
             />
             <RemoveButton type="button" onClick={() => removeEntry(idx)}>
               ✕
@@ -107,7 +107,7 @@ export default function EditWeeklySummary({
           <SummaryTextarea
             placeholder="요약 내용 (줄바꿈으로 문단 구분)"
             value={entry.summary}
-            onChange={(e) => updateEntry(idx, 'summary', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => updateEntry(idx, 'summary', e.target.value)}
           />
         </EntryCard>
       ))}
