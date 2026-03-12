@@ -1,3 +1,4 @@
+import React from 'react';
 import { complexClone } from '@/utils';
 import { useArr } from '@/utils/hook/useArr';
 import { getCommentRest } from '@/utils/news';
@@ -103,7 +104,7 @@ export default function CommentInput({ comments, setComments }: CommentInputProp
             <CommentSelect
               className="form-select"
               value={comments[curFocus]}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
                 const curComments = complexClone(comments);
                 curComments[curFocus] = e.currentTarget.value as commentType;
                 setComments(curComments);

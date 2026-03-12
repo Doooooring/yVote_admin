@@ -23,7 +23,7 @@ import {
 } from '@interface/news';
 import { useCommonStore } from '@store/common';
 import { useNewsStore } from '@store/news';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import CommentModal from '../commenModal';
 import EditNewsSummaries from '../editNewsSummaries/editNewsSummaries';
@@ -224,7 +224,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               type="text"
               className="form-control"
               value={news.title ?? ''}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setNewsVal('title', e.currentTarget.value);
               }}
             ></Input>
@@ -250,7 +250,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               type="text"
               className="form-control"
               value={news.subTitle ?? ''}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setNewsVal('subTitle', e.currentTarget.value);
               }}
             ></Input>
@@ -259,7 +259,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               type="text"
               className="form-control"
               value={news.slug ?? ''}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setNewsVal('slug', e.currentTarget.value);
               }}
             ></Input>
@@ -272,11 +272,11 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               max="9999-12-31"
               className="form-control"
               value={news.date ? getStandardDateForm(news.date!) : ''}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const nextValue = e.target.value;
                 setNewsVal('date', nextValue);
               }}
-              onClick={(e) => {
+              onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                 if (e.currentTarget.showPicker) {
                   e.currentTarget.showPicker();
                 }
@@ -406,7 +406,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                   <VoteInput
                     type="text"
                     value={news.billVoteResult ?? ''}
-                    onChange={(e) => setNewsVal('billVoteResult', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewsVal('billVoteResult', e.target.value)}
                     placeholder="원안가결, 수정가결, 부결 등"
                   />
                 </VoteInputGroup>
@@ -415,7 +415,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                   <VoteInput
                     type="number"
                     value={news.billVoteTotal ?? 0}
-                    onChange={(e) => setNewsVal('billVoteTotal', Number(e.target.value))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewsVal('billVoteTotal', Number(e.target.value))}
                   />
                 </VoteInputGroup>
               </VoteInputRow>
@@ -440,7 +440,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                       onDragStart={() => {
                         dragIdxRef.current = idx;
                       }}
-                      onDragOver={(e) => {
+                      onDragOver={(e: React.DragEvent<HTMLTableRowElement>) => {
                         e.preventDefault();
                         setDragOverIdx(idx);
                       }}
@@ -470,7 +470,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                         <VoteInput
                           type="text"
                           value={pv.party}
-                          onChange={(e) => {
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                             const updated = [...(news.billVoteByParty ?? [])];
                             updated[idx] = { ...updated[idx], party: e.target.value };
                             setNewsVal('billVoteByParty', updated);
@@ -483,7 +483,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                           <VoteInput
                             type="number"
                             value={pv[field]}
-                            onChange={(e) => {
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                               const updated = [...(news.billVoteByParty ?? [])];
                               updated[idx] = { ...updated[idx], [field]: Number(e.target.value) };
                               setNewsVal('billVoteByParty', updated);
@@ -577,7 +577,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               type="text"
               className="form-control"
               value={news.opinionLeft}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const v = e.currentTarget.value;
                 setNewsVal('opinionLeft', v);
               }}
@@ -587,7 +587,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               type="text"
               className="form-control"
               value={news.opinionRight}
-              onChange={(e) => {
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 const v = e.currentTarget.value;
                 setNewsVal('opinionRight', v);
               }}

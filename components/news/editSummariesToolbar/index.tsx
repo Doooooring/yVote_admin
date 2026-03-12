@@ -9,7 +9,7 @@ import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { commentType, NewsSummary } from '@interface/news';
 import { newsRepositories } from '@repositories/news';
-import { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import Select_DropDown from '../../common/select/select_dropdown/select_dropdown';
 
@@ -109,7 +109,7 @@ export default function EditSummariesToolbar({
       <SlideWrapper>
         <PopUpButtonLayout>
           <PopUpButton
-            onClick={(e) => {
+            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
               setIsMenuOpen(!isMenuOpen);
             }}
           >

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import styled from 'styled-components';
 
 interface ModalProps {
@@ -18,7 +18,7 @@ export default function CommonModal({
 
   return (
     <Wrapper
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget && outClickAction) {
           outClickAction();
         }

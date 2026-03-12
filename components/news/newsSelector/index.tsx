@@ -70,7 +70,7 @@ const SelectWrapper = styled.div`
   width: 50%;
   height: 400px;
 
-  overflow: scroll;
+  overflow: auto;
   background-color: white;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;

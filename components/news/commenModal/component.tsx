@@ -5,7 +5,7 @@ import { complexClone } from '@/utils';
 import { getStandardDateForm, getDotDateForm } from '@/utils/tools';
 import { faArrowRight } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useCallback, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import styled from 'styled-components';
 
 type CommentForm = {
@@ -151,7 +151,7 @@ export function EditBulkComments({
                       type="text"
                       className="form-control"
                       value={comment.title}
-                      onChange={(e) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         onChangeInput(index, 'title', e.target.value);
                       }}
                     />
@@ -162,7 +162,7 @@ export function EditBulkComments({
                       type="text"
                       className="form-control"
                       value={comment.comment}
-                      onChange={(e) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         onChangeInput(index, 'comment', e.target.value);
                       }}
                     />
@@ -175,10 +175,10 @@ export function EditBulkComments({
                       max="9999-12-31"
                       className="form-control"
                       value={comment.date || ''}
-                      onChange={(e) => {
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                         onChangeInput(index, 'date', e.target.value);
                       }}
-                      onClick={(e) => {
+                      onClick={(e: React.MouseEvent<HTMLInputElement>) => {
                         if (e.currentTarget.showPicker) {
                           e.currentTarget.showPicker();
                         }
@@ -317,7 +317,8 @@ const RightColumnLayer = styled.div`
 
   min-height: 100px;
   max-height: 500px;
-  overflow: scroll;
+  overflow: auto;
+  background-color: white;
   div.input_layer_header {
     display: flex;
     flex-direction: row;

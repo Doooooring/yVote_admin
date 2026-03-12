@@ -1,3 +1,4 @@
+import React from 'react';
 import { NewsTitle } from '@interface/news';
 import styled from 'styled-components';
 
@@ -15,7 +16,7 @@ export default function IdSelector({
   return (
     <Wrapper
       state={newsSelectorUp}
-      onClick={(e) => {
+      onClick={(e: React.MouseEvent<HTMLDivElement>) => {
         if (e.target === e.currentTarget) {
           setNewsSelectorUp(false);
         }
@@ -65,7 +66,7 @@ const Wrapper = styled.div<WrapperProps>`
 const SelectWrapper = styled.div`
   width: 50%;
   max-height: 400px;
-  overflow: scroll;
+  overflow: auto;
   background-color: white;
   border: 1px solid #ced4da;
   border-radius: 0.25rem;
