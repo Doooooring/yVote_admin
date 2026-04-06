@@ -545,6 +545,54 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               />
             </CabinetExtraBox>
           </CabinetExtraWrapper>
+        ) : news.newsType === NewsType.executive ? (
+          <CabinetExtraWrapper>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>주요 내용</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.billSummary ?? ''}
+                onChange={(value) => {
+                  setNewsVal('billSummary', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>시행령 상세보기</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.billDetail ?? ''}
+                onChange={(value) => {
+                  setNewsVal('billDetail', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>수정안 내용</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.billAmendment ?? ''}
+                onChange={(value) => {
+                  setNewsVal('billAmendment', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>찬성 토론</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.proDebate ?? ''}
+                onChange={(value) => {
+                  setNewsVal('proDebate', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>반대 토론</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.conDebate ?? ''}
+                onChange={(value) => {
+                  setNewsVal('conDebate', value);
+                }}
+              />
+            </CabinetExtraBox>
+          </CabinetExtraWrapper>
         ) : (
           <NewsPreviewWrapper>
             {summarySelected != null ? (
