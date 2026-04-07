@@ -31,6 +31,7 @@ export enum CommentQualification {
 export enum NewsType {
   bill = 'bill',
   teukprosecution = 'teukprosecution',
+  northkorea = 'northkorea',
   constitution = 'constitution',
   executive = 'executive',
   cabinet = 'cabinet',
@@ -64,6 +65,8 @@ export const newsTypesToKor = (newsType: NewsType) => {
       return '일주일';
     case NewsType.teukprosecution:
       return '특검';
+    case NewsType.northkorea:
+      return '북한';
     case NewsType.others:
       return '기타';
     default:
