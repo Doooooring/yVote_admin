@@ -40,6 +40,7 @@ export enum NewsType {
   debate = 'debate',
   election = 'election',
   weekly = 'weekly',
+  investigation = 'investigation',
   others = 'others',
 }
 
@@ -67,6 +68,8 @@ export const newsTypesToKor = (newsType: NewsType) => {
       return '특검';
     case NewsType.northkorea:
       return '북한';
+    case NewsType.investigation:
+      return '국정조사';
     case NewsType.others:
       return '기타';
     default:
