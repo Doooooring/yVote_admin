@@ -157,6 +157,16 @@ export interface PartyVote {
   absent: number;
 }
 
+export interface BillItem {
+  billNo: string;
+  billName: string;
+  detail?: string;
+  proposalReason?: string;
+  voteResult?: string;
+  voteTotal?: number;
+  voteByParty?: PartyVote[];
+}
+
 export interface News {
   id: number;
   order: number;
@@ -176,6 +186,7 @@ export interface News {
   billVoteResult?: string;
   billVoteTotal?: number;
   billVoteByParty?: PartyVote[];
+  bills?: BillItem[];
   date: string | null;
   keywords: Array<Keyword>;
   newsImage: string | null;
@@ -224,6 +235,7 @@ export interface NewsOrg
     | 'billVoteResult'
     | 'billVoteTotal'
     | 'billVoteByParty'
+    | 'bills'
     | 'date'
     | 'state'
     | 'newsImage'
@@ -267,6 +279,7 @@ export const defaultNews = {
   billVoteResult: '',
   billVoteTotal: 0,
   billVoteByParty: [],
+  bills: [],
   date: null,
   state: NewsState.NotPublished,
   newsImage: '',
