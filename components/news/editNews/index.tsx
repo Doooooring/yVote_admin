@@ -429,7 +429,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
             </KeywordWrapper>
           </KeywordSetter>
         </ContentEditWrapper>
-        {news.newsType === NewsType.cabinet ? (
+        {news.newsType === NewsType.cabinet || news.newsType === NewsType.plenary ? (
           <CabinetExtraWrapper>
             <CabinetExtraBox>
               <CabinetExtraTitle>안건 목록</CabinetExtraTitle>

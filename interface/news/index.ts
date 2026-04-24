@@ -42,6 +42,7 @@ export enum NewsType {
   weekly = 'weekly',
   investigation = 'investigation',
   budget = 'budget',
+  plenary = 'plenary',
   others = 'others',
 }
 
@@ -73,6 +74,8 @@ export const newsTypesToKor = (newsType: NewsType) => {
       return '국정조사';
     case NewsType.budget:
       return '예산';
+    case NewsType.plenary:
+      return '본회의';
     case NewsType.others:
       return '기타';
     default:
