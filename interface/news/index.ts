@@ -19,7 +19,48 @@ export enum commentType {
   더불어민주당 = '더불어민주당',
   기타 = '기타',
   헌법재판소 = '헌법재판소',
+  // Historical lineage names — see yvote_automation party_history.py for
+  // cutoff dates. Backfill scrapes for past dates emit these instead of
+  // the modern canonical names.
+  대통령실 = '대통령실',
+  한나라당 = '한나라당',
+  새누리당 = '새누리당',
+  자유한국당 = '자유한국당',
+  미래통합당 = '미래통합당',
+  통합민주당 = '통합민주당',
+  민주당 = '민주당',
+  민주통합당 = '민주통합당',
+  새정치민주연합 = '새정치민주연합',
 }
+
+// "Alive" commentTypes — the ones an editor reaches for on a current
+// (post-2025-12-29) news. Surfaced first in the admin commentType
+// dropdown; historical (era-only) types follow after a separator.
+export const CURRENT_COMMENT_TYPES: ReadonlyArray<commentType> = [
+  commentType.와이보트,
+  commentType.입법부,
+  commentType.행정부,
+  commentType.청와대,
+  commentType.국민의힘,
+  commentType.더불어민주당,
+  commentType.헌법재판소,
+  commentType.기타,
+];
+
+export const HISTORICAL_COMMENT_TYPES: ReadonlyArray<commentType> = [
+  // 청와대 lineage
+  commentType.대통령실,
+  // Conservative lineage (oldest → newest)
+  commentType.한나라당,
+  commentType.새누리당,
+  commentType.자유한국당,
+  commentType.미래통합당,
+  // Progressive lineage (oldest → newest)
+  commentType.통합민주당,
+  commentType.민주당,
+  commentType.민주통합당,
+  commentType.새정치민주연합,
+];
 
 export enum CommentQualification {
   YVOTE = 0,
