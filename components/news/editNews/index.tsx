@@ -10,6 +10,7 @@ import TextEditor from '@components/common/textEditor';
 import Select_DropDown from '@components/common/select/select_dropdown/select_dropdown';
 import { KeywordTitle } from '@interface/keywords';
 import {
+  BillItem,
   commentType,
   NewsState,
   NewsStateKor,
@@ -78,6 +79,60 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
   // Drag-and-drop for party vote rows
   const dragIdxRef = useRef<number | null>(null);
   const [dragOverIdx, setDragOverIdx] = useState<number | null>(null);
+
+  // Per-bill navigation (multi-bill aware). Legacy single-bill news read bills[0]
+  // lazily — if bills is empty but flat billDetail/billVote* have content, we
+  // synthesize a single-item array so the editor always has something to edit.
+  const bills = news.bills ?? [];
+  const hasMultipleBills = bills.length > 1;
+  const [billIndex, setBillIndex] = useState(0);
+  useEffect(() => {
+    if (billIndex >= Math.max(1, bills.length)) setBillIndex(0);
+  }, [bills.length, billIndex]);
+
+  const ensureBills = useCallback((): BillItem[] => {
+    if (bills.length > 0) return [...bills];
+    return [{
+      billNo: '',
+      billName: '',
+      detail: news.billDetail ?? '',
+      voteResult: news.billVoteResult ?? '',
+      voteTotal: news.billVoteTotal ?? 0,
+      voteByParty: news.billVoteByParty ?? [],
+    }];
+  }, [bills, news.billDetail, news.billVoteResult, news.billVoteTotal, news.billVoteByParty]);
+
+  const currentBill: BillItem = (bills[billIndex] ?? ensureBills()[0]) ?? {
+    billNo: '', billName: '',
+  };
+
+  const updateCurrentBill = useCallback((patch: Partial<BillItem>) => {
+    const arr = ensureBills();
+    const idx = Math.min(billIndex, arr.length - 1);
+    arr[idx] = { ...arr[idx], ...patch };
+    setNewsVal('bills', arr);
+  }, [ensureBills, billIndex, setNewsVal]);
+
+  const gotoPrevBill = useCallback(() => {
+    setBillIndex((i) => (i <= 0 ? Math.max(0, bills.length - 1) : i - 1));
+  }, [bills.length]);
+  const gotoNextBill = useCallback(() => {
+    setBillIndex((i) => (i >= bills.length - 1 ? 0 : i + 1));
+  }, [bills.length]);
+
+  // Keyboard arrows navigate bills — skipped when focus is in a text input
+  // or editor (admin has many of these; don't hijack caret movement).
+  useEffect(() => {
+    if (!hasMultipleBills) return;
+    const onKey = (e: KeyboardEvent) => {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return;
+      if (e.key === 'ArrowLeft') { e.preventDefault(); gotoPrevBill(); }
+      else if (e.key === 'ArrowRight') { e.preventDefault(); gotoNextBill(); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [hasMultipleBills, gotoPrevBill, gotoNextBill]);
 
   // Helper: Parse HTML agenda input into JSON structure (browser-safe)
   function htmlAgendaToJson(html: string) {
@@ -192,24 +247,45 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
       const bi = summaryOrder.indexOf(b.commentType);
       return (ai === -1 ? summaryOrder.length : ai) - (bi === -1 ? summaryOrder.length : bi);
     });
-    // Normalize &nbsp; and insert space after numbered prefixes like "25." when missing
-    const trimmedBillDetail = (news.billDetail ?? '')
-      .replace(/&nbsp;/g, ' ')
-      .replace(/>(\d+(?:의\d+)?\.)(<)/g, '>$1 $2');
+    // Normalize detail HTML (&nbsp; → space, "25." missing space fix).
+    const normalizeDetail = (html: string): string =>
+      html
+        .replace(/&nbsp;/g, ' ')
+        .replace(/>(\d+(?:의\d+)?\.)(<)/g, '>$1 $2');
+
+    const normalizedBills = (news.bills ?? []).map((b) => ({
+      ...b,
+      detail: b.detail ? normalizeDetail(b.detail) : b.detail,
+    }));
+
+    // Transitional: mirror bills[0] into legacy flat fields so the public
+    // frontend (not yet bills-aware) keeps rendering the primary bill.
+    const primary = normalizedBills[0];
+    const flatFromPrimary = primary
+      ? {
+          billDetail: primary.detail ?? '',
+          billVoteResult: primary.voteResult ?? '',
+          billVoteTotal: primary.voteTotal ?? 0,
+          billVoteByParty: primary.voteByParty ?? [],
+        }
+      : {
+          billDetail: normalizeDetail(news.billDetail ?? ''),
+          billVoteResult: news.billVoteResult ?? '',
+          billVoteTotal: news.billVoteTotal ?? 0,
+          billVoteByParty: news.billVoteByParty ?? [],
+        };
+
     const { comments, ...rest } = news;
     submit({
       ...rest,
       summaries: sortedSummaries,
       agendaList,
       speechContent,
-      billDetail: trimmedBillDetail,
       billSummary: news.billSummary,
       proDebate: news.proDebate,
       conDebate: news.conDebate,
-      billAmendment: news.billAmendment,
-      billVoteResult: news.billVoteResult,
-      billVoteTotal: news.billVoteTotal,
-      billVoteByParty: news.billVoteByParty,
+      bills: normalizedBills,
+      ...flatFromPrimary,
     });
     return;
   }, [news, submit]);
@@ -353,7 +429,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
             </KeywordWrapper>
           </KeywordSetter>
         </ContentEditWrapper>
-        {news.newsType === NewsType.cabinet ? (
+        {news.newsType === NewsType.cabinet || news.newsType === NewsType.plenary ? (
           <CabinetExtraWrapper>
             <CabinetExtraBox>
               <CabinetExtraTitle>안건 목록</CabinetExtraTitle>
@@ -381,7 +457,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
         ) : news.newsType === NewsType.bill ? (
           <CabinetExtraWrapper>
             <CabinetExtraBox>
-              <CabinetExtraTitle>법안 요약</CabinetExtraTitle>
+              <CabinetExtraTitle>법안 요약 (전체)</CabinetExtraTitle>
               <CabinetTextEditor
                 value={news.billSummary ?? ''}
                 onChange={(value) => {
@@ -389,24 +465,42 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                 }}
               />
             </CabinetExtraBox>
+
+            {hasMultipleBills && (
+              <BillNavBar>
+                <NavArrow onClick={gotoPrevBill} aria-label="이전 법안">◀</NavArrow>
+                <BillNavLabel>
+                  <span className="index">{billIndex + 1} / {bills.length}</span>
+                  <span className="name">{currentBill.billName || currentBill.billNo || '(이름 없음)'}</span>
+                </BillNavLabel>
+                <NavArrow onClick={gotoNextBill} aria-label="다음 법안">▶</NavArrow>
+              </BillNavBar>
+            )}
+
             <CabinetExtraBox>
-              <CabinetExtraTitle>법안 상세보기</CabinetExtraTitle>
+              <CabinetExtraTitle>
+                법안 상세보기
+                {hasMultipleBills && <BillScopeHint> — {currentBill.billName}</BillScopeHint>}
+              </CabinetExtraTitle>
               <CabinetTextEditor
-                value={news.billDetail ?? ''}
+                value={currentBill.detail ?? ''}
                 onChange={(value) => {
-                  setNewsVal('billDetail', value);
+                  updateCurrentBill({ detail: value });
                 }}
               />
             </CabinetExtraBox>
             <CabinetExtraBox>
-              <CabinetExtraTitle>표결 정보</CabinetExtraTitle>
+              <CabinetExtraTitle>
+                표결 정보
+                {hasMultipleBills && <BillScopeHint> — {currentBill.billName}</BillScopeHint>}
+              </CabinetExtraTitle>
               <VoteInputRow>
                 <VoteInputGroup>
                   <VoteInputLabel>의결결과</VoteInputLabel>
                   <VoteInput
                     type="text"
-                    value={news.billVoteResult ?? ''}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewsVal('billVoteResult', e.target.value)}
+                    value={currentBill.voteResult ?? ''}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCurrentBill({ voteResult: e.target.value })}
                     placeholder="원안가결, 수정가결, 부결 등"
                   />
                 </VoteInputGroup>
@@ -414,8 +508,8 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                   <VoteInputLabel>총투표</VoteInputLabel>
                   <VoteInput
                     type="number"
-                    value={news.billVoteTotal ?? 0}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewsVal('billVoteTotal', Number(e.target.value))}
+                    value={currentBill.voteTotal ?? 0}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateCurrentBill({ voteTotal: Number(e.target.value) })}
                   />
                 </VoteInputGroup>
               </VoteInputRow>
@@ -432,7 +526,7 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                   </tr>
                 </thead>
                 <tbody>
-                  {(news.billVoteByParty ?? []).map((pv, idx) => (
+                  {(currentBill.voteByParty ?? []).map((pv, idx) => (
                     <VotePartyRow
                       key={idx}
                       draggable
@@ -450,10 +544,10 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                       onDrop={() => {
                         const from = dragIdxRef.current;
                         if (from !== null && from !== idx) {
-                          const updated = [...(news.billVoteByParty ?? [])];
+                          const updated = [...(currentBill.voteByParty ?? [])];
                           const [item] = updated.splice(from, 1);
                           updated.splice(idx, 0, item);
-                          setNewsVal('billVoteByParty', updated);
+                          updateCurrentBill({ voteByParty: updated });
                         }
                         dragIdxRef.current = null;
                         setDragOverIdx(null);
@@ -471,9 +565,9 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                           type="text"
                           value={pv.party}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                            const updated = [...(news.billVoteByParty ?? [])];
+                            const updated = [...(currentBill.voteByParty ?? [])];
                             updated[idx] = { ...updated[idx], party: e.target.value };
-                            setNewsVal('billVoteByParty', updated);
+                            updateCurrentBill({ voteByParty: updated });
                           }}
                           placeholder="정당명"
                         />
@@ -484,9 +578,9 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                             type="number"
                             value={pv[field]}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                              const updated = [...(news.billVoteByParty ?? [])];
+                              const updated = [...(currentBill.voteByParty ?? [])];
                               updated[idx] = { ...updated[idx], [field]: Number(e.target.value) };
-                              setNewsVal('billVoteByParty', updated);
+                              updateCurrentBill({ voteByParty: updated });
                             }}
                             style={{ width: '70px' }}
                           />
@@ -495,8 +589,8 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
                       <td>
                         <VoteDeleteBtn
                           onClick={() => {
-                            const updated = (news.billVoteByParty ?? []).filter((_, i) => i !== idx);
-                            setNewsVal('billVoteByParty', updated);
+                            const updated = (currentBill.voteByParty ?? []).filter((_, i) => i !== idx);
+                            updateCurrentBill({ voteByParty: updated });
                           }}
                         >
                           ✕
@@ -508,14 +602,55 @@ export default function EditNews({ newsOrg, submit }: EditNewsProps) {
               </VotePartyTable>
               <VoteAddBtn
                 onClick={() => {
-                  setNewsVal('billVoteByParty', [
-                    ...(news.billVoteByParty ?? []),
-                    { party: '', for: 0, against: 0, abstain: 0, absent: 0 },
-                  ]);
+                  updateCurrentBill({
+                    voteByParty: [
+                      ...(currentBill.voteByParty ?? []),
+                      { party: '', for: 0, against: 0, abstain: 0, absent: 0 },
+                    ],
+                  });
                 }}
               >
                 + 정당 추가
               </VoteAddBtn>
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>찬성 토론</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.proDebate ?? ''}
+                onChange={(value) => {
+                  setNewsVal('proDebate', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>반대 토론</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.conDebate ?? ''}
+                onChange={(value) => {
+                  setNewsVal('conDebate', value);
+                }}
+              />
+            </CabinetExtraBox>
+          </CabinetExtraWrapper>
+        ) : news.newsType === NewsType.executive ? (
+          <CabinetExtraWrapper>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>주요 내용</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.billSummary ?? ''}
+                onChange={(value) => {
+                  setNewsVal('billSummary', value);
+                }}
+              />
+            </CabinetExtraBox>
+            <CabinetExtraBox>
+              <CabinetExtraTitle>시행령 상세보기</CabinetExtraTitle>
+              <CabinetTextEditor
+                value={news.billDetail ?? ''}
+                onChange={(value) => {
+                  setNewsVal('billDetail', value);
+                }}
+              />
             </CabinetExtraBox>
             <CabinetExtraBox>
               <CabinetExtraTitle>수정안 내용</CabinetExtraTitle>
@@ -714,6 +849,65 @@ const CabinetExtraTitle = styled.div`
   font-size: 14px;
   font-weight: bold;
   margin-bottom: 8px;
+`;
+
+const BillScopeHint = styled.span`
+  font-size: 12px;
+  font-weight: 500;
+  color: #6c757d;
+  margin-left: 6px;
+`;
+
+const BillNavBar = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f1f3f5;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+`;
+
+const NavArrow = styled.button`
+  background: #ffffff;
+  border: 1px solid #adb5bd;
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:hover { background: #e9ecef; }
+`;
+
+const BillNavLabel = styled.div`
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  text-align: center;
+
+  .index {
+    font-size: 11px;
+    color: #6c757d;
+    letter-spacing: 0.04em;
+  }
+
+  .name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #212529;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
 `;
 
 const CabinetEditorWrapper = styled.div`
